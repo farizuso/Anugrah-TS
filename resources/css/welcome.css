@@ -1,0 +1,11 @@
+.bg-image{
+    background-image: linear-gradient(rgba(0, 0, 0, 0.250), rgba(0, 0, 0, 0.250)), url(../assets/img/hero.jpg);
+    background-position: center;
+    background-size: cover;
+}
+
+.bg-konten {
+    background-image: url(../assets/img/GTR.jpeg);
+    background-position: center;
+    background-size: cover;
+}
