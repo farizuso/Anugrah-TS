@@ -23,6 +23,7 @@ const sidebarItems = [
         href: "/admin/dashboard",
         icon: <LayoutDashboardIcon />,
     },
+    // {label: "Laporan Penjualan", href: "/admin/laporan_penjualan", icon: <SquareGanttChart />},
     { label: "Produk", href: "/admin/produk", icon: <BsFillBoxSeamFill size={20} />},
     { label: "Rekap", href: "/admin/rekap", icon: <FaBookBible size={20} />},
     { label: "Transaksi", href: "/admin/transaksi", icon: <Banknote /> },

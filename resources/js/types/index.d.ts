@@ -14,6 +14,17 @@ export interface TodoWithMethod extends Todo {
     _method: string;
 }
 
+export interface LaporanPembelian{
+    id: number;
+    tgl_pembelian: Date;
+    Produk: Produk;
+    nama_supplier: string;
+    quantity: string;
+    harga: string;
+    total: string;
+    keterangan: string;
+}
+
 export interface Produk{
     id: number;
     no_botol: string;

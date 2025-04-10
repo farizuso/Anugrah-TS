@@ -11,23 +11,23 @@ import {
     AlertDialogTrigger,
 } from "@/Components/ui/alert-dialog"
 import { Button } from "@/Components/ui/button"
-import { Pelanggan, Todo } from '@/types'
+import { LaporanPembelian, Todo } from '@/types'
 import { useForm } from '@inertiajs/react'
 import { FaTrash } from "react-icons/fa";
 
 
 
-interface DeletePelanggan {
-    pelanggandelete:Pelanggan;
+interface DeleteLaporanPembelian {
+    pembeliandelete:LaporanPembelian;
 }
-const Delete = ({pelanggandelete}:DeletePelanggan) => {
+const Delete = ({pembeliandelete}:DeleteLaporanPembelian) => {
 
     const { delete: destroy ,data, setData, post, processing, errors, reset } = useForm({
         name: "",
     })
 
-    const destroyPelanggan = (id: number) => {
-        destroy(route("admin.pelanggan.destroy", id), {
+    const destroyPembelian = (id: number) => {
+        destroy(route("admin.pembelian.destroy", id), {
             onSuccess: () => reset(),
         });
     }
@@ -48,7 +48,7 @@ const Delete = ({pelanggandelete}:DeletePelanggan) => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => destroyPelanggan(pelanggandelete.id)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => destroyPembelian(pembeliandelete.id)}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

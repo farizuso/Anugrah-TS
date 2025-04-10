@@ -89,19 +89,7 @@ const Edit = ({ rekapedit }: EditRekap) => {
         // Here, it's simply adding the value locally.
     };
 
-<<<<<<< HEAD
-    const handleDateSelect = (field:any, date:any) => {
-        if (date) {
-            // Set the time to noon to avoid timezone issues
-            const adjustedDate = new Date(date);
-            adjustedDate.setHours(12, 0, 0, 0);
-            setData({ ...data, [field]: adjustedDate.toISOString().split('T')[0] });
-        } else {
-            setData({ ...data, [field]: "" });
-        }
-    };
-    
-=======
+
     // const handleDateSelect = (field: 'tgl_keluar' | 'tgl_kembali' | 'tgl_masuk_pabrik', date: Date | undefined) => {
     //     if (date) {
     //         // Format the date and update the corresponding field
@@ -110,7 +98,6 @@ const Edit = ({ rekapedit }: EditRekap) => {
     // };
 
 
->>>>>>> 2aacc0438750ed422cc56610b103dc799996325c
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();

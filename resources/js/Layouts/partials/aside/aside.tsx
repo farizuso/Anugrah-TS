@@ -10,6 +10,10 @@ export function Aside() {
                 <IconDashboard />
                 <span>Dashboard</span>
             </AsideLink>
+            <AsideLink active={route().current('admin.LaporanPembelian.index')} href={route('admin.LaporanPembelian.index')}>
+                <IconBrandProducthunt />
+                <span>Laporan Pembelian</span>
+            </AsideLink>
             <AsideLink active={route().current('admin.produk.index')} href={route('admin.produk.index')}>
                 <IconBrandProducthunt />
                 <span>Produk</span>
