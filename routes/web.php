@@ -37,7 +37,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('/todos', TodoController::class)->names('admin.todo');
     
-    Route::resource('/admin/produk', ProductController::class)->names('admin.produk');
+    // Route::resource('/admin/produk', ProductController::class)->names('admin.produk');
+    Route::get('/admin/produk', [ProductController::class, 'index'])->name('admin.produk.index');
+    Route::put('/admin/produk/{produk}', [ProductController::class, 'update'])->name('admin.produk.update');
+    Route::delete('/admin/produk/{produk}', [ProductController::class, 'destroy'])->name('admin.produk.destroy');
+    Route::post('/admin/produk', [ProductController::class, 'store'])->name('admin.produk.store');
+    
     Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
     Route::resource('/admin/rekap', RekapController::class)->names('admin.rekap');
     Route::resource('/admin/Pelanggan', PelangganController::class)->names('admin.pelanggan');
