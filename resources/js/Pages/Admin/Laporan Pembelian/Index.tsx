@@ -30,6 +30,7 @@ import { CalendarIcon } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { Popover } from "@headlessui/react";
 
+
 interface LaporanPembelianProps {
     posts: LaporanPembelian[];
 }
@@ -39,8 +40,8 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
 
     const { delete: destroy, data, setData, post, processing, errors, reset } = useForm({
         tgl_pembelian: "",
-        produk_id: "",
         nama_supplier: "",
+        produk_id: "",
         quantity: "",
         harga: "",
         total: "",
@@ -164,6 +165,34 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                         name="harga"
                                         onChange={(e) => setData("harga", e.target.value)}
                                         value={data.harga}
+                                    />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <Label htmlFor="total">Total</Label>
+                                    <Input
+                                        id="total"
+                                        type="number"
+                                        name="total"
+                                        onChange={(e) => setData("total", e.target.value)}
+                                        value={data.harga}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="keterangan">
+                                        Keterangan
+                                    </Label>
+                                    <Input
+                                        id="keterangan"
+                                        type="text"
+                                        name="keterangan"
+                                        onChange={(e) =>
+                                            setData(
+                                                "keterangan",
+                                                e.target.value
+                                            )
+                                        }
+                                        value={data.keterangan}
                                     />
                                 </div>
                             </CardContent>
