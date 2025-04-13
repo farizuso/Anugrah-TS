@@ -11,16 +11,13 @@ class LaporanPembelian extends Model
 
     protected $fillable = [
         'tgl_pembelian',
-        'nama_supplier',  
-        'produk_id',   
-        'quantity',
-        'harga',
+        'nama_supplier',
         'total',
         'keterangan',
     ];
 
-    public function produk()
+    public function details()
     {
-        return $this->belongsTo(Produk::class);
+        return $this->hasMany(LaporanPembelianDetail::class, 'laporan_pembelian_id');
     }
 }

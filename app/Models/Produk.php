@@ -10,18 +10,18 @@ class Produk extends Model
     use HasFactory;
 
     protected $fillable = [
-        'no_botol',
         'nama_produk',
         'simbol',
-        'harga',
+        'jenis',
+        'harga_jual',
     ];
 
     public function rekaps()
     {
         return $this->hasMany(Rekap::class);
     }
-    public function stoks()
-    {
-        return $this->hasMany(Stok::class);
-    }
+    // public function stoks()
+    // {
+    //     return $this->hasMany(Stok::class);
+    // }
 }

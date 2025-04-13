@@ -10,37 +10,35 @@ import {
 } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { Produk } from "@/types";
+import { Supplier } from "@/types";
 // import { Todo, TodoWithMethod } from "@/types"
 import { useForm } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import { BsPencilSquare } from "react-icons/bs";
 
-interface EditProduk {
-    produkedit: Produk;
+interface EditSupplier {
+    supplieredit: Supplier;
 }
-const Edit = ({ produkedit }: EditProduk) => {
+const Edit = ({ supplieredit }: EditSupplier) => {
     const [open, setOpen] = useState(false);
     const { put, data, setData, post, processing, errors, reset } = useForm({
-        nama_produk: produkedit.nama_produk,
-        simbol: produkedit.simbol,
-        jenis: produkedit.jenis,
-        harga_jual: produkedit.harga_jual,
+        nama_supplier: supplieredit.nama_supplier,
+        alamat: supplieredit.alamat,
+        no_telp: supplieredit.no_telp,
     });
 
     useEffect(() => {
         setData({
             ...data,
-            nama_produk: produkedit.nama_produk,
-            simbol: produkedit.simbol,
-            jenis: produkedit.jenis,
-            harga_jual: produkedit.harga_jual,
+            nama_supplier: supplieredit.nama_supplier,
+            alamat: supplieredit.alamat,
+            no_telp: supplieredit.no_telp,
         });
-    }, [produkedit]);
-    console.log(produkedit);
+    }, [supplieredit]);
+    console.log(supplieredit);
     const submit = (e: any) => {
         e.preventDefault();
-        put(route("admin.produk.update", [produkedit]));
+        put(route("admin.supplier.update", [supplieredit]));
     };
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -64,51 +62,51 @@ const Edit = ({ produkedit }: EditProduk) => {
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="name" className="text-right">
-                            Nama produk
+                            Nama Supplier
                         </Label>
                         <Input
-                            id="nama_produk"
+                            id="nama_supplier"
                             // defaultValue="Pedro Duarte"
                             className="col-span-3"
-                            name="nama_produk"
-                            value={data.nama_produk}
+                            name="nama_supplier"
+                            value={data.nama_supplier}
                             onChange={(e) =>
-                                setData("nama_produk", e.target.value)
+                                setData("nama_supplier", e.target.value)
                             }
-                            placeholder="masukkan nama produk"
+                            placeholder="masukkan nama supplier"
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="name" className="text-right">
-                            Simbol
+                            Alamat
                         </Label>
                         <Input
-                            id="simbol"
+                            id="alamat"
                             // defaultValue="Pedro Duarte"
                             className="col-span-3"
-                            name="simbol"
-                            value={data.simbol}
-                            onChange={(e) => setData("simbol", e.target.value)}
-                            placeholder="masukkan simbol"
+                            name="alamat"
+                            value={data.alamat}
+                            onChange={(e) => setData("alamat", e.target.value)}
+                            placeholder="masukkan alamat"
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="name" className="text-right">
-                            Harga
+                            No_Telp
                         </Label>
                         <Input
-                            id="harga_jual"
+                            id="no_telp"
                             defaultValue="Pedro Duarte"
                             className="col-span-3"
-                            name="harga_jual"
-                            value={data.harga_jual}
+                            name="no_telp"
+                            value={data.no_telp}
                             onChange={(e) =>
                                 setData(
-                                    "harga_jual",
+                                    "no_telp",
                                     parseFloat(e.target.value) || 0
                                 )
                             } // Parsing string to number, default to 0 if NaN
-                            placeholder="Masukkan harga_jual"
+                            placeholder="Masukkan no_telp"
                         />
                     </div>
                 </div>

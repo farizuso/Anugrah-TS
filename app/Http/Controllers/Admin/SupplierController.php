@@ -5,20 +5,21 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Rekap;
 use App\Models\Stok;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
-class StokController extends Controller
+class SupplierController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
-        $posts = Stok::with('produk')->get();
-        return Inertia::render('Admin/Stok/Index', [
+
+        $posts = Supplier::all();
+        return Inertia::render('Admin/Supplier/Index', [
             'posts' => $posts
         ]);
     }
@@ -29,7 +30,7 @@ class StokController extends Controller
     public function create()
     {
         //
-        
+
     }
 
     /**
@@ -40,18 +41,17 @@ class StokController extends Controller
         try {
             // Validasi input
             $data = $request->validate([
-                'produk_id' => 'required',
-                'lokasi_penyimpanan' => 'required',
-                'jumlah_stok' => 'required',
-                'minimum_stok' => 'required',
+                'nama_supplier' => 'required',
+                'alamat' => 'required',
+                'no_telp' => 'required',
             ]);
 
-            
+
             // Insert ke database
-            Stok::create($data);
-    
+            Supplier::create($data);
+
             // Redirect jika sukses
-            return redirect()->route('admin.stok.index')->with('success', 'Data Stok berhasil ditambahkan');
+            return redirect()->route('admin.supplier.index')->with('success', 'Data supplier berhasil ditambahkan');
         } catch (\Exception $e) {
             Log::error($e->getMessage());
 
@@ -59,7 +59,7 @@ class StokController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menambahkan data: ' . $e->getMessage());
         }
     }
-    
+
 
     /**
      * Display the specified resource.
@@ -72,19 +72,17 @@ class StokController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function update(Request $request,Stok $stok)
+    public function update(Request $request, Supplier $supplier)
     {
         //
         $data = $request->validate([
-            'produk_id' => 'required',
-            'lokasi_penyimpanan' => 'required',
-            'jumlah_stok' => 'required',
-            'minimum_stok' => 'required',
-            'tgl_update_stok' => 'required',
+            'nama_supplier' => 'required',
+            'alamat' => 'required',
+            'no_telp' => 'required',
         ]);
 
-        $stok->update($data);
-        return redirect()->route('admin.stok.index')->with('success', 'Data Stok berhasil diubah');
+        $supplier->update($data);
+        return redirect()->route('admin.supplier.index')->with('success', 'Data supplier berhasil diubah');
     }
 
     /**
@@ -101,8 +99,8 @@ class StokController extends Controller
     public function destroy(string $id)
     {
         //
-        $stok = Stok::findOrFail($id);
-        $stok->delete();
-        return redirect()->route('admin.stok.index')->with('success', 'Data Stok berhasil dihapus');
+        $supplier = Supplier::findOrFail($id);
+        $supplier->delete();
+        return redirect()->route('admin.supplier.index')->with('success', 'Data supplier berhasil dihapus');
     }
 }

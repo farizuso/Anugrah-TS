@@ -1,4 +1,3 @@
-// import { Produk } from '@/types';
 export interface User {
     id: number;
     name: string;
@@ -6,7 +5,7 @@ export interface User {
     email_verified_at: string;
 }
 
-export interface Todo{
+export interface Todo {
     id: number;
     name: string;
 }
@@ -14,56 +13,58 @@ export interface TodoWithMethod extends Todo {
     _method: string;
 }
 
-export interface LaporanPembelian{
+export interface LaporanPembelian {
     id: number;
-    tgl_pembelian: Date;
-    Produk: Produk;
+    tgl_pembelian: string;
     nama_supplier: string;
-    quantity: string;
-    harga: string;
-    total: string;
+    total: number;
     keterangan: string;
+    details: {
+        id: number;
+        harga: number;
+        quantity: number;
+        produk: {
+            id: number;
+            nama_produk: string;
+        };
+    }[];
 }
 
-export interface Produk{
+export interface Produk {
     id: number;
-    no_botol: string;
     nama_produk: string;
     simbol: string;
-    harga: string;
+    jenis: string;
+    harga_jual: number;
     stok: string;
-    deskripsi: string;
 }
 
-export interface Pelanggan{
+export interface Pelanggan {
     id: number;
     nama_pelanggan: string;
     alamat: string;
     no_hp: string;
 }
-export interface Stok {
+export interface Supplier {
     id: number;
-    produk: Produk; 
-    lokasi_penyimpanan: string;
-    jumlah_stok: number;
-    minimum_stok: number;
-    tgl_update_stok: Date;
+    nama_supplier: string;
+    alamat: string;
+    no_telp: number;
 }
 
-
-
-export interface Rekap{
+export interface Rekap {
     id: number;
     tgl_keluar: Date;
     tgl_kembali: Date;
     tgl_masuk_pabrik: Date;
     keterangan: string;
-    produk : Produk
-    pelanggan : Pelanggan
+    produk: Produk;
+    pelanggan: Pelanggan;
 }
 
-
-export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+export type PageProps<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = T & {
     auth: {
         user: User;
     };
@@ -71,23 +72,22 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
         success: string;
         error: string;
     };
-    produks : Produk[]
-    pelanggans : Pelanggan[]
+    produks: Produk[];
+    pelanggans: Pelanggan[];
 };
 
 export interface DebouncedWindowSizeOptions {
-    initialWidth?: number
-    initialHeight?: number
-    wait?: number
-    leading?: boolean
-  }
-  export declare const useWindowSize: (
+    initialWidth?: number;
+    initialHeight?: number;
+    wait?: number;
+    leading?: boolean;
+}
+export declare const useWindowSize: (
     options?: DebouncedWindowSizeOptions
-  ) => readonly [number, number]
-  export declare const useWindowHeight: (
-    options?: Omit<DebouncedWindowSizeOptions, 'initialWidth'>
-  ) => number
-  export declare const useWindowWidth: (
-    options?: Omit<DebouncedWindowSizeOptions, 'initialHeight'>
-  ) => number
-  
+) => readonly [number, number];
+export declare const useWindowHeight: (
+    options?: Omit<DebouncedWindowSizeOptions, "initialWidth">
+) => number;
+export declare const useWindowWidth: (
+    options?: Omit<DebouncedWindowSizeOptions, "initialHeight">
+) => number;

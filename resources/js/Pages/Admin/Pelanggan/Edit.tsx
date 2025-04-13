@@ -1,4 +1,4 @@
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/Components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -7,15 +7,14 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/Components/ui/dialog"
-import { Input } from "@/Components/ui/input"
-import { Label } from "@/Components/ui/label"
-import { Pelanggan, Produk } from "@/types"
+} from "@/Components/ui/dialog";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { Pelanggan, Produk } from "@/types";
 // import { Todo, TodoWithMethod } from "@/types"
-import { useForm } from "@inertiajs/react"
-import { useEffect, useState } from "react"
-import { BsPencilSquare } from "react-icons/bs"
-
+import { useForm } from "@inertiajs/react";
+import { useEffect, useState } from "react";
+import { BsPencilSquare } from "react-icons/bs";
 
 interface EditPelanggan {
     pelangganedit: Pelanggan;
@@ -34,18 +33,19 @@ const Edit = ({ pelangganedit }: EditPelanggan) => {
             nama_pelanggan: pelangganedit.nama_pelanggan,
             alamat: pelangganedit.alamat,
             no_hp: pelangganedit.no_hp,
-        })
+        });
     }, [pelangganedit]);
     console.log(pelangganedit);
     const submit = (e: any) => {
         e.preventDefault();
-        put(route('admin.pelanggan.update', [pelangganedit]))
-    }
+        put(route("admin.pelanggan.update", [pelangganedit]));
+    };
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button
-                    variant="blue"
+                    variant="outline_blue"
+                    size="sm"
                     onClick={() => setOpen(true)}
                 >
                     <BsPencilSquare />
@@ -55,7 +55,8 @@ const Edit = ({ pelangganedit }: EditPelanggan) => {
                 <DialogHeader>
                     <DialogTitle>Edit profile</DialogTitle>
                     <DialogDescription>
-                        Make changes to your profile here. Click save when you're done.
+                        Make changes to your profile here. Click save when
+                        you're done.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -69,7 +70,9 @@ const Edit = ({ pelangganedit }: EditPelanggan) => {
                             className="col-span-3"
                             name="nama_pelanggan"
                             value={data.nama_pelanggan}
-                            onChange={(e) => setData("nama_pelanggan", e.target.value)}
+                            onChange={(e) =>
+                                setData("nama_pelanggan", e.target.value)
+                            }
                             placeholder="masukkan nama pelanggan"
                         />
                     </div>
@@ -113,6 +116,6 @@ const Edit = ({ pelangganedit }: EditPelanggan) => {
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-    )
-}
+    );
+};
 export default Edit;

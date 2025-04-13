@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Produk;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,13 +37,14 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'flash' => [
-                'error' => fn () => $request->session()->get('error'),
-                'success' => fn () => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
+                'success' => fn() => $request->session()->get('success'),
             ],
-            
-            'produks' => fn () => Produk::all(),
-            'pelanggans' => fn () => \App\Models\Pelanggan::all(),
-            'stoks' => fn () => \App\Models\Stok::all(),
+
+            'produks' => fn() => Produk::all(),
+            'pelanggans' => fn() => \App\Models\Pelanggan::all(),
+            // 'stoks' => fn () => \App\Models\Stok::all(),
+            'suppliers' => fn() => Supplier::all(),
         ];
     }
 }

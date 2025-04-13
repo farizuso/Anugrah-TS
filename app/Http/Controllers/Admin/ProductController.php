@@ -19,17 +19,17 @@ class ProductController extends Controller
     {
         // return Inertia::render('Admin/Produk/Index');
         $posts = Produk::all();
-        return Inertia::render('Admin/Produk/Index',[
+        return Inertia::render('Admin/Produk/Index', [
             'posts' => $posts
         ]);
     }
     public function store(Request $request)
     {
         $data = $request->validate([
-            'no_botol' => 'required',
             'nama_produk' => 'required',
             'simbol' => 'required',
-            'harga' => 'required',
+            'jenis' => 'required',
+            'harga_jual' => 'required',
         ]);
 
         Produk::create($data);
@@ -46,22 +46,22 @@ class ProductController extends Controller
 
         return redirect()->route('admin.produk.index')->with('success', 'Data Produk berhasil dihapus');
     }
-    
+
     public function update(Request $request, Produk $produk)
     {
         $produk->update([
-            'no_botol' => $request->no_botol,
             'nama_produk' => $request->nama_produk,
             'simbol' => $request->simbol,
-            'harga' =>$request->harga
+            'jenis' => $request->jenis,
+            'harga_jual' => $request->harga_jual
         ]);
         return redirect()->route('admin.produk.index')->with('success', 'data Produk berhasil diubah');
     }
-    
+
     public function create()
     {
         $posts = Produk::all();
-        return Inertia::render('Admin/Produk/Index',[
+        return Inertia::render('Admin/Produk/Index', [
             'posts' => $posts
         ]);
     }
@@ -69,7 +69,7 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    
+
 
     /**
      * Display the specified resource.
@@ -90,10 +90,9 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    
+
 
     /**
      * Remove the specified resource from storage.
      */
-    
 }

@@ -11,20 +11,22 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { DataTable } from "@/Components/DataTable";
-import { PageProps, Produk } from "@/types";
+import { PageProps, Pelanggan, Produk, Supplier } from "@/types";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useForm, usePage } from "@inertiajs/react";
-import { FormEventHandler } from "react";
-import { produkColumns } from "./produkColumn";
+import React, { FormEventHandler } from "react";
+import { SupplierColumns } from "./SupplierColumn";
+import CreatableSelect from "react-select/creatable";
 
-interface ProdukProps {
-    posts: Produk[];
+interface SupplierProps {
+    posts: Supplier[];
 }
 
-const TabsDemo = ({ posts }: ProdukProps) => {
+const Index = ({ posts }: SupplierProps) => {
     const flash = usePage<PageProps>().props.flash;
     console.log(flash.success);
 
+    // Data form sesuai field yang ada di tabel
     const {
         delete: destroy,
         data,
@@ -34,23 +36,41 @@ const TabsDemo = ({ posts }: ProdukProps) => {
         errors,
         reset,
     } = useForm({
-        nama_produk: "",
-        simbol: "",
-        jenis: "",
-        harga_jual: "",
+        nama_supplier: "",
+        alamat: "",
+        no_telp: "",
     });
 
     console.log(data);
 
+    const { produks = [] } = usePage<PageProps>().props;
+
+    // State to store produk options
+    const [produkOptions, setProdukOptions] = React.useState(
+        produks?.map((produk) => ({
+            value: String(produk.id),
+            label: produk.nama_produk,
+        })) || []
+    );
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        console.log(data);
-        // router.post("/todos", data, {
-        //     onSuccess: () => reset(),
-        // });
-        post(route("admin.produk.store"), {
+        post(route("admin.supplier.store"), {
             onSuccess: () => reset(),
         });
+    };
+
+    const handleDateSelect = (field: any, date: any) => {
+        if (date) {
+            const adjustedDate = new Date(date);
+            adjustedDate.setHours(12, 0, 0, 0);
+            setData({
+                ...data,
+                [field]: adjustedDate.toISOString().split("T")[0],
+            });
+        } else {
+            setData({ ...data, [field]: "" });
+        }
     };
 
     return (
@@ -58,78 +78,65 @@ const TabsDemo = ({ posts }: ProdukProps) => {
             <Tabs defaultValue="account" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="account">Data Table</TabsTrigger>
-                    <TabsTrigger value="password">Tambah Data</TabsTrigger>
+                    <TabsTrigger value="password">
+                        Tambah Data Supplier
+                    </TabsTrigger>
                 </TabsList>
                 <TabsContent value="account">
-                    <DataTable data={posts} columns={produkColumns} />
+                    <DataTable data={posts} columns={SupplierColumns} />
                 </TabsContent>
                 <TabsContent value="password">
                     <Card>
                         <form onSubmit={submit}>
                             <CardHeader>
-                                <CardTitle>Tambah Data Produk</CardTitle>
+                                <CardTitle>Tambah Data Supplier</CardTitle>
                                 <CardDescription>
-                                    Masukkan data produk.
+                                    Masukkan data Supplier.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <div className="space-y-1">
-                                    <Label htmlFor="new">Nama Produk</Label>
+                                    <Label htmlFor="new">Nama Supplier</Label>
                                     <Input
                                         id="new"
                                         type="text"
-                                        name="nama_produk"
+                                        name="nama_supplier"
                                         onChange={(e) =>
                                             setData(
-                                                "nama_produk",
+                                                "nama_supplier",
                                                 e.target.value
                                             )
                                         }
-                                        value={data.nama_produk}
+                                        value={data.nama_supplier}
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="new">Simbol</Label>
+                                    <Label htmlFor="new">Alamat</Label>
                                     <Input
                                         id="new"
                                         type="text"
-                                        name="simbol"
+                                        name="alamat"
                                         onChange={(e) =>
-                                            setData("simbol", e.target.value)
+                                            setData("alamat", e.target.value)
                                         }
-                                        value={data.simbol}
+                                        value={data.alamat}
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="new">Jenis</Label>
+                                    <Label htmlFor="new">No_Telp</Label>
                                     <Input
                                         id="new"
                                         type="text"
-                                        name="jenis"
+                                        name="no_telp"
                                         onChange={(e) =>
-                                            setData("jenis", e.target.value)
+                                            setData("no_telp", e.target.value)
                                         }
-                                        value={data.jenis}
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="new">Harga Jual</Label>
-                                    <Input
-                                        id="new"
-                                        type="text"
-                                        name="harga_jual"
-                                        onChange={(e) =>
-                                            setData(
-                                                "harga_jual",
-                                                e.target.value
-                                            )
-                                        }
-                                        value={data.harga_jual}
+                                        value={data.no_telp}
                                     />
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button>Save Produk</Button>
+                                <Button>Simpan Data Supplier</Button>
                             </CardFooter>
                         </form>
                     </Card>
@@ -138,5 +145,4 @@ const TabsDemo = ({ posts }: ProdukProps) => {
         </AdminLayout>
     );
 };
-
-export default TabsDemo;
+export default Index;

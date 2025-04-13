@@ -14,25 +14,65 @@ class ProdukSeeder extends Seeder
     {
         // Define a list of industrial gases
         $gases = [
-            ["nama_produk" => "Oksigen", "simbol" => "O₂"],
-            ["nama_produk" => "Argon", "simbol" => "Ar"],
-            ["nama_produk" => "Nitrogen", "simbol" => "N₂"],
-            ["nama_produk" => "Karbon Dioksida", "simbol" => "CO₂"],
-            ["nama_produk" => "Asetilena", "simbol" => "C₂H₂"],
+            [
+                'id' => 1,
+                'nama_produk' => "nitrogen",
+                'simbol' => "N",
+                'jenis' => "gas",
+                'harga_jual' => 170000,
+            ],
+            [
+                'id' => 2,
+                'nama_produk' => "oxygen",
+                'simbol' => "O",
+                'jenis' => "gas",
+                'harga_jual' => 100000,
+            ],
+            [
+                'id' => 3,
+                'nama_produk' => "argon",
+                'simbol' => "Ar",
+                'jenis' => "gas",
+                'harga_jual' => 350000,
+            ],
+            [
+                'id' => 4,
+                'nama_produk' => "asitilen",
+                'simbol' => "C2H2",
+                'jenis' => "gas",
+                'harga_jual' => 500000,
+            ],
+            [
+                'id' => 5,
+                'nama_produk' => "karbon dioksida",
+                'simbol' => "CO2",
+                'jenis' => "gas",
+                'harga_jual' => 200000,
+            ],
+            [
+                'id' => 6,
+                'nama_produk' => "LPG",
+                'simbol' => "LPG",
+                'jenis' => "gas",
+                'harga_jual' => 850000,
+            ],
+            [
+                'id' => 7,
+                'nama_produk' => "regulator",
+                'simbol' => "-",
+                'jenis' => "aksesoris",
+                'harga_jual' => 150000,
+            ],
+            [
+                'id' => 8,
+                'nama_produk' => "non-breathing mask",
+                'simbol' => "-",
+                'jenis' => "aksesoris",
+                'harga_jual' => 25000,
+            ],
         ];
-
-        // Generate 50 product entries
-        for ($i = 1; $i <= 50; $i++) {
-            $gas = $gases[array_rand($gases)];
-            $produk = [
-                'id' => $i,
-                'no_botol' => str_pad($i, 3, '0', STR_PAD_LEFT), // Pads the number with leading zeros
-                'nama_produk' => $gas['nama_produk'], // Uses the selected gas name
-                'simbol' => $gas['simbol'], // Uses the selected gas symbol
-                'harga' => rand(10000, 50000), // Generates a random price between 10,000 and 50,000
-            ];
-
-            \App\Models\Produk::create($produk);
+        foreach ($gases as $gas) {
+            \App\Models\Produk::create($gas);
         }
     }
 }
