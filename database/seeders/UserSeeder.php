@@ -9,36 +9,32 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
     public function run()
     {
         // Membuat Admin
-        $adminRole = Role::where('name', 'Admin')->first();
-        $admin = User::create([
+        User::create([
             'name' => 'Admin User',
             'email' => 'admin@gmail.com',
-            'password' => bcrypt('admin123'),
+            'role' => 'admin',
+            'password' => Hash::make('admin123'), 
         ]);
-        $admin->roles()->attach($adminRole);
 
-        // Membuat Staff Gudang
-        $staffGudangRole = Role::where('name', 'Staff Gudang')->first();
-        $staffGudang = User::create([
-            'name' => 'Staff Gudang User',
+        User::create([
+            'name' => 'Staff Gudang',
             'email' => 'staffgudang@gmail.com',
-            'password' => bcrypt('staffgudang123'),
+            'role' => 'staff_gudang',
+            'password' => Hash::make('staffgudang123'), 
         ]);
-        $staffGudang->roles()->attach($staffGudangRole);
 
-        // Membuat Staff Penjualan
-        $staffPenjualanRole = Role::where('name', 'Staff Penjualan')->first();
-        $staffPenjualan = User::create([
-            'name' => 'Staff Penjualan User',
+        User::create([
+            'name' => 'Staff Penjualan',
             'email' => 'staffpenjualan@gmail.com',
-            'password' => bcrypt('staffpenjualan123'),
+            'role' => 'staff_penjualan',
+            'password' => Hash::make('staffpenjualan123'),
         ]);
-        $staffPenjualan->roles()->attach($staffPenjualanRole);
     }
 }

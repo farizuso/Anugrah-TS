@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             LaporanPembelianSeeder::class,
             SupplierSeeder::class
-
         ]);
     }
 }

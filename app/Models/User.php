@@ -15,6 +15,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role',
         'password',
     ];
 
@@ -23,8 +24,5 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class);
-    }
+    
 }

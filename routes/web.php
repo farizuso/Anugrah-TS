@@ -1,83 +1,78 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Application;
-use Inertia\Inertia;
-
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PelangganController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\BackupController;
+use App\Http\Controllers\Admin\TodoController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\RekapController;
+use App\Http\Controllers\Admin\StokController;
 use App\Http\Controllers\Admin\LaporanPembelianController;
 use App\Http\Controllers\Admin\LaporanPenjualanController;
-use App\Http\Controllers\Admin\RekapController;
 use App\Http\Controllers\Admin\SupplierController;
+// use App\Http\Controllers\Admin\ProductCategoryController;
+// use App\Http\Controllers\Admin\DashboardAdminController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+return Inertia::render('Welcome', [
+'canLogin' => Route::has('login'),
+'canRegister' => Route::has('register'),
+'laravelVersion' => Application::VERSION,
+'phpVersion' => PHP_VERSION,
+]);
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::get('/dashboard', function () {
+return Inertia::render('Admin/Dashboard/Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-    // ✅ Route Umum
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard/Dashboard');
-    })->name('dashboard');
+Route::middleware('auth')->group(function () {
 
-    // ✅ Profile (semua role bisa akses profil)
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::resource('/todos', TodoController::class)->names('admin.todo');
 
-    // ✅ ADMIN ONLY ROUTES
-    Route::middleware('role:Admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::resource('/dashboard', DashboardController::class)->only(['index']);
+// Route::resource('/admin/produk', ProductController::class)->names('admin.produk');
+Route::get('/admin/produk', [ProductController::class, 'index'])->name('admin.produk.index');
+Route::put('/admin/produk/{produk}', [ProductController::class, 'update'])->name('admin.produk.update');
+Route::delete('/admin/produk/{produk}', [ProductController::class, 'destroy'])->name('admin.produk.destroy');
+Route::post('/admin/produk', [ProductController::class, 'store'])->name('admin.produk.store');
 
-        // Produk
-        Route::get('/produk', [ProductController::class, 'index'])->name('produk.index');
-        Route::post('/produk', [ProductController::class, 'store'])->name('produk.store');
-        Route::put('/produk/{produk}', [ProductController::class, 'update'])->name('produk.update');
-        Route::delete('/produk/{produk}', [ProductController::class, 'destroy'])->name('produk.destroy');
+Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
+Route::resource('/admin/rekap', RekapController::class)->names('admin.rekap');
+Route::resource('/admin/Pelanggan', PelangganController::class)->names('admin.pelanggan');
 
-        // Supplier
-        Route::get('/supplier', [SupplierController::class, 'index'])->name('supplier.index');
-        Route::post('/supplier', [SupplierController::class, 'store'])->name('supplier.store');
-        Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
-        Route::delete('/supplier/{id}', [SupplierController::class, 'destroy'])->name('supplier.destroy');
+Route::resource('/admin/supplier', SupplierController::class)->names('admin.supplier');
 
-        // Pelanggan, Rekap, Laporan
-        Route::resource('/pelanggan', PelangganController::class)->names('pelanggan');
-        Route::resource('/rekap', RekapController::class)->names('rekap');
+Route::get('/admin/supplier', [SupplierController::class, 'index'])->name('admin.supplier.index');
+Route::put('/admin/supplier/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
+Route::delete('/admin/supplier/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
+Route::post('/admin/supplier', [ProductController::class, 'store'])->name('admin.supplier.store');
 
-        Route::get('/laporanpembelian/export', [LaporanPembelianController::class, 'export'])->name('laporanpembelian.export');
-        Route::get('/laporanpembelian', [LaporanPembelianController::class, 'index'])->name('laporanpembelian.index');
-        Route::post('/laporanpembelian', [LaporanPembelianController::class, 'store'])->name('laporanpembelian.store');
-        Route::put('/laporanpembelian/{id}', [LaporanPembelianController::class, 'update'])->name('laporanpembelian.update');
-        Route::delete('/laporanpembelian/{id}', [LaporanPembelianController::class, 'destroy'])->name('laporanpembelian.destroy');
 
-        Route::get('/laporanpenjualan', [LaporanPenjualanController::class, 'index'])->name('laporanpenjualan.index');
-        // Uncomment kalau nanti butuh update, delete, store
-        // Route::post('/laporanpenjualan', [LaporanPenjualanController::class, 'store'])->name('laporanpenjualan.store');
-        // Route::put('/laporanpenjualan/{id}', [LaporanPenjualanController::class, 'update'])->name('laporanpenjualan.update');
-        // Route::delete('/laporanpenjualan/{id}', [LaporanPenjualanController::class, 'destroy'])->name('laporanpenjualan.destroy');
-    });
 
-    // ✅ STAFF GUDANG
-    Route::middleware('role:Staff Gudang')->prefix('gudang')->name('gudang.')->group(function () {
-        // Tambahkan route khusus staff gudang di sini
-        Route::get('/dashboard', fn() => Inertia::render('Gudang/Dashboard'))->name('dashboard');
-    });
+Route::get('/admin/laporanpembelian/export', [LaporanPembelianController::class,
+'export'])->name('admin.laporanpembelian.export');
 
-    // ✅ STAFF PENJUALAN
-    Route::middleware('role:Staff Penjualan')->prefix('penjualan')->name('penjualan.')->group(function () {
-        // Tambahkan route khusus staff penjualan di sini
-        Route::get('/dashboard', fn() => Inertia::render('Penjualan/Dashboard'))->name('dashboard');
-    });
+Route::get('/admin/laporanpembelian', [LaporanPembelianController::class,
+'index'])->name('admin.laporanpembelian.index');
+Route::put('/admin/laporanpembelian/{id}', [LaporanPembelianController::class,
+'update'])->name('admin.laporanpembelian.update');
+Route::delete('/admin/laporanpembelian/{id}', [LaporanPembelianController::class,
+'destroy'])->name('admin.laporanpembelian.destroy');
+Route::post('/admin/laporanpembelian', [LaporanPembelianController::class,
+'store'])->name('admin.laporanpembelian.store');
+
+Route::get('/admin/laporanpenjualan', [LaporanPenjualanController::class,'index'])->name('admin.laporanpenjualan.index');
+// Route::put(/admin/laporanpenjualan/{id}', [LaporanPenjualanController::class,'update'])->name('admin.laporanpenjualan.update');
+// Route::delete('/admin/laporanpenjualan/{id}', [LaporanPenjualanController::class,'destroy'])->name('admin.laporanpenjualan.destroy');
+// Route::post('/admin/laporanpenjualan', [LaporanPenjualanController::class,'store'])->name('admin.laporanpenjualan.store');
+
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

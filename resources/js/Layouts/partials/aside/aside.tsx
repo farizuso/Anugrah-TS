@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from "react";
-import { InertiaLinkProps, Link } from "@inertiajs/react";
+import { InertiaLinkProps, Link, usePage } from "@inertiajs/react";
 import { cn } from "@/lib/utils";
 import {
     IconBrandProducthunt,
@@ -13,6 +13,9 @@ import {
 } from "@irsyadadl/paranoid";
 
 export function Aside() {
+    const { auth } = usePage().props as any;
+    const role = auth?.user?.role;
+
     return (
         <ul className="grid items-center gap-1 px-4 text-md font-medium lg:px-4">
             <AsideLink
@@ -22,48 +25,72 @@ export function Aside() {
                 <IconDashboard />
                 <span>Dashboard</span>
             </AsideLink>
-            <AsideLink
-                active={route().current("admin.laporanpembelian.index")}
-                href={route("admin.laporanpembelian.index")}
-            >
-                <IconBrandProducthunt />
-                <span>Laporan Pembelian</span>
-            </AsideLink>
-            <AsideLink
-                active={route().current("admin.laporanpenjualan.index")}
-                href={route("admin.laporanpenjualan.index")}
-            >
-                <IconStoreFill />
-                <span>Laporan Penjualan</span>
-            </AsideLink>
-            <AsideLink
-                active={route().current("admin.produk.index")}
-                href={route("admin.produk.index")}
-            >
-                <IconBrandProducthunt />
-                <span>Produk</span>
-            </AsideLink>
-            <AsideLink
-                active={route().current("admin.rekap.index")}
-                href={route("admin.rekap.index")}
-            >
-                <IconPerson />
-                <span>Rekap</span>
-            </AsideLink>
-            <AsideLink
-                active={route().current("admin.pelanggan.index")}
-                href={route("admin.pelanggan.index")}
-            >
-                <IconPerson />
-                <span>Data Pelanggan</span>
-            </AsideLink>
-            <AsideLink
-                active={route().current("admin.supplier.index")}
-                href={route("admin.supplier.index")}
-            >
-                <IconToolbox />
-                <span>Supplier</span>
-            </AsideLink>
+
+            {role === "admin" && (
+                <>
+                    <AsideLink
+                        active={route().current("admin.laporanpembelian.index")}
+                        href={route("admin.laporanpembelian.index")}
+                    >
+                        <IconBrandProducthunt />
+                        <span>Laporan Pembelian</span>
+                    </AsideLink>
+
+                    <AsideLink
+                        active={route().current("admin.laporanpenjualan.index")}
+                        href={route("admin.laporanpenjualan.index")}
+                    >
+                        <IconStoreFill />
+                        <span>Laporan Penjualan</span>
+                    </AsideLink>
+
+                    <AsideLink
+                        active={route().current("admin.produk.index")}
+                        href={route("admin.produk.index")}
+                    >
+                        <IconBrandProducthunt />
+                        <span>Produk</span>
+                    </AsideLink>
+                </>
+            )}
+
+
+            {role === "staff_gudang" && (
+                <>
+                    <AsideLink
+                        active={route().current("admin.rekap.index")}
+                        href={route("admin.rekap.index")}
+                    >
+                        <IconPerson />
+                        <span>Rekap</span>
+                    </AsideLink>
+
+                    <AsideLink
+                        active={route().current("admin.supplier.index")}
+                        href={route("admin.supplier.index")}
+                    >
+                        <IconToolbox />
+                        <span>Supplier</span>
+                    </AsideLink>
+                </>
+            )}
+
+
+
+            {role === "staff_penjualan" && (
+                <>
+
+
+                    <AsideLink
+                        active={route().current("admin.pelanggan.index")}
+                        href={route("admin.pelanggan.index")}
+                    >
+                        <IconPerson />
+                        <span>Data Pelanggan</span>
+                    </AsideLink>
+
+                </>
+            )}
         </ul>
     );
 }
