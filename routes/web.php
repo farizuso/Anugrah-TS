@@ -30,30 +30,24 @@ Route::get('/dashboard', function () {
     return Inertia::render('Admin/Dashboard/Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth',)->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('/todos', TodoController::class)->names('admin.todo');
+    Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
+
 
     // Route::resource('/admin/produk', ProductController::class)->names('admin.produk');
+
+});
+
+Route::middleware('auth','role:admin')->group(function () {
     Route::get('/admin/produk', [ProductController::class, 'index'])->name('admin.produk.index');
     Route::put('/admin/produk/{produk}', [ProductController::class, 'update'])->name('admin.produk.update');
     Route::delete('/admin/produk/{produk}', [ProductController::class, 'destroy'])->name('admin.produk.destroy');
     Route::post('/admin/produk', [ProductController::class, 'store'])->name('admin.produk.store');
-
-    Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
-    Route::resource('/admin/rekap', RekapController::class)->names('admin.rekap');
-    Route::resource('/admin/Pelanggan', PelangganController::class)->names('admin.pelanggan');
-
-    Route::resource('/admin/supplier', SupplierController::class)->names('admin.supplier');
-
-    Route::get('/admin/supplier', [SupplierController::class, 'index'])->name('admin.supplier.index');
-    Route::put('/admin/supplier/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
-    Route::delete('/admin/supplier/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
-    Route::post('/admin/supplier', [ProductController::class, 'store'])->name('admin.supplier.store');
-
 
 
     Route::get('/admin/laporanpembelian/export', [LaporanPembelianController::class,'export'])->name('admin.laporanpembelian.export');
@@ -67,7 +61,22 @@ Route::middleware('auth')->group(function () {
     // Route::put(/admin/laporanpenjualan/{id}', [LaporanPenjualanController::class,'update'])->name('admin.laporanpenjualan.update');
     // Route::delete('/admin/laporanpenjualan/{id}', [LaporanPenjualanController::class,'destroy'])->name('admin.laporanpenjualan.destroy');
     // Route::post('/admin/laporanpenjualan', [LaporanPenjualanController::class,'store'])->name('admin.laporanpenjualan.store');
+});
 
+Route::middleware('auth','role:staff_gudang')->group(function () {
+    
+    Route::resource('/admin/supplier', SupplierController::class)->names('admin.supplier');
+
+    Route::get('/admin/supplier', [SupplierController::class, 'index'])->name('admin.supplier.index');
+    Route::put('/admin/supplier/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
+    Route::delete('/admin/supplier/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
+    Route::post('/admin/supplier', [ProductController::class, 'store'])->name('admin.supplier.store');
+    Route::resource('/admin/rekap', RekapController::class)->names('admin.rekap');
+
+});
+
+Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
+    Route::resource('/admin/Pelanggan', PelangganController::class)->names('admin.pelanggan');
 });
 
 require __DIR__ . '/auth.php';
