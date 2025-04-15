@@ -28,11 +28,15 @@ class LaporanPembelianController extends Controller
         ]);
     }
 
-    public function export()
-    {
-        return Excel::download(new LaporanPembelianExport, 'laporan_pembelian.xlsx');
-    }
+    // Export Excel langsung download
 
+    public function export(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        return Excel::download(new LaporanPembelianExport($startDate, $endDate), 'laporan_pembelian.xlsx');
+    }
     /**
      * Show the form for creating a new resource.
      */

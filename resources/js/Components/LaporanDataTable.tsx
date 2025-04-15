@@ -116,7 +116,7 @@ export function LaporanDataTable<TData>({
                 item.details.forEach((detail: any) => {
                     rows.push({
                         "Tanggal Pembelian": item.tgl_pembelian,
-                        "Nama Supplier": item.nama_supplier,
+                        "Nama Supplier": item.supplier?.nama_supplier ?? "-", // Perbaikan di sini
                         "Nama Produk": detail.produk?.nama_produk ?? "-",
                         Harga: detail.harga,
                         Quantity: detail.quantity,
@@ -127,7 +127,7 @@ export function LaporanDataTable<TData>({
             } else {
                 rows.push({
                     "Tanggal Pembelian": item.tgl_pembelian,
-                    "Nama Supplier": item.nama_supplier,
+                    "Nama Supplier": item.supplier?.nama_supplier ?? "-", // Perbaikan di sini
                     "Nama Produk": "-",
                     Harga: 0,
                     Quantity: 0,
@@ -137,10 +137,13 @@ export function LaporanDataTable<TData>({
             }
         });
 
-        const ws = XLSX.utils.json_to_sheet(rows);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Laporan");
-        XLSX.writeFile(wb, "Laporan_Pembelian.xlsx");
+        // Menggunakan library XLSX untuk menulis dan mengunduh file Excel
+        const ws = XLSX.utils.json_to_sheet(rows); // Mengubah data menjadi sheet
+        const wb = XLSX.utils.book_new(); // Membuat buku baru
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan Pembelian"); // Menambahkan sheet ke dalam buku
+
+        // Menyimpan file Excel
+        XLSX.writeFile(wb, "laporan_pembelian.xlsx");
     };
 
     const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {

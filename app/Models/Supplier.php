@@ -18,7 +18,7 @@ class Supplier extends Model
     /**
      * Relasi dengan LaporanPembelian
      */
-    public function laporanPembelians()
+    public function laporanPembelian()
     {
         return $this->hasMany(LaporanPembelian::class);
     }

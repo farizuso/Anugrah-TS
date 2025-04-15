@@ -11,11 +11,13 @@ use App\Http\Controllers\Admin\StokController;
 use App\Http\Controllers\Admin\LaporanPembelianController;
 use App\Http\Controllers\Admin\LaporanPenjualanController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Models\LaporanPembelian;
 // use App\Http\Controllers\Admin\ProductCategoryController;
 // use App\Http\Controllers\Admin\DashboardAdminController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -55,7 +57,6 @@ Route::middleware('auth', 'role:admin')->group(function () {
     Route::put('/admin/supplier/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
     Route::delete('/admin/supplier/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
     Route::post('/admin/supplier', [SupplierController::class, 'store'])->name('admin.supplier.store');
-
 
     Route::get('/admin/laporanpembelian/export', [LaporanPembelianController::class, 'export'])->name('admin.laporanpembelian.export');
 

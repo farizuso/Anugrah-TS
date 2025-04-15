@@ -43,9 +43,12 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         header: "Nama supplier",
         cell: ({ row }) => (
             <div className="capitalize">
-                {row.original.supplier.nama_supplier}
+                {row.original.supplier
+                    ? row.original.supplier.nama_supplier
+                    : "-"}
             </div>
         ),
+
         accessorFn: (row) => row.supplier.nama_supplier,
     },
     {
