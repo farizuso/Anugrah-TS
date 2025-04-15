@@ -6,6 +6,8 @@ import { Button } from "@/Components/ui/button";
 import { Checkbox } from "@/Components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 import { format } from "date-fns"; // Import format dari date-fns
+import { id } from "date-fns/locale";
+
 
 export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
     {
@@ -33,12 +35,26 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         enableHiding: false,
     },
     {
-        accessorFn: (row: LaporanPembelian) => row.tgl_pembelian,
-        header: "Tanggal Pembelian",
+        accessorKey: "tgl_pembelian",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="default"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Tgl. Pembelian
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
         cell: ({ row }) => {
-            const date = new Date(row.getValue("tgl_pembelian"));
-            const formattedDate = format(date, "yyyy-MM-dd");
-            return <div className="capitalize">{formattedDate}</div>;
+            const tanggal = row.getValue("tgl_pembelian");
+            // Pastikan tanggal dalam bentuk Date dan format dengan locale Indonesia
+            const formattedDate = tanggal && typeof tanggal === 'string'
+                ? format(new Date(tanggal), 'dd MMMM yyyy', { locale: id })
+                : '-';
+
+            return <div>{formattedDate}</div>;
         },
     },
     {
@@ -122,8 +138,8 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
                 status === "lunas"
                     ? "text-green-600 font-semibold"
                     : status === "belum lunas"
-                    ? "text-red-600 font-semibold"
-                    : "text-gray-700";
+                        ? "text-red-600 font-semibold"
+                        : "text-gray-700";
             return (
                 <div className={`capitalize ${className}`}>
                     {row.original.keterangan}

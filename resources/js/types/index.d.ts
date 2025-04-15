@@ -95,6 +95,7 @@ export type PageProps<
     };
     produks: Produk[];
     pelanggans: Pelanggan[];
+    LaporanPembelian: LaporanPembelian[];
 };
 
 export interface DebouncedWindowSizeOptions {
