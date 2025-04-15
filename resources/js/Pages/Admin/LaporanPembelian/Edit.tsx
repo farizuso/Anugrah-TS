@@ -29,7 +29,7 @@ interface EditLaporanPembelian {
     pembelianedit: LaporanPembelian;
 }
 
-const Edit = ({ pembelianedit: pembelianedit }: EditLaporanPembelian) => {
+const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
     const [open, setOpen] = useState(false);
     const { produks = [] } = usePage<PageProps>().props;
 
@@ -39,8 +39,10 @@ const Edit = ({ pembelianedit: pembelianedit }: EditLaporanPembelian) => {
     }));
 
     const { data, setData, put, processing, errors, reset } = useForm({
-        tgl_pembelian: pembelianedit.tgl_pembelian || "",
-        nama_supplier: pembelianedit.nama_supplier || "",
+        tgl_pembelian: pembelianedit.tgl_pembelian
+            ? new Date(pembelianedit.tgl_pembelian)
+            : new Date(),
+        nama_supplier: pembelianedit.supplier.nama_supplier || "",
         produk: pembelianedit.details.map((item) => ({
             produk_id: String(item.produk.id),
             harga: String(item.harga),
@@ -92,15 +94,17 @@ const Edit = ({ pembelianedit: pembelianedit }: EditLaporanPembelian) => {
 
     const handleDateSelect = (date: Date | undefined) => {
         if (date) {
-            const d = new Date(date);
-            d.setHours(12);
-            setData("tgl_pembelian", d.toISOString().split("T")[0]);
+            setData("tgl_pembelian", date);
         }
     };
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         put(route("admin.laporanpembelian.update", pembelianedit.id), {
+            data: {
+                ...data,
+                tgl_pembelian: data.tgl_pembelian.toISOString(),
+            },
             onSuccess: () => {
                 reset();
                 setOpen(false);
@@ -139,7 +143,7 @@ const Edit = ({ pembelianedit: pembelianedit }: EditLaporanPembelian) => {
                                 >
                                     {data.tgl_pembelian
                                         ? format(
-                                              new Date(data.tgl_pembelian),
+                                              data.tgl_pembelian,
                                               "yyyy-MM-dd"
                                           )
                                         : "Pilih Tanggal"}
@@ -149,11 +153,7 @@ const Edit = ({ pembelianedit: pembelianedit }: EditLaporanPembelian) => {
                             <PopoverContent className="w-auto p-0">
                                 <Calendar
                                     mode="single"
-                                    selected={
-                                        data.tgl_pembelian
-                                            ? new Date(data.tgl_pembelian)
-                                            : undefined
-                                    }
+                                    selected={data.tgl_pembelian}
                                     onSelect={handleDateSelect}
                                     initialFocus
                                 />
@@ -171,7 +171,6 @@ const Edit = ({ pembelianedit: pembelianedit }: EditLaporanPembelian) => {
                         />
                     </div>
 
-                    {/* Repeater Produk */}
                     <div className="space-y-2">
                         <Label>Produk</Label>
                         {data.produk.map((item, index) => (

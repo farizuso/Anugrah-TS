@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanPembelianExport;
 use App\Models\Supplier;
+use Carbon\Carbon;
 
 class LaporanPembelianController extends Controller
 {
@@ -23,26 +24,26 @@ class LaporanPembelianController extends Controller
     {
         $posts = LaporanPembelian::with(['details.produk', 'supplier'])->get();
 
+        // Pastikan tgl_pembelian adalah objek Date
+        $posts->transform(function ($post) {
+            $post->tgl_pembelian = Carbon::parse($post->tgl_pembelian)->format('Y-m-d');
+
+            return $post;
+        });
+
         return Inertia::render('Admin/LaporanPembelian/Index', [
             'posts' => $posts
         ]);
     }
 
-    // Export Excel langsung download
 
+    // Export Excel langsung download
     public function export(Request $request)
     {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
         return Excel::download(new LaporanPembelianExport($startDate, $endDate), 'laporan_pembelian.xlsx');
-    }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -62,7 +63,7 @@ class LaporanPembelianController extends Controller
 
         try {
             // Format tanggal sesuai yang diinginkan
-            $tglFix = \Carbon\Carbon::parse($validated['tgl_pembelian'])->format('Y-m-d');
+            $tglFix = Carbon::parse($validated['tgl_pembelian'])->format('Y-m-d');
         } catch (\Exception $e) {
             return back()->withErrors(['tgl_pembelian' => 'Format tanggal tidak valid.']);
         }
@@ -98,26 +99,6 @@ class LaporanPembelianController extends Controller
             ->with('success', 'Data Laporan Pembelian berhasil disimpan');
     }
 
-
-
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(LaporanPembelian $laporanPembelian)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(LaporanPembelian $laporanPembelian)
-    {
-        //
-    }
-
     /**
      * Update the specified resource in storage.
      */
@@ -133,7 +114,13 @@ class LaporanPembelianController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($validated, $id) {
+        try {
+            $tglFix = Carbon::parse($validated['tgl_pembelian'])->format('Y-m-d');
+        } catch (\Exception $e) {
+            return back()->withErrors(['tgl_pembelian' => 'Format tanggal tidak valid.']);
+        }
+
+        DB::transaction(function () use ($validated, $id, $tglFix) {
             // Temukan laporan pembelian berdasarkan ID
             $laporanPembelian = LaporanPembelian::findOrFail($id);
 
@@ -147,7 +134,7 @@ class LaporanPembelianController extends Controller
 
             // Update laporan pembelian
             $laporanPembelian->update([
-                'tgl_pembelian' => $validated['tgl_pembelian'],
+                'tgl_pembelian' => $tglFix,
                 'supplier_id' => $supplierId,
                 'keterangan' => $validated['keterangan'] ?? null,
                 'total' => $totalBaru,
@@ -169,12 +156,6 @@ class LaporanPembelianController extends Controller
         return redirect()->route('admin.laporanpembelian.index')
             ->with('success', 'Data Laporan Pembelian berhasil diubah');
     }
-
-
-
-
-
-
 
     /**
      * Remove the specified resource from storage.

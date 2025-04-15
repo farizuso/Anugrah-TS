@@ -14,6 +14,11 @@ class LaporanPembelian extends Model
         'supplier_id',
         'total',
         'keterangan',
+        'details', // Pastikan details sesuai dengan struktur yang diinginkan
+    ];
+
+    protected $casts = [
+        'tgl_pembelian' => 'date',  // Menggunakan tipe date di sini
     ];
 
     /**

@@ -24,12 +24,29 @@ import {
 import { Calendar } from "@/Components/ui/calendar";
 import { rankItem } from "@tanstack/match-sorter-utils";
 
+// Interface untuk detail pembelian
+interface Detail {
+    produk: { nama_produk: string };
+    harga: number;
+    quantity: number;
+}
+
+// Interface untuk Laporan Pembelian yang lebih spesifik
+interface LaporanPembelian {
+    tgl_pembelian: string;
+    supplier: { nama_supplier: string };
+    keterangan: string;
+    details: Detail[];
+}
+
+// Props untuk DataTable
 interface DataTableProps<TData> {
     data: TData[];
     columns: ColumnDef<TData>[];
 }
 
-export function LaporanDataTable<TData>({
+// Komponen LaporanDataTable
+export function LaporanDataTable<TData extends LaporanPembelian>({
     data,
     columns,
 }: DataTableProps<TData>) {
@@ -38,24 +55,20 @@ export function LaporanDataTable<TData>({
     const [endDate, setEndDate] = React.useState<Date | null>(null);
     const [showCustom, setShowCustom] = React.useState(false);
 
-    // Filter data by date range
+    // Filter data berdasarkan rentang tanggal
     const filteredData = React.useMemo(() => {
         if (!startDate || !endDate) return data;
-        return data.filter((row: any) => {
+        return data.filter((row) => {
             const date = new Date(row.tgl_pembelian);
             return date >= startDate && date <= endDate;
         });
     }, [data, startDate, endDate]);
 
-    // Calculate totals (total price, total quantity)
+    // Menghitung total harga
     const totalPrice = React.useMemo(() => {
         return filteredData.reduce((total, item) => {
-            const itemWithDetails = item as { details: any[] };
-            if (
-                itemWithDetails.details &&
-                Array.isArray(itemWithDetails.details)
-            ) {
-                itemWithDetails.details.forEach((detail: any) => {
+            if (item.details && Array.isArray(item.details)) {
+                item.details.forEach((detail) => {
                     total += detail.harga * detail.quantity;
                 });
             }
@@ -63,10 +76,11 @@ export function LaporanDataTable<TData>({
         }, 0);
     }, [filteredData]);
 
+    // Menghitung total kuantitas
     const totalQuantity = React.useMemo(() => {
         return filteredData.reduce((total, item) => {
             if (item.details && Array.isArray(item.details)) {
-                item.details.forEach((detail: any) => {
+                item.details.forEach((detail) => {
                     total += detail.quantity;
                 });
             }
@@ -74,16 +88,16 @@ export function LaporanDataTable<TData>({
         }, 0);
     }, [filteredData]);
 
-    // Apply quick filters for date range
+    // Mengatur filter cepat berdasarkan rentang tanggal
     const applyQuickFilter = (type: string) => {
         const now = new Date();
         let from: Date, to: Date;
 
         switch (type) {
             case "today":
-                from = new Date(now.setHours(0, 0, 0, 0)); // Set start time to 00:00:00
+                from = new Date(now.setHours(0, 0, 0, 0)); // Set waktu mulai ke 00:00:00
                 to = new Date();
-                to.setHours(23, 59, 59, 999); // Set end time to 23:59:59
+                to.setHours(23, 59, 59, 999); // Set waktu akhir ke 23:59:59
                 break;
             case "thisMonth":
                 from = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -107,16 +121,16 @@ export function LaporanDataTable<TData>({
         setShowCustom(false);
     };
 
-    // Export filtered data to Excel
+    // Ekspor data yang sudah difilter ke dalam file Excel
     const exportToExcel = () => {
         const rows: any[] = [];
 
-        filteredData.forEach((item: any) => {
+        filteredData.forEach((item) => {
             if (item.details && Array.isArray(item.details)) {
-                item.details.forEach((detail: any) => {
+                item.details.forEach((detail) => {
                     rows.push({
                         "Tanggal Pembelian": item.tgl_pembelian,
-                        "Nama Supplier": item.supplier?.nama_supplier ?? "-", // Perbaikan di sini
+                        "Nama Supplier": item.supplier?.nama_supplier ?? "-",
                         "Nama Produk": detail.produk?.nama_produk ?? "-",
                         Harga: detail.harga,
                         Quantity: detail.quantity,
@@ -127,7 +141,7 @@ export function LaporanDataTable<TData>({
             } else {
                 rows.push({
                     "Tanggal Pembelian": item.tgl_pembelian,
-                    "Nama Supplier": item.supplier?.nama_supplier ?? "-", // Perbaikan di sini
+                    "Nama Supplier": item.supplier?.nama_supplier ?? "-",
                     "Nama Produk": "-",
                     Harga: 0,
                     Quantity: 0,
@@ -146,6 +160,7 @@ export function LaporanDataTable<TData>({
         XLSX.writeFile(wb, "laporan_pembelian.xlsx");
     };
 
+    // Filter fuzzy untuk pencarian
     const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
         const itemRank = rankItem(row.getValue(columnId), value);
         addMeta({
@@ -154,13 +169,13 @@ export function LaporanDataTable<TData>({
         return itemRank.passed;
     };
 
-    // Setting up table with react-table hooks
+    // Setting up table dengan react-table hooks
     const table = useReactTable({
         data: filteredData,
         columns,
         state: { globalFilter },
         onGlobalFilterChange: setGlobalFilter,
-        filterFns: { fuzzy: fuzzyFilter }, // Add this line for fuzzy search
+        filterFns: { fuzzy: fuzzyFilter }, // Menambahkan filter fuzzy
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),

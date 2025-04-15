@@ -1,3 +1,5 @@
+// File: resources/js/Pages/LaporanPembelian/TabsDemo.tsx
+
 import { Button } from "@/Components/ui/button";
 import {
     Card,
@@ -10,8 +12,6 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
-
-import { LaporanPembelian, PageProps, Produk, Supplier } from "@/types";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useForm, usePage } from "@inertiajs/react";
 import React, { FormEventHandler, useEffect } from "react";
@@ -27,32 +27,42 @@ import { Calendar } from "@/Components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { LaporanDataTable } from "@/Components/LaporanDataTable";
-import { PageProps as InertiaPageProps } from "@inertiajs/core";
+import { Produk, Supplier, LaporanPembelian, PageProps } from "@/types";
 
 interface LaporanPembelianProps {
     posts: LaporanPembelian[];
+    produks: Produk[];
+    suppliers: Supplier[];
 }
 
-const TabsDemo = ({ posts }: LaporanPembelianProps) => {
+const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
+    const flash = usePage<PageProps>().props.flash;
+
     const { data, setData, post, processing, errors, reset } = useForm({
-        tgl_pembelian: "",
+        tgl_pembelian: new Date(),
         supplier_id: "",
         produk: [{ produk_id: "", harga: "", quantity: "" }],
-        quantity: "",
         total: 0,
         keterangan: "",
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
+        const formattedDate = format(data.tgl_pembelian, "yyyy-MM-dd");
+
         post(route("admin.laporanpembelian.store"), {
+            data: {
+                ...data,
+                tgl_pembelian: formattedDate,
+            },
             onSuccess: () => reset(),
         });
     };
 
     const handleProdukChange = (index: number, value: any) => {
         const newProduk = [...data.produk];
-        newProduk[index].produk_id = value ? String(value.value) : "";
+        newProduk[index].produk_id = value?.value || "";
         setData("produk", newProduk);
     };
 
@@ -82,27 +92,19 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
     };
 
     const handleSupplierChange = (option: any) => {
-        setData("supplier_id", option ? option.value : "");
+        setData("supplier_id", option?.value || "");
     };
 
     const handleCreate = (inputValue: string) => {
-        // Contoh: bisa ganti dengan open modal input supplier baru
         alert(`Tambah supplier baru: ${inputValue}`);
     };
 
-    interface PageProps {
-        produks: Produk[];
-        suppliers: Supplier[];
-    }
-
-    const { produks = [], suppliers = [] } = usePage<PageProps>().props;
-
-    const produkOptions = produks.map((produk: Produk) => ({
+    const produkOptions = produks.map((produk) => ({
         value: String(produk.id),
         label: produk.nama_produk,
     }));
 
-    const supplierOptions = suppliers.map((supplier: Supplier) => ({
+    const supplierOptions = suppliers.map((supplier) => ({
         value: String(supplier.id),
         label: supplier.nama_supplier,
     }));
@@ -138,20 +140,15 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                     <Card>
                         <form onSubmit={submit}>
                             <CardHeader>
-                                <CardTitle>
-                                    Tambah Data Laporan Pembelian
-                                </CardTitle>
+                                <CardTitle>Tambah Laporan Pembelian</CardTitle>
                                 <CardDescription>
-                                    Masukkan data laporan pembelian.
+                                    Masukkan data pembelian produk.
                                 </CardDescription>
                             </CardHeader>
 
                             <CardContent className="space-y-4">
-                                {/* Tanggal Pembelian */}
                                 <div className="space-y-1">
-                                    <Label htmlFor="tgl_pembelian">
-                                        Tanggal Pembelian
-                                    </Label>
+                                    <Label>Tanggal Pembelian</Label>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
@@ -164,9 +161,7 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                             >
                                                 {data.tgl_pembelian
                                                     ? format(
-                                                          new Date(
-                                                              data.tgl_pembelian
-                                                          ),
+                                                          data.tgl_pembelian,
                                                           "yyyy-MM-dd"
                                                       )
                                                     : "Pilih Tanggal"}
@@ -176,75 +171,50 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                         <PopoverContent className="w-auto p-0">
                                             <Calendar
                                                 mode="single"
-                                                selected={
-                                                    data.tgl_pembelian
-                                                        ? new Date(
-                                                              data.tgl_pembelian
-                                                          )
-                                                        : undefined
-                                                }
+                                                selected={data.tgl_pembelian}
                                                 onSelect={(date) => {
                                                     if (date) {
-                                                        const local = new Date(
-                                                            date
-                                                        );
-                                                        local.setHours(12); // Hindari offset
                                                         setData(
                                                             "tgl_pembelian",
-                                                            local
-                                                                .toISOString()
-                                                                .split("T")[0]
+                                                            date
                                                         );
                                                     }
                                                 }}
-                                                initialFocus
                                             />
                                         </PopoverContent>
                                     </Popover>
                                 </div>
 
-                                {/* Supplier */}
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="supplier_id">
-                                        Nama Supplier
-                                    </Label>
+                                    <Label>Nama Supplier</Label>
                                     <CreatableSelect
-                                        id="supplier_id"
                                         isClearable
                                         options={supplierOptions}
                                         onChange={handleSupplierChange}
                                         onCreateOption={handleCreate}
                                         value={supplierOptions.find(
-                                            (option) =>
-                                                option.value ===
-                                                data.supplier_id
+                                            (opt) =>
+                                                opt.value === data.supplier_id
                                         )}
                                     />
                                 </div>
 
-                                {/* Produk Repeater */}
                                 {data.produk.map((item, index) => (
                                     <div
                                         key={index}
                                         className="flex gap-2 items-end"
                                     >
-                                        <div className="w-full">
-                                            <CreatableSelect
-                                                isClearable
-                                                options={produkOptions}
-                                                onChange={(val) =>
-                                                    handleProdukChange(
-                                                        index,
-                                                        val
-                                                    )
-                                                }
-                                                value={produkOptions.find(
-                                                    (opt) =>
-                                                        opt.value ===
-                                                        item.produk_id
-                                                )}
-                                            />
-                                        </div>
+                                        <CreatableSelect
+                                            isClearable
+                                            options={produkOptions}
+                                            onChange={(val) =>
+                                                handleProdukChange(index, val)
+                                            }
+                                            value={produkOptions.find(
+                                                (opt) =>
+                                                    opt.value === item.produk_id
+                                            )}
+                                        />
                                         <Input
                                             type="number"
                                             placeholder="Harga"
@@ -295,18 +265,14 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                     <Input
                                         type="text"
                                         value={formatRupiah(data.total)}
-                                        disabled
+                                        readOnly
                                     />
                                 </div>
 
                                 <div className="space-y-1">
-                                    <Label htmlFor="keterangan">
-                                        Keterangan
-                                    </Label>
+                                    <Label>Keterangan</Label>
                                     <Input
-                                        id="keterangan"
                                         type="text"
-                                        name="keterangan"
                                         value={data.keterangan}
                                         onChange={(e) =>
                                             setData(

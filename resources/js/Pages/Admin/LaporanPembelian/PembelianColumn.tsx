@@ -5,6 +5,7 @@ import Edit from "./Edit";
 import { Button } from "@/Components/ui/button";
 import { Checkbox } from "@/Components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
+import { format } from "date-fns"; // Import format dari date-fns
 
 export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
     {
@@ -32,24 +33,22 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "tgl_pembelian",
+        accessorFn: (row: LaporanPembelian) => row.tgl_pembelian,
         header: "Tanggal Pembelian",
-        cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("tgl_pembelian")}</div>
-        ),
+        cell: ({ row }) => {
+            const date = new Date(row.getValue("tgl_pembelian"));
+            const formattedDate = format(date, "yyyy-MM-dd");
+            return <div className="capitalize">{formattedDate}</div>;
+        },
     },
     {
-        accessorKey: "nama_supplier",
-        header: "Nama supplier",
+        accessorFn: (row) => row.supplier?.nama_supplier || "-", // Gunakan hanya accessorFn
+        header: "Nama Supplier",
         cell: ({ row }) => (
             <div className="capitalize">
-                {row.original.supplier
-                    ? row.original.supplier.nama_supplier
-                    : "-"}
+                {row.original.supplier?.nama_supplier || "-"}
             </div>
         ),
-
-        accessorFn: (row) => row.supplier.nama_supplier,
     },
     {
         header: "Nama Produk",
@@ -107,28 +106,24 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
             const totalSeluruh = table
                 .getFilteredRowModel()
                 .rows.reduce((sum, row) => sum + row.original.total, 0);
-
             const formatted = new Intl.NumberFormat("id-ID", {
                 style: "currency",
                 currency: "IDR",
             }).format(totalSeluruh);
-
             return <div className="font-bold text-green-700">{formatted}</div>;
         },
     },
     {
-        accessorKey: "keterangan",
+        accessorKey: "keterangan", // Gunakan accessorKey
         header: "Keterangan",
         cell: ({ row }) => {
             const status = row.original.keterangan?.toLowerCase();
-
             const className =
                 status === "lunas"
                     ? "text-green-600 font-semibold"
                     : status === "belum lunas"
                     ? "text-red-600 font-semibold"
                     : "text-gray-700";
-
             return (
                 <div className={`capitalize ${className}`}>
                     {row.original.keterangan}
@@ -142,11 +137,10 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         enableHiding: false,
         cell: ({ row }) => {
             const laporanpembelian = row.original;
-
             return (
                 <div className="justify-center flex items-center gap-2">
                     <Delete pembeliandelete={laporanpembelian} />
-                    {/* <Edit pembelianedit={laporanpembelian} /> */}
+                    <Edit pembelianedit={laporanpembelian} />
                 </div>
             );
         },
