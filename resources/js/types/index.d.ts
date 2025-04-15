@@ -1,3 +1,4 @@
+import { id } from "date-fns/locale";
 export interface User {
     id: number;
     name: string;
@@ -16,8 +17,8 @@ export interface TodoWithMethod extends Todo {
 
 export interface LaporanPembelian {
     id: number;
-    tgl_pembelian: string;
-    nama_supplier: string;
+    tgl_pembelian: Date;
+    supplier: Supplier;
     total: number;
     keterangan: string;
     details: {
@@ -29,6 +30,31 @@ export interface LaporanPembelian {
             nama_produk: string;
         };
     }[];
+}
+
+export interface Supplier {
+    id: number;
+    nama_supplier: string;
+    alamat: string;
+    no_telp: number;
+}
+
+export interface Pesanan {
+    id: number;
+    tgl_pesanan: Date;
+    pelanggan: Pelanggan;
+    produk: Produk;
+    quantity: number;
+    total: number;
+    status_pesanan: string;
+}
+
+export interface Pembayaran {
+    id: number;
+    pesanan: Pesanan;
+    metode_pembayaran: string;
+    jumlah_dibayar: number;
+    status_pembayaran: string;
 }
 
 export interface Produk {
@@ -45,12 +71,6 @@ export interface Pelanggan {
     nama_pelanggan: string;
     alamat: string;
     no_hp: string;
-}
-export interface Supplier {
-    id: number;
-    nama_supplier: string;
-    alamat: string;
-    no_telp: number;
 }
 
 export interface Rekap {

@@ -11,21 +11,28 @@ class LaporanPembelianExport implements FromCollection, WithHeadings
 {
     public function collection()
     {
-        $laporan = LaporanPembelian::with('details.produk')->get();
+        // Mengambil data LaporanPembelian dengan relasi supplier dan produk
+        $laporan = LaporanPembelian::with(['supplier', 'details.produk'])->get();
+
+        // Debugging: Verifikasi apakah relasi supplier dimuat
+        dd($laporan);
 
         $data = collect();
 
+        // Loop melalui setiap laporan pembelian
         foreach ($laporan as $item) {
             foreach ($item->details as $detail) {
-                $data->push([
+                $row = [
                     'Tanggal Pembelian' => $item->tgl_pembelian,
-                    'Nama Supplier' => $item->nama_supplier,
-                    'Nama Produk' => $detail->produk->nama_produk ?? '-',
+                    'Nama Supplier' => $item->supplier->nama_supplier,
+                    'Nama Produk' => $detail->produk->nama_produk ?? 'PRODUK NULL',
                     'Harga' => $detail->harga,
                     'Quantity' => $detail->quantity,
                     'Total' => $detail->harga * $detail->quantity,
                     'Keterangan' => $item->keterangan,
-                ]);
+                ];
+
+                $data->push($row);
             }
         }
 

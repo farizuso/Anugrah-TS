@@ -36,10 +36,16 @@ const Edit = ({ supplieredit }: EditSupplier) => {
         });
     }, [supplieredit]);
     console.log(supplieredit);
+
     const submit = (e: any) => {
         e.preventDefault();
-        put(route("admin.supplier.update", [supplieredit]));
+        put(route("admin.supplier.update", supplieredit.id), {
+            onSuccess: () => {
+                setOpen(false);
+            },
+        });
     };
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>

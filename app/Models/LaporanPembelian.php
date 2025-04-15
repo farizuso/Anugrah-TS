@@ -11,13 +11,21 @@ class LaporanPembelian extends Model
 
     protected $fillable = [
         'tgl_pembelian',
-        'nama_supplier',
+        'supplier_id',
         'total',
         'keterangan',
     ];
 
+    /**
+     * Relasi dengan Supplier
+     */
     public function details()
     {
         return $this->hasMany(LaporanPembelianDetail::class, 'laporan_pembelian_id');
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 }

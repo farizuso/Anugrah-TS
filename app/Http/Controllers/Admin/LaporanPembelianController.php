@@ -12,8 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanPembelianExport;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use App\Models\Supplier;
 
 class LaporanPembelianController extends Controller
 {
@@ -22,13 +21,13 @@ class LaporanPembelianController extends Controller
      */
     public function index()
     {
-        $laporan = LaporanPembelian::with('details.produk')->get();
+        $posts = LaporanPembelian::with(['details.produk', 'supplier'])->get();
 
         return Inertia::render('Admin/LaporanPembelian/Index', [
-            'posts' => $laporan,
-            'produks' => Produk::all(), // supaya tetap bisa dipakai di form select
+            'posts' => $posts
         ]);
     }
+
     public function export()
     {
         return Excel::download(new LaporanPembelianExport, 'laporan_pembelian.xlsx');
@@ -48,8 +47,8 @@ class LaporanPembelianController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'tgl_pembelian' => 'required|date', // bisa juga 'date', tapi kita parse manual
-            'nama_supplier' => 'required|string',
+            'tgl_pembelian' => 'required|date',
+            'supplier_id' => 'required|exists:suppliers,id',
             'produk' => 'required|array|min:1',
             'produk.*.produk_id' => 'required|exists:produks,id',
             'produk.*.harga' => 'required|numeric|min:0',
@@ -57,23 +56,29 @@ class LaporanPembelianController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        // 🔐 Pastikan format tanggal aman (YYYY-MM-DD)
         try {
+            // Format tanggal sesuai yang diinginkan
             $tglFix = \Carbon\Carbon::parse($validated['tgl_pembelian'])->format('Y-m-d');
         } catch (\Exception $e) {
             return back()->withErrors(['tgl_pembelian' => 'Format tanggal tidak valid.']);
         }
 
+        // Menjalankan transaksi untuk memastikan atomisitas
         DB::transaction(function () use ($validated, $tglFix) {
+            // Ambil supplier berdasarkan supplier_id
+            $supplierId = $validated['supplier_id'];
+            $supplier = Supplier::find($supplierId);
+            $namaSupplier = $supplier?->nama_supplier;  // Nama supplier diambil dari relasi
+
+            // Membuat laporan pembelian
             $pembelian = LaporanPembelian::create([
                 'tgl_pembelian' => $tglFix,
-                'nama_supplier' => $validated['nama_supplier'],
+                'supplier_id' => $supplierId,
                 'keterangan' => $validated['keterangan'] ?? null,
-                'total' => collect($validated['produk'])->sum(function ($item) {
-                    return $item['harga'] * $item['quantity'];
-                }),
+                'total' => collect($validated['produk'])->sum(fn($item) => $item['harga'] * $item['quantity']),
             ]);
 
+            // Menyimpan detail produk
             foreach ($validated['produk'] as $item) {
                 LaporanPembelianDetail::create([
                     'laporan_pembelian_id' => $pembelian->id,
@@ -84,9 +89,11 @@ class LaporanPembelianController extends Controller
             }
         });
 
+        // Redirect ke halaman laporan pembelian setelah berhasil menyimpan data
         return redirect()->route('admin.laporanpembelian.index')
             ->with('success', 'Data Laporan Pembelian berhasil disimpan');
     }
+
 
 
 
@@ -114,7 +121,7 @@ class LaporanPembelianController extends Controller
     {
         $validated = $request->validate([
             'tgl_pembelian' => 'required|date',
-            'nama_supplier' => 'required|string',
+            'supplier_id' => 'required|exists:suppliers,id',
             'produk' => 'required|array|min:1',
             'produk.*.produk_id' => 'required|exists:produks,id',
             'produk.*.harga' => 'required|numeric|min:0',
@@ -123,26 +130,28 @@ class LaporanPembelianController extends Controller
         ]);
 
         DB::transaction(function () use ($validated, $id) {
-            // ✅ Ambil ulang model berdasarkan ID
+            // Temukan laporan pembelian berdasarkan ID
             $laporanPembelian = LaporanPembelian::findOrFail($id);
 
-            // Hitung total baru
-            $totalBaru = collect($validated['produk'])->sum(function ($item) {
-                return $item['harga'] * $item['quantity'];
-            });
+            // Ambil supplier berdasarkan supplier_id
+            $supplierId = $validated['supplier_id'];
+            $supplier = Supplier::find($supplierId);
+            $namaSupplier = $supplier?->nama_supplier;  // Nama supplier diambil dari relasi
 
-            // Update laporan
+            // Hitung total baru berdasarkan produk yang diupdate
+            $totalBaru = collect($validated['produk'])->sum(fn($item) => $item['harga'] * $item['quantity']);
+
+            // Update laporan pembelian
             $laporanPembelian->update([
                 'tgl_pembelian' => $validated['tgl_pembelian'],
-                'nama_supplier' => $validated['nama_supplier'],
+                'supplier_id' => $supplierId,
                 'keterangan' => $validated['keterangan'] ?? null,
                 'total' => $totalBaru,
             ]);
 
-            // Hapus semua detail lama
+            // Hapus detail produk lama dan buat yang baru
             $laporanPembelian->details()->delete();
 
-            // Tambahkan ulang detail
             foreach ($validated['produk'] as $item) {
                 LaporanPembelianDetail::create([
                     'laporan_pembelian_id' => $laporanPembelian->id,
@@ -156,6 +165,8 @@ class LaporanPembelianController extends Controller
         return redirect()->route('admin.laporanpembelian.index')
             ->with('success', 'Data Laporan Pembelian berhasil diubah');
     }
+
+
 
 
 

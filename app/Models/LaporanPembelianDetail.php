@@ -16,11 +16,17 @@ class LaporanPembelianDetail extends Model
         'quantity',
     ];
 
+    /**
+     * Relasi dengan Produk
+     */
     public function produk()
     {
-        return $this->belongsTo(Produk::class, 'produk_id');
+        return $this->belongsTo(Produk::class);
     }
 
+    /**
+     * Relasi dengan LaporanPembelian
+     */
     public function laporan()
     {
         return $this->belongsTo(LaporanPembelian::class, 'laporan_pembelian_id');

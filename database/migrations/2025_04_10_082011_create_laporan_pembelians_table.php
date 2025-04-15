@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('laporan_pembelians', function (Blueprint $table) {
             $table->id();
             $table->date('tgl_pembelian');
-            $table->string('nama_supplier');
+            $table->foreignId('supplier_id');
             $table->integer('total')->default(0); // bisa nullable jika awalnya tidak langsung dihitung
             $table->text('keterangan')->nullable();
             $table->timestamps();

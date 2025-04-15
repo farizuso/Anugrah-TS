@@ -1,7 +1,7 @@
 import { FormEventHandler } from "react";
 import Checkbox from "@/Components/Checkbox";
 import GuestLayout from "@/Layouts/GuestLayout";
-import UserLayout from "@/Layouts/UserLayout"
+import UserLayout from "@/Layouts/UserLayout";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { Label } from "@/Components/ui/label";
 import { Input } from "@/Components/ui/input";
@@ -49,7 +49,7 @@ export default function Login() {
         <GuestLayout>
             <div className="flex flex-col gap-2 w-full justify-center items-center px-5 max-w-md">
                 <img className="w-50" src={logo} />
-                <p className="text-xl font-bold">Login Admin</p>
+                <p className="text-xl font-bold">Login User</p>
                 <form
                     onSubmit={submit}
                     className="flex flex-col gap-5 lg:mt-1 shadow-sm mt-5 p-5 bg-white border border-gray-300 rounded-lg w-full"
@@ -101,7 +101,12 @@ export default function Login() {
                     >
                         Sign in
                     </Button>
-                    <Link className="text-blue-500 text-center underline" href="/register">Register</Link>
+                    <Link
+                        className="text-blue-500 text-center underline"
+                        href="/register"
+                    >
+                        Register
+                    </Link>
                 </form>
             </div>
         </GuestLayout>

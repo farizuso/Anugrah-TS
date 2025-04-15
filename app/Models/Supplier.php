@@ -14,4 +14,12 @@ class Supplier extends Model
         'alamat',
         'no_telp',
     ];
+
+    /**
+     * Relasi dengan LaporanPembelian
+     */
+    public function laporanPembelians()
+    {
+        return $this->hasMany(LaporanPembelian::class);
+    }
 }

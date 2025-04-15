@@ -40,26 +40,19 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
     },
     {
         accessorKey: "nama_supplier",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                }
-            >
-                Nama Supplier
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
+        header: "Nama supplier",
         cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("nama_supplier")}</div>
+            <div className="capitalize">
+                {row.original.supplier.nama_supplier}
+            </div>
         ),
+        accessorFn: (row) => row.supplier.nama_supplier,
     },
     {
         header: "Nama Produk",
         cell: ({ row }) => (
             <div className="space-y-1">
-                {row.original.details.map((item, index) => (
+                {(row.original.details || []).map((item, index) => (
                     <div
                         key={index}
                         className="capitalize before:content-['•_']"
@@ -74,7 +67,7 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         header: "QTY",
         cell: ({ row }) => (
             <div className="space-y-1">
-                {row.original.details.map((item, index) => (
+                {(row.original.details || []).map((item, index) => (
                     <div key={index} className="before:content-['•_']">
                         {item.quantity}
                     </div>
@@ -86,7 +79,7 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         header: "Harga",
         cell: ({ row }) => (
             <div className="space-y-1">
-                {row.original.details.map((item, index) => (
+                {(row.original.details || []).map((item, index) => (
                     <div key={index} className="before:content-['•_']">
                         {new Intl.NumberFormat("id-ID", {
                             style: "currency",
@@ -150,7 +143,7 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
             return (
                 <div className="justify-center flex items-center gap-2">
                     <Delete pembeliandelete={laporanpembelian} />
-                    <Edit pembelianedit={laporanpembelian} />
+                    {/* <Edit pembelianedit={laporanpembelian} /> */}
                 </div>
             );
         },

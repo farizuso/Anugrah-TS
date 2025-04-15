@@ -11,7 +11,7 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 
-import { LaporanPembelian, PageProps, Produk } from "@/types";
+import { LaporanPembelian, PageProps, Produk, Supplier } from "@/types";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useForm, usePage } from "@inertiajs/react";
 import React, { FormEventHandler, useEffect } from "react";
@@ -24,23 +24,22 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "@/Components/ui/calendar";
-import { CalendarIcon, DownloadIcon } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { LaporanDataTable } from "@/Components/LaporanDataTable";
+import { PageProps as InertiaPageProps } from "@inertiajs/core";
 
 interface LaporanPembelianProps {
     posts: LaporanPembelian[];
 }
 
 const TabsDemo = ({ posts }: LaporanPembelianProps) => {
-    const flash = usePage<PageProps>().props.flash;
-
     const { data, setData, post, processing, errors, reset } = useForm({
         tgl_pembelian: "",
-        nama_supplier: "",
+        supplier_id: "",
         produk: [{ produk_id: "", harga: "", quantity: "" }],
         quantity: "",
-        total: 0, // ← dijadikan number
+        total: 0,
         keterangan: "",
     });
 
@@ -82,42 +81,60 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
         setData("produk", newProduk);
     };
 
-    const { produks = [] } = usePage<PageProps>().props;
+    const handleSupplierChange = (option: any) => {
+        setData("supplier_id", option ? option.value : "");
+    };
+
+    const handleCreate = (inputValue: string) => {
+        // Contoh: bisa ganti dengan open modal input supplier baru
+        alert(`Tambah supplier baru: ${inputValue}`);
+    };
+
+    interface PageProps {
+        produks: Produk[];
+        suppliers: Supplier[];
+    }
+
+    const { produks = [], suppliers = [] } = usePage<PageProps>().props;
 
     const produkOptions = produks.map((produk: Produk) => ({
         value: String(produk.id),
         label: produk.nama_produk,
     }));
 
-    // Format rupiah
+    const supplierOptions = suppliers.map((supplier: Supplier) => ({
+        value: String(supplier.id),
+        label: supplier.nama_supplier,
+    }));
+
     const formatRupiah = (number: number): string =>
         new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
         }).format(number);
 
-    // Hitung total otomatis
     useEffect(() => {
         const totalHarga = data.produk.reduce((acc, curr) => {
             const harga = parseFloat(curr.harga) || 0;
             const qty = parseFloat(curr.quantity) || 0;
             return acc + harga * qty;
         }, 0);
-
         setData("total", totalHarga);
     }, [data.produk]);
 
     return (
         <AdminLayout>
-            <Tabs defaultValue="account" className="w-full">
+            <Tabs defaultValue="datatable" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="account">Data Table</TabsTrigger>
-                    <TabsTrigger value="password">Tambah Data</TabsTrigger>
+                    <TabsTrigger value="datatable">Data Table</TabsTrigger>
+                    <TabsTrigger value="form">Tambah Data</TabsTrigger>
                 </TabsList>
-                <TabsContent value="account">
+
+                <TabsContent value="datatable">
                     <LaporanDataTable data={posts} columns={PembelianColumns} />
                 </TabsContent>
-                <TabsContent value="password">
+
+                <TabsContent value="form">
                     <Card>
                         <form onSubmit={submit}>
                             <CardHeader>
@@ -128,8 +145,9 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                     Masukkan data laporan pembelian.
                                 </CardDescription>
                             </CardHeader>
+
                             <CardContent className="space-y-4">
-                                {/* Tanggal */}
+                                {/* Tanggal Pembelian */}
                                 <div className="space-y-1">
                                     <Label htmlFor="tgl_pembelian">
                                         Tanggal Pembelian
@@ -167,13 +185,13 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                                 }
                                                 onSelect={(date) => {
                                                     if (date) {
-                                                        const d = new Date(
+                                                        const local = new Date(
                                                             date
                                                         );
-                                                        d.setHours(12);
+                                                        local.setHours(12); // Hindari offset
                                                         setData(
                                                             "tgl_pembelian",
-                                                            d
+                                                            local
                                                                 .toISOString()
                                                                 .split("T")[0]
                                                         );
@@ -186,25 +204,25 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                 </div>
 
                                 {/* Supplier */}
-                                <div className="space-y-1">
-                                    <Label htmlFor="nama_supplier">
+                                <div className="flex flex-col gap-2">
+                                    <Label htmlFor="supplier_id">
                                         Nama Supplier
                                     </Label>
-                                    <Input
-                                        id="nama_supplier"
-                                        type="text"
-                                        name="nama_supplier"
-                                        value={data.nama_supplier}
-                                        onChange={(e) =>
-                                            setData(
-                                                "nama_supplier",
-                                                e.target.value
-                                            )
-                                        }
+                                    <CreatableSelect
+                                        id="supplier_id"
+                                        isClearable
+                                        options={supplierOptions}
+                                        onChange={handleSupplierChange}
+                                        onCreateOption={handleCreate}
+                                        value={supplierOptions.find(
+                                            (option) =>
+                                                option.value ===
+                                                data.supplier_id
+                                        )}
                                     />
                                 </div>
 
-                                {/* Repeater Produk */}
+                                {/* Produk Repeater */}
                                 {data.produk.map((item, index) => (
                                     <div
                                         key={index}
@@ -264,7 +282,6 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                     </div>
                                 ))}
 
-                                {/* Tombol Tambah Baris */}
                                 <Button
                                     type="button"
                                     variant="secondary"
@@ -273,7 +290,6 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                     + Tambah Produk
                                 </Button>
 
-                                {/* Total dan lainnya */}
                                 <div className="space-y-1">
                                     <Label>Total</Label>
                                     <Input
@@ -301,6 +317,7 @@ const TabsDemo = ({ posts }: LaporanPembelianProps) => {
                                     />
                                 </div>
                             </CardContent>
+
                             <CardFooter>
                                 <Button type="submit" disabled={processing}>
                                     {processing

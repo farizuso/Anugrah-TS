@@ -5,6 +5,7 @@ import {
     IconBrandProducthunt,
     IconDashboard,
     IconGrid4,
+    IconMacbookAir,
     IconNotes,
     IconPerson,
     IconSettings,
@@ -51,19 +52,6 @@ export function Aside() {
                         <IconBrandProducthunt />
                         <span>Produk</span>
                     </AsideLink>
-                </>
-            )}
-
-
-            {role === "staff_gudang" && (
-                <>
-                    <AsideLink
-                        active={route().current("admin.rekap.index")}
-                        href={route("admin.rekap.index")}
-                    >
-                        <IconPerson />
-                        <span>Rekap</span>
-                    </AsideLink>
 
                     <AsideLink
                         active={route().current("admin.supplier.index")}
@@ -75,12 +63,28 @@ export function Aside() {
                 </>
             )}
 
+            {role === "staff_gudang" && (
+                <>
+                    <AsideLink
+                        active={route().current("admin.rekap.index")}
+                        href={route("admin.rekap.index")}
+                    >
+                        <IconPerson />
+                        <span>Rekap</span>
+                    </AsideLink>
 
+                    {/* <AsideLink
+                        active={route().current("admin.supplier.index")}
+                        href={route("admin.supplier.index")}
+                    >
+                        <IconToolbox />
+                        <span>Supplier</span>
+                    </AsideLink> */}
+                </>
+            )}
 
             {role === "staff_penjualan" && (
                 <>
-
-
                     <AsideLink
                         active={route().current("admin.pelanggan.index")}
                         href={route("admin.pelanggan.index")}
@@ -89,6 +93,13 @@ export function Aside() {
                         <span>Data Pelanggan</span>
                     </AsideLink>
 
+                    <AsideLink
+                    // active={route().current("admin.pesanan.index")}
+                    // href={route("admin.pesanan.index")}
+                    >
+                        <IconMacbookAir />
+                        <span>Pesanan</span>
+                    </AsideLink>
                 </>
             )}
         </ul>
