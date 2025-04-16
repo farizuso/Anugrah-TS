@@ -53,8 +53,8 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
             const formattedDate =
                 tanggal && typeof tanggal === "string"
                     ? format(new Date(tanggal), "dd MMMM yyyy", {
-                        locale: id,
-                    })
+                          locale: id,
+                      })
                     : "-";
             return <div>{formattedDate}</div>;
         },
@@ -118,9 +118,7 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
                 style: "currency",
                 currency: "IDR",
             }).format(total);
-            return (
-                <div className="font-bold text-green-600">{formatted}</div>
-            );
+            return <div className="font-bold text-green-600">{formatted}</div>;
         },
         footer: ({ table }) => {
             const totalSeluruh = table
@@ -130,9 +128,7 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
                 style: "currency",
                 currency: "IDR",
             }).format(totalSeluruh);
-            return (
-                <div className="font-bold text-green-700">{formatted}</div>
-            );
+            return <div className="font-bold text-green-700">{formatted}</div>;
         },
     },
     {
@@ -144,8 +140,8 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
                 status === "lunas"
                     ? "text-green-600 font-semibold"
                     : status === "belum lunas"
-                        ? "text-red-600 font-semibold"
-                        : "text-gray-700";
+                    ? "text-red-600 font-semibold"
+                    : "text-gray-700";
             return (
                 <div className={`capitalize ${className}`}>
                     {row.original.keterangan}
@@ -167,5 +163,4 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
             );
         },
     },
-
 ];

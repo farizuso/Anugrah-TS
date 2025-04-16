@@ -38,9 +38,13 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
 
     const filteredData = React.useMemo(() => {
         if (!startDate || !endDate) return data;
+
+        const start = new Date(startDate.setHours(0, 0, 0, 0));
+        const end = new Date(endDate.setHours(23, 59, 59, 999));
+
         return data.filter((row) => {
-            const date = row.tgl_pembelian; // ✅ Tidak perlu new Date()
-            return date >= startDate && date <= endDate;
+            const date = new Date(row.tgl_pembelian);
+            return date >= start && date <= end;
         });
     }, [data, startDate, endDate]);
 
@@ -100,8 +104,9 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
         filteredData.forEach((item) => {
             item.details?.forEach((detail) => {
                 rows.push({
-                    "Tanggal Pembelian":
-                        item.tgl_pembelian.toLocaleDateString("id-ID"),
+                    "Tanggal Pembelian": new Date(
+                        item.tgl_pembelian
+                    ).toLocaleDateString("id-ID"),
                     "Nama Supplier": item.supplier?.nama_supplier ?? "-",
                     "Nama Produk": detail.produk?.nama_produk ?? "-",
                     Harga: detail.harga,
@@ -115,7 +120,18 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
         const ws = XLSX.utils.json_to_sheet(rows);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Laporan Pembelian");
-        XLSX.writeFile(wb, "laporan_pembelian.xlsx");
+
+        // Buat nama file berdasarkan tanggal filter
+        const getDateStr = (date: Date) => date.toISOString().split("T")[0]; // yyyy-mm-dd
+        let fileName = "laporan_pembelian.xlsx";
+
+        if (startDate && endDate) {
+            fileName = `laporan_pembelian_${getDateStr(
+                startDate
+            )}_sampai_${getDateStr(endDate)}.xlsx`;
+        }
+
+        XLSX.writeFile(wb, fileName);
     };
 
     const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
