@@ -27,7 +27,7 @@ import { Calendar } from "@/Components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { LaporanDataTable } from "@/Components/LaporanDataTable";
-import { Produk, Supplier, LaporanPembelian, PageProps, User } from "@/types";
+import { Produk, Supplier, LaporanPembelian, PageProps } from "@/types";
 import { DataTable } from "@/Components/DataTable";
 
 interface LaporanPembelianProps {
@@ -138,7 +138,7 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
 
                 <TabsContent value="datatable">
                     {auth?.user && (
-                        <DataTable
+                        <LaporanDataTable
                             columns={PembelianColumns}
                             data={posts}
                         />

@@ -10,6 +10,7 @@ import {
     FilterFn,
 } from "@tanstack/react-table";
 import * as XLSX from "xlsx";
+import { rankItem } from "@tanstack/match-sorter-utils";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { SearchIcon } from "lucide-react";
@@ -22,82 +23,54 @@ import {
     TableRow,
 } from "@/Components/ui/table";
 import { Calendar } from "@/Components/ui/calendar";
-import { rankItem } from "@tanstack/match-sorter-utils";
+import { LaporanPembelian } from "@/types"; // ✅ Import dari types utama
 
-// Interface untuk detail pembelian
-interface Detail {
-    produk: { nama_produk: string };
-    harga: number;
-    quantity: number;
+interface LaporanDataTableProps {
+    data: LaporanPembelian[];
+    columns: ColumnDef<LaporanPembelian>[];
 }
 
-// Interface untuk Laporan Pembelian yang lebih spesifik
-interface LaporanPembelian {
-    tgl_pembelian: string;
-    supplier: { nama_supplier: string };
-    keterangan: string;
-    details: Detail[];
-}
-
-// Props untuk DataTable
-interface LaporanDataTableProps<TData> {
-    data: TData[];
-    columns: ColumnDef<TData>[];
-}
-
-// Komponen LaporanDataTable
-export function LaporanDataTable<TData extends LaporanPembelian>({
-    data,
-    columns,
-}: LaporanDataTableProps<TData>) {
+export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
     const [globalFilter, setGlobalFilter] = React.useState("");
     const [startDate, setStartDate] = React.useState<Date | null>(null);
     const [endDate, setEndDate] = React.useState<Date | null>(null);
     const [showCustom, setShowCustom] = React.useState(false);
 
-    // Filter data berdasarkan rentang tanggal
     const filteredData = React.useMemo(() => {
         if (!startDate || !endDate) return data;
         return data.filter((row) => {
-            const date = new Date(row.tgl_pembelian);
+            const date = row.tgl_pembelian; // ✅ Tidak perlu new Date()
             return date >= startDate && date <= endDate;
         });
     }, [data, startDate, endDate]);
 
-    // Menghitung total harga
     const totalPrice = React.useMemo(() => {
         return filteredData.reduce((total, item) => {
-            if (item.details && Array.isArray(item.details)) {
-                item.details.forEach((detail) => {
-                    total += detail.harga * detail.quantity;
-                });
-            }
+            item.details?.forEach((detail) => {
+                total += detail.harga * detail.quantity;
+            });
             return total;
         }, 0);
     }, [filteredData]);
 
-    // Menghitung total kuantitas
     const totalQuantity = React.useMemo(() => {
         return filteredData.reduce((total, item) => {
-            if (item.details && Array.isArray(item.details)) {
-                item.details.forEach((detail) => {
-                    total += detail.quantity;
-                });
-            }
+            item.details?.forEach((detail) => {
+                total += detail.quantity;
+            });
             return total;
         }, 0);
     }, [filteredData]);
 
-    // Mengatur filter cepat berdasarkan rentang tanggal
     const applyQuickFilter = (type: string) => {
         const now = new Date();
         let from: Date, to: Date;
 
         switch (type) {
             case "today":
-                from = new Date(now.setHours(0, 0, 0, 0)); // Set waktu mulai ke 00:00:00
+                from = new Date(now.setHours(0, 0, 0, 0));
                 to = new Date();
-                to.setHours(23, 59, 59, 999); // Set waktu akhir ke 23:59:59
+                to.setHours(23, 59, 59, 999);
                 break;
             case "thisMonth":
                 from = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -121,61 +94,42 @@ export function LaporanDataTable<TData extends LaporanPembelian>({
         setShowCustom(false);
     };
 
-    // Ekspor data yang sudah difilter ke dalam file Excel
     const exportToExcel = () => {
         const rows: any[] = [];
 
         filteredData.forEach((item) => {
-            if (item.details && Array.isArray(item.details)) {
-                item.details.forEach((detail) => {
-                    rows.push({
-                        "Tanggal Pembelian": item.tgl_pembelian,
-                        "Nama Supplier": item.supplier?.nama_supplier ?? "-",
-                        "Nama Produk": detail.produk?.nama_produk ?? "-",
-                        Harga: detail.harga,
-                        Quantity: detail.quantity,
-                        Subtotal: detail.harga * detail.quantity,
-                        Keterangan: item.keterangan ?? "",
-                    });
-                });
-            } else {
+            item.details?.forEach((detail) => {
                 rows.push({
-                    "Tanggal Pembelian": item.tgl_pembelian,
+                    "Tanggal Pembelian":
+                        item.tgl_pembelian.toLocaleDateString("id-ID"),
                     "Nama Supplier": item.supplier?.nama_supplier ?? "-",
-                    "Nama Produk": "-",
-                    Harga: 0,
-                    Quantity: 0,
-                    Subtotal: 0,
+                    "Nama Produk": detail.produk?.nama_produk ?? "-",
+                    Harga: detail.harga,
+                    Quantity: detail.quantity,
+                    Subtotal: detail.harga * detail.quantity,
                     Keterangan: item.keterangan ?? "",
                 });
-            }
+            });
         });
 
-        // Menggunakan library XLSX untuk menulis dan mengunduh file Excel
-        const ws = XLSX.utils.json_to_sheet(rows); // Mengubah data menjadi sheet
-        const wb = XLSX.utils.book_new(); // Membuat buku baru
-        XLSX.utils.book_append_sheet(wb, ws, "Laporan Pembelian"); // Menambahkan sheet ke dalam buku
-
-        // Menyimpan file Excel
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan Pembelian");
         XLSX.writeFile(wb, "laporan_pembelian.xlsx");
     };
 
-    // Filter fuzzy untuk pencarian
     const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
         const itemRank = rankItem(row.getValue(columnId), value);
-        addMeta({
-            itemRank,
-        });
+        addMeta({ itemRank });
         return itemRank.passed;
     };
 
-    // Setting up table dengan react-table hooks
     const table = useReactTable({
         data: filteredData,
         columns,
         state: { globalFilter },
         onGlobalFilterChange: setGlobalFilter,
-        filterFns: { fuzzy: fuzzyFilter }, // Menambahkan filter fuzzy
+        filterFns: { fuzzy: fuzzyFilter },
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -284,7 +238,6 @@ export function LaporanDataTable<TData extends LaporanPembelian>({
                 </Table>
             </div>
 
-            {/* Display Total at the bottom right */}
             <div className="flex justify-end items-center space-x-4 py-4">
                 <div className="text-sm">
                     <strong>Total Jumlah Pembelian:</strong> {totalQuantity}{" "}
@@ -296,7 +249,6 @@ export function LaporanDataTable<TData extends LaporanPembelian>({
                 </div>
             </div>
 
-            {/* Pagination Controls */}
             <div className="flex items-center justify-end space-x-2 py-4">
                 <Button
                     variant="outline"
