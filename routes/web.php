@@ -45,45 +45,38 @@ Route::middleware('auth',)->group(function () {
 
 });
 
-Route::middleware('auth', 'role:admin')->group(function () {
+Route::middleware(['auth', 'role:admin,staff_gudang'])->group(function () {
     Route::get('/admin/produk', [ProductController::class, 'index'])->name('admin.produk.index');
     Route::put('/admin/produk/{produk}', [ProductController::class, 'update'])->name('admin.produk.update');
     Route::delete('/admin/produk/{produk}', [ProductController::class, 'destroy'])->name('admin.produk.destroy');
     Route::post('/admin/produk', [ProductController::class, 'store'])->name('admin.produk.store');
-
-    // Route::resource('/admin/supplier', SupplierController::class)->names('admin.supplier');
 
     Route::get('/admin/supplier', [SupplierController::class, 'index'])->name('admin.supplier.index');
     Route::put('/admin/supplier/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
     Route::delete('/admin/supplier/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
     Route::post('/admin/supplier', [SupplierController::class, 'store'])->name('admin.supplier.store');
 
-    Route::get('/admin/laporanpembelian/export', [LaporanPembelianController::class, 'export'])->name('admin.laporanpembelian.export');
-
     Route::get('/admin/laporanpembelian', [LaporanPembelianController::class, 'index'])->name('admin.laporanpembelian.index');
     Route::put('/admin/laporanpembelian/{id}', [LaporanPembelianController::class, 'update'])->name('admin.laporanpembelian.update');
     Route::delete('/admin/laporanpembelian/{id}', [LaporanPembelianController::class, 'destroy'])->name('admin.laporanpembelian.destroy');
     Route::post('/admin/laporanpembelian', [LaporanPembelianController::class, 'store'])->name('admin.laporanpembelian.store');
+    Route::get('/admin/laporanpembelian/export', [LaporanPembelianController::class, 'export'])->name('admin.laporanpembelian.export');
+    Route::post('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('admin.laporanpembelian.konfirmasi');
 
     Route::get('/admin/laporanpenjualan', [LaporanPenjualanController::class, 'index'])->name('admin.laporanpenjualan.index');
-    // Route::put(/admin/laporanpenjualan/{id}', [LaporanPenjualanController::class,'update'])->name('admin.laporanpenjualan.update');
-    // Route::delete('/admin/laporanpenjualan/{id}', [LaporanPenjualanController::class,'destroy'])->name('admin.laporanpenjualan.destroy');
-    // Route::post('/admin/laporanpenjualan', [LaporanPenjualanController::class,'store'])->name('admin.laporanpenjualan.store');
 });
+
 
 Route::middleware('auth', 'role:staff_gudang')->group(function () {
-
-    // Route::resource('/admin/supplier', SupplierController::class)->names('admin.supplier');
-
-    // Route::get('/admin/supplier', [SupplierController::class, 'index'])->name('admin.supplier.index');
-    // Route::put('/admin/supplier/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
-    // Route::delete('/admin/supplier/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
-    // Route::post('/admin/supplier', [ProductController::class, 'store'])->name('admin.supplier.store');
+    // Route::get('/admin/laporanpembelian', [LaporanPembelianController::class, 'index'])->name('admin.laporanpembelian.index');
+    // Route::post('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('admin.laporanpembelian.konfirmasi');
     Route::resource('/admin/rekap', RekapController::class)->names('admin.rekap');
 });
+
 
 Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
     Route::resource('/admin/Pelanggan', PelangganController::class)->names('admin.pelanggan');
 });
+
 
 require __DIR__ . '/auth.php';

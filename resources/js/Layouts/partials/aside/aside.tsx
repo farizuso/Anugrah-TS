@@ -73,13 +73,13 @@ export function Aside() {
                         <span>Rekap</span>
                     </AsideLink>
 
-                    {/* <AsideLink
-                        active={route().current("admin.supplier.index")}
-                        href={route("admin.supplier.index")}
+                    <AsideLink
+                        active={route().current("admin.laporanpembelian.index")}
+                        href={route("admin.laporanpembelian.index")}
                     >
-                        <IconToolbox />
-                        <span>Supplier</span>
-                    </AsideLink> */}
+                        <IconBrandProducthunt />
+                        <span>Laporan Pembelian</span>
+                    </AsideLink>
                 </>
             )}
 

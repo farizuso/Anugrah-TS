@@ -1,4 +1,15 @@
 import { id } from "date-fns/locale";
+
+export interface Auth {
+    auth: {
+        user?: User | null; // optional untuk safety
+    };
+    flash: {
+        success?: string;
+        error?: string;
+    };
+}
+
 export interface User {
     id: number;
     name: string;
@@ -21,6 +32,7 @@ export interface LaporanPembelian {
     supplier: Supplier;
     total: number;
     keterangan: string;
+    status: string;
     details: {
         id: number;
         harga: number;

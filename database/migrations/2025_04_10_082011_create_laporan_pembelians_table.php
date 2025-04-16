@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('supplier_id');
             $table->integer('total')->default(0); // bisa nullable jika awalnya tidak langsung dihitung
             $table->text('keterangan')->nullable();
+            $table->string('status')->default('Belum Dikonfirmasi'); // bisa nullable jika awalnya belum dikonfirmasi();
             $table->timestamps();
         });
     }

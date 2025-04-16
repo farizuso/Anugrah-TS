@@ -40,7 +40,7 @@ interface LaporanPembelian {
 }
 
 // Props untuk DataTable
-interface DataTableProps<TData> {
+interface LaporanDataTableProps<TData> {
     data: TData[];
     columns: ColumnDef<TData>[];
 }
@@ -49,7 +49,7 @@ interface DataTableProps<TData> {
 export function LaporanDataTable<TData extends LaporanPembelian>({
     data,
     columns,
-}: DataTableProps<TData>) {
+}: LaporanDataTableProps<TData>) {
     const [globalFilter, setGlobalFilter] = React.useState("");
     const [startDate, setStartDate] = React.useState<Date | null>(null);
     const [endDate, setEndDate] = React.useState<Date | null>(null);

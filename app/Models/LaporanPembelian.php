@@ -15,6 +15,8 @@ class LaporanPembelian extends Model
         'total',
         'keterangan',
         'details', // Pastikan details sesuai dengan struktur yang diinginkan
+        'status',
+
     ];
 
     protected $casts = [

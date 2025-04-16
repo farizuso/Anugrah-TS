@@ -27,7 +27,7 @@ import { Calendar } from "@/Components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { LaporanDataTable } from "@/Components/LaporanDataTable";
-import { Produk, Supplier, LaporanPembelian, PageProps } from "@/types";
+import { Produk, Supplier, LaporanPembelian, PageProps, User } from "@/types";
 import { DataTable } from "@/Components/DataTable";
 
 interface LaporanPembelianProps {
@@ -37,6 +37,8 @@ interface LaporanPembelianProps {
 }
 
 const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
+    const pageProps = usePage<PageProps>();
+    const auth = pageProps.props.auth;
     const flash = usePage<PageProps>().props.flash;
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -45,6 +47,7 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
         produk: [{ produk_id: "", harga: "", quantity: "" }],
         total: 0,
         keterangan: "",
+        status: "",
     });
 
     const submit: FormEventHandler = (e) => {
@@ -134,7 +137,12 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                 </TabsList>
 
                 <TabsContent value="datatable">
-                    <DataTable data={posts} columns={PembelianColumns} />
+                    {auth?.user && (
+                        <DataTable
+                            columns={PembelianColumns(auth.user)}
+                            data={posts}
+                        />
+                    )}
                 </TabsContent>
 
                 <TabsContent value="form">

@@ -12,8 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanPembelianExport;
+use App\Models\Stok;
 use App\Models\Supplier;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
 
 class LaporanPembelianController extends Controller
 {
@@ -22,17 +25,20 @@ class LaporanPembelianController extends Controller
      */
     public function index()
     {
+        // Mengambil data laporan pembelian beserta detail produk dan supplier
         $posts = LaporanPembelian::with(['details.produk', 'supplier'])->get();
 
-        // Pastikan tgl_pembelian adalah objek Date
+        // Pastikan tgl_pembelian adalah objek Date dan di-format sesuai yang diinginkan
         $posts->transform(function ($post) {
             $post->tgl_pembelian = Carbon::parse($post->tgl_pembelian)->format('Y-m-d');
-
             return $post;
         });
 
+        // Kirim data posts beserta role pengguna ke frontend
         return Inertia::render('Admin/LaporanPembelian/Index', [
-            'posts' => $posts
+            'posts' => $posts,
+            'role' => Auth::user()->role,  // Ambil langsung role dari database
+            'auth' => Auth::user()
         ]);
     }
 
@@ -171,5 +177,32 @@ class LaporanPembelianController extends Controller
         $laporanPembelian->delete();
 
         return redirect()->back()->with('success', 'Data berhasil dihapus.');
+    }
+
+    public function konfirmasi($id)
+    {
+        // Mencari laporan pembelian beserta detail produk
+        $laporan = LaporanPembelian::with('details.produk')->findOrFail($id);
+
+        // Mengecek apakah laporan sudah dikonfirmasi sebelumnya
+        if ($laporan->status === 'Dikonfirmasi') {
+            return back()->with('message', 'Laporan ini sudah dikonfirmasi sebelumnya');
+        }
+
+        // Ubah status laporan menjadi Dikonfirmasi
+        $laporan->update(['status' => 'Dikonfirmasi']);
+
+        // Proses untuk menambah stok produk
+        foreach ($laporan->details as $detail) {
+            $produk = $detail->produk;
+
+            // Pastikan stok ada atau buat stok jika belum ada
+            $stok = $produk->stok()->firstOrCreate([], ['jumlah_stok' => 0]);
+
+            // Menambah jumlah stok berdasarkan quantity dari detail pembelian
+            $stok->increment('jumlah_stok', $detail->quantity);
+        }
+
+        return back()->with('message', 'Berhasil dikonfirmasi dan stok produk berhasil ditambahkan');
     }
 }

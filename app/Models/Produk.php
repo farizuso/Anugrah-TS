@@ -20,8 +20,8 @@ class Produk extends Model
     {
         return $this->hasMany(Rekap::class);
     }
-    // public function stoks()
-    // {
-    //     return $this->hasMany(Stok::class);
-    // }
+    public function stok()
+    {
+        return $this->hasOne(Stok::class);
+    }
 }
