@@ -25,20 +25,32 @@ class LaporanPembelianController extends Controller
      */
     public function index()
     {
-        // Mengambil data laporan pembelian beserta detail produk dan supplier
         $posts = LaporanPembelian::with(['details.produk', 'supplier'])->get();
 
-        // Pastikan tgl_pembelian adalah objek Date dan di-format sesuai yang diinginkan
+        // Pastikan tgl_pembelian adalah objek Date
         $posts->transform(function ($post) {
             $post->tgl_pembelian = Carbon::parse($post->tgl_pembelian)->format('Y-m-d');
+
             return $post;
         });
 
-        // Kirim data posts beserta role pengguna ke frontend
         return Inertia::render('Admin/LaporanPembelian/Index', [
-            'posts' => $posts,
-            'role' => Auth::user()->role,  // Ambil langsung role dari database
-            'auth' => Auth::user()
+            'posts' => $posts
+        ]);
+    }
+
+    public function getLaporanPembelianGudang()
+    {
+        $posts = LaporanPembelian::with(['details.produk', 'supplier'])->get();
+
+        $posts->transform(function ($post) {
+            $post->tgl_pembelian = Carbon::parse($post->tgl_pembelian)->format('Y-m-d');
+
+            return $post;
+        });
+
+        return Inertia::render('StaffGudang/LaporanPembelian/Index', [
+            'posts' => $posts
         ]);
     }
 
@@ -181,6 +193,7 @@ class LaporanPembelianController extends Controller
 
     public function konfirmasi($id)
     {
+        try{
         // Mencari laporan pembelian beserta detail produk
         $laporan = LaporanPembelian::with('details.produk')->findOrFail($id);
 
@@ -203,6 +216,9 @@ class LaporanPembelianController extends Controller
             $stok->increment('jumlah_stok', $detail->quantity);
         }
 
-        return back()->with('message', 'Berhasil dikonfirmasi dan stok produk berhasil ditambahkan');
+        return back()->with('success', 'Berhasil dikonfirmasi dan stok produk berhasil ditambahkan');
+    } catch (\Exception $e) {
+        return back()->with('error', 'Gagal: '. $e->getMessage());
+    }
     }
 }

@@ -54,9 +54,9 @@ const AdminLayout = ({
         }
     }, [flash]);
 
-    if (!auth?.user) {
-        return <div>Memuat data pengguna...</div>; // atau spinner
-    }
+    // if (!auth?.user) {
+    //     return <div>Memuat data pengguna...</div>; // atau spinner
+    // }
     return (
         <>
             <Head title={title} />

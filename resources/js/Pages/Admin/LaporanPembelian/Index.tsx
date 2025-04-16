@@ -139,7 +139,7 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                 <TabsContent value="datatable">
                     {auth?.user && (
                         <DataTable
-                            columns={PembelianColumns(auth.user)}
+                            columns={PembelianColumns}
                             data={posts}
                         />
                     )}

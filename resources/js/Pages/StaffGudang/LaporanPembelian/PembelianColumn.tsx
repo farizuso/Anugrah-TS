@@ -5,9 +5,9 @@ import { Checkbox } from "@/Components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { router } from "@inertiajs/react";
-import Delete from "./Delete";
-import Edit from "./Edit";
+import { Link, router } from "@inertiajs/react";
+// import Delete from "./Delete";
+// import Edit from "./Edit";
 
 // Gunakan parameter opsional + default fallback
 export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
@@ -154,6 +154,33 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         },
     },
     {
+        accessorKey: "status",
+        header: "Status ",
+        cell: ({ row }) => {
+            const status = row.getValue("status") as string;
+
+            let badgeClass = '';
+
+            switch (status) {
+                case 'Dikonfirmasi':
+                    badgeClass = 'bg-green-500 text-white font-bold';
+                    break;
+                case 'Belum Dikonfirmasi':
+                    badgeClass = 'bg-yellow-500 text-black font-bold';
+                    break;
+                default:
+                    badgeClass = 'bg-gray-500 text-white font-bold';
+                    break;
+            }
+
+            return (
+                <div className={`capitalize inline-flex items-center px-3 py-1 rounded-full ${badgeClass}`}>
+                    {status}
+                </div>
+            );
+        },
+    },
+    {
         id: "actions",
         header: () => <div className="text-center">Action</div>,
         enableHiding: false,
@@ -161,8 +188,9 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
             const laporanpembelian = row.original;
             return (
                 <div className="justify-center flex items-center gap-2">
-                    <Delete pembeliandelete={laporanpembelian} />
-                    <Edit pembelianedit={laporanpembelian} />
+                    <Link href={route("staffgudang.laporanpembelian.konfirmasi", laporanpembelian.id)}>
+                    <Button variant="default">Konfirmasi</Button>
+                    </Link>
                 </div>
             );
         },

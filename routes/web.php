@@ -45,7 +45,7 @@ Route::middleware('auth',)->group(function () {
 
 });
 
-Route::middleware(['auth', 'role:admin,staff_gudang'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/produk', [ProductController::class, 'index'])->name('admin.produk.index');
     Route::put('/admin/produk/{produk}', [ProductController::class, 'update'])->name('admin.produk.update');
     Route::delete('/admin/produk/{produk}', [ProductController::class, 'destroy'])->name('admin.produk.destroy');
@@ -61,7 +61,6 @@ Route::middleware(['auth', 'role:admin,staff_gudang'])->group(function () {
     Route::delete('/admin/laporanpembelian/{id}', [LaporanPembelianController::class, 'destroy'])->name('admin.laporanpembelian.destroy');
     Route::post('/admin/laporanpembelian', [LaporanPembelianController::class, 'store'])->name('admin.laporanpembelian.store');
     Route::get('/admin/laporanpembelian/export', [LaporanPembelianController::class, 'export'])->name('admin.laporanpembelian.export');
-    Route::post('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('admin.laporanpembelian.konfirmasi');
 
     Route::get('/admin/laporanpenjualan', [LaporanPenjualanController::class, 'index'])->name('admin.laporanpenjualan.index');
 });
@@ -70,7 +69,9 @@ Route::middleware(['auth', 'role:admin,staff_gudang'])->group(function () {
 Route::middleware('auth', 'role:staff_gudang')->group(function () {
     // Route::get('/admin/laporanpembelian', [LaporanPembelianController::class, 'index'])->name('admin.laporanpembelian.index');
     // Route::post('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('admin.laporanpembelian.konfirmasi');
+    Route::get('/gudang/laporanpembelian', [LaporanPembelianController::class, 'getLaporanPembelianGudang'])->name('staffgudang.laporanpembelian.index');
     Route::resource('/admin/rekap', RekapController::class)->names('admin.rekap');
+    Route::get('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('staffgudang.laporanpembelian.konfirmasi');
 });
 
 

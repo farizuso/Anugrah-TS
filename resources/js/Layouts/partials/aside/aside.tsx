@@ -74,8 +74,8 @@ export function Aside() {
                     </AsideLink>
 
                     <AsideLink
-                        active={route().current("admin.laporanpembelian.index")}
-                        href={route("admin.laporanpembelian.index")}
+                        active={route().current("staffgudang.laporanpembelian.index")}
+                        href={route("staffgudang.laporanpembelian.index")}
                     >
                         <IconBrandProducthunt />
                         <span>Laporan Pembelian</span>
@@ -94,8 +94,8 @@ export function Aside() {
                     </AsideLink>
 
                     <AsideLink
-                    // active={route().current("admin.pesanan.index")}
-                    // href={route("admin.pesanan.index")}
+                        
+                        href=""
                     >
                         <IconMacbookAir />
                         <span>Pesanan</span>
