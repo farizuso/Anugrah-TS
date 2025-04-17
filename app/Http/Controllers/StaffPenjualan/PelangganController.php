@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\StaffPenjualan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pelanggan;
@@ -15,7 +15,7 @@ class PelangganController extends Controller
     public function index()
     {
         $posts = Pelanggan::all();
-        return Inertia::render('Admin/Pelanggan/Index', [
+        return Inertia::render('StaffPenjualan/Pelanggan/Index', [
             'posts' => $posts
         ]);
     }
@@ -24,14 +24,6 @@ class PelangganController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
-        $posts = Pelanggan::all();
-        return Inertia::render('Admin/Pelanggan/Index', [
-            'posts' => $posts
-        ]);
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -45,7 +37,7 @@ class PelangganController extends Controller
             'no_hp' => 'required',
         ]);
         Pelanggan::create($data);
-        return redirect()->route('admin.pelanggan.index')->with('success', 'Data Pelanggan berhasil ditambahkan');
+        return redirect()->route('staffpenjualan.pelanggan.index')->with('success', 'Data Pelanggan berhasil ditambahkan');
     }
 
     /**
@@ -79,7 +71,7 @@ class PelangganController extends Controller
 
         $pelanggan->update($validated);
 
-        return redirect()->route('admin.pelanggan.index')->with('success', 'Data Pelanggan berhasil diubah');
+        return redirect()->route('staffpenjualan.pelanggan.index')->with('success', 'Data Pelanggan berhasil diubah');
     }
 
 
@@ -88,11 +80,11 @@ class PelangganController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy($id)
-{
-    $pelanggan = Pelanggan::findOrFail($id);
+    {
+        $pelanggan = Pelanggan::findOrFail($id);
 
-    $pelanggan->delete();
+        $pelanggan->delete();
 
-    return redirect()->route('admin.pelanggan.index')->with('success', 'Data Pelanggan berhasil dihapus');
-}
+        return redirect()->route('staffpenjualan.pelanggan.index')->with('success', 'Data Pelanggan berhasil dihapus');
+    }
 }

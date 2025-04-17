@@ -24,15 +24,7 @@ interface DeleteLaporanPembelian {
     pembeliandelete: LaporanPembelian;
 }
 const Delete = ({ pembeliandelete }: DeleteLaporanPembelian) => {
-    const {
-        delete: destroy,
-        data,
-        setData,
-        post,
-        processing,
-        errors,
-        reset,
-    } = useForm({
+    const { delete: destroy, reset } = useForm({
         name: "",
     });
 

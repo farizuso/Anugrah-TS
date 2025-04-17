@@ -1,4 +1,4 @@
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/Components/ui/button";
 import {
     Card,
     CardContent,
@@ -6,22 +6,16 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/Components/ui/card"
-import { Input } from "@/Components/ui/input"
-import { Label } from "@/Components/ui/label"
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/Components/ui/tabs"
-import { DataTable } from "@/Components/DataTable"
-import { PageProps, Pelanggan, Produk } from '@/types'
-import AdminLayout from "@/Layouts/AdminLayout"
-import { useForm, usePage } from "@inertiajs/react"
-import { FormEventHandler } from "react"
-import { pelangganColumns } from "./pelangganColumn"
-
+} from "@/Components/ui/card";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
+import { DataTable } from "@/Components/DataTable";
+import { PageProps, Pelanggan, Produk } from "@/types";
+import AdminLayout from "@/Layouts/AdminLayout";
+import { useForm, usePage } from "@inertiajs/react";
+import { FormEventHandler } from "react";
+import { pelangganColumns } from "./pelangganColumn";
 
 interface PelangganProps {
     posts: Pelanggan[];
@@ -31,13 +25,21 @@ const TabsDemo = ({ posts }: PelangganProps) => {
     const flash = usePage<PageProps>().props.flash;
     console.log(flash.success);
 
-    const { delete: destroy, data, setData, post, processing, errors, reset } = useForm({
-       nama_pelanggan: "",
-       alamat: "",
-       no_hp: "",
+    const {
+        delete: destroy,
+        data,
+        setData,
+        post,
+        processing,
+        errors,
+        reset,
+    } = useForm({
+        nama_pelanggan: "",
+        alamat: "",
+        no_hp: "",
     });
 
-    console.log(data)
+    console.log(data);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -45,11 +47,10 @@ const TabsDemo = ({ posts }: PelangganProps) => {
         // router.post("/todos", data, {
         //     onSuccess: () => reset(),
         // });
-        post(route("admin.pelanggan.store"), {
+        post(route("staffpenjualan.pelanggan.store"), {
             onSuccess: () => reset(),
         });
-    }
-
+    };
 
     return (
         <AdminLayout>
@@ -72,12 +73,19 @@ const TabsDemo = ({ posts }: PelangganProps) => {
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <div className="space-y-1">
-                                    <Label htmlFor="current">Nama Pelanggan</Label>
+                                    <Label htmlFor="current">
+                                        Nama Pelanggan
+                                    </Label>
                                     <Input
                                         id="current"
                                         type="text"
                                         name="nama_pelanggan"
-                                        onChange={(e) => setData("nama_pelanggan", e.target.value)}
+                                        onChange={(e) =>
+                                            setData(
+                                                "nama_pelanggan",
+                                                e.target.value
+                                            )
+                                        }
                                         value={data.nama_pelanggan}
                                     />
                                 </div>
@@ -87,7 +95,9 @@ const TabsDemo = ({ posts }: PelangganProps) => {
                                         id="new"
                                         type="text"
                                         name="alamat"
-                                        onChange={(e) => setData("alamat", e.target.value)}
+                                        onChange={(e) =>
+                                            setData("alamat", e.target.value)
+                                        }
                                         value={data.alamat}
                                     />
                                 </div>
@@ -97,7 +107,9 @@ const TabsDemo = ({ posts }: PelangganProps) => {
                                         id="new"
                                         type="text"
                                         name="no_hp"
-                                        onChange={(e) => setData("no_hp", e.target.value)}
+                                        onChange={(e) =>
+                                            setData("no_hp", e.target.value)
+                                        }
                                         value={data.no_hp}
                                     />
                                 </div>
@@ -109,8 +121,8 @@ const TabsDemo = ({ posts }: PelangganProps) => {
                     </Card>
                 </TabsContent>
             </Tabs>
-        </AdminLayout >
-    )
-}
+        </AdminLayout>
+    );
+};
 
 export default TabsDemo;

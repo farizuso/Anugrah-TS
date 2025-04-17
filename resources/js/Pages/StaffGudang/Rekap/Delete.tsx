@@ -8,24 +8,31 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/Components/ui/alert-dialog"
-import { Button } from "@/Components/ui/button"
-import { Produk, Rekap, Todo } from '@/types'
-import { useForm } from '@inertiajs/react'
+} from "@/Components/ui/alert-dialog";
+import { Button } from "@/Components/ui/button";
+import { Produk, Rekap, Todo } from "@/types";
+import { useForm } from "@inertiajs/react";
 import { FaTrash } from "react-icons/fa";
 
 interface DeleteRekap {
     rekapdelete: Rekap;
 }
 
-const Deleterkp = ({rekapdelete}:DeleteRekap) => {
-
-    const { delete: destroy ,data, setData, post, processing, errors, reset } = useForm({
+const Deleterkp = ({ rekapdelete }: DeleteRekap) => {
+    const {
+        delete: destroy,
+        data,
+        setData,
+        post,
+        processing,
+        errors,
+        reset,
+    } = useForm({
         name: "",
     });
 
     const DeleteRekap = (id: number) => {
-        destroy(route("admin.rekap.destroy", id), {
+        destroy(route("staffgudang.rekap.destroy", id), {
             onSuccess: () => reset(),
         });
     };
@@ -33,7 +40,7 @@ const Deleterkp = ({rekapdelete}:DeleteRekap) => {
         <div>
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <Button size={'sm'} variant="outline_red">
+                    <Button size={"sm"} variant="outline_red">
                         <FaTrash />
                     </Button>
                 </AlertDialogTrigger>
@@ -46,14 +53,16 @@ const Deleterkp = ({rekapdelete}:DeleteRekap) => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => DeleteRekap(rekapdelete.id)}>Continue</AlertDialogAction>
+                        <AlertDialogAction
+                            onClick={() => DeleteRekap(rekapdelete.id)}
+                        >
+                            Continue
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </div>
-    )
-}
+    );
+};
 
-export default Deleterkp
-
-
+export default Deleterkp;

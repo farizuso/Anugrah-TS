@@ -32,7 +32,7 @@ const Delete = ({ pelanggandelete }: DeletePelanggan) => {
     });
 
     const destroyPelanggan = (id: number) => {
-        destroy(route("admin.pelanggan.destroy", id), {
+        destroy(route("staffpenjualan.pelanggan.destroy", id), {
             onSuccess: () => reset(),
         });
     };

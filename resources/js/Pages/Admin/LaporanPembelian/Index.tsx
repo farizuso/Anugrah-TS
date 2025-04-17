@@ -39,7 +39,6 @@ interface LaporanPembelianProps {
 const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
     const pageProps = usePage<PageProps>();
     const auth = pageProps.props.auth;
-    const flash = usePage<PageProps>().props.flash;
 
     const { data, setData, post, processing, errors, reset } = useForm({
         tgl_pembelian: new Date(),

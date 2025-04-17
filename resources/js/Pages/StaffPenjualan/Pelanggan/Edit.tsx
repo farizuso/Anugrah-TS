@@ -38,7 +38,7 @@ const Edit = ({ pelangganedit }: EditPelanggan) => {
     console.log(pelangganedit);
     const submit = (e: any) => {
         e.preventDefault();
-        put(route("admin.pelanggan.update", [pelangganedit]));
+        put(route("staffpenjualan.pelanggan.update", [pelangganedit]));
     };
     return (
         <Dialog open={open} onOpenChange={setOpen}>

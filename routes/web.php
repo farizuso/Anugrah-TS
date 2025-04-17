@@ -1,16 +1,15 @@
 <?php
 
-use App\Http\Controllers\Admin\PelangganController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\TodoController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\RekapController;
-use App\Http\Controllers\Admin\StokController;
 use App\Http\Controllers\Admin\LaporanPembelianController;
 use App\Http\Controllers\Admin\LaporanPenjualanController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\StaffGudang\RekapController;
+use App\Http\Controllers\StaffPenjualan\PelangganController;
+use App\Http\Controllers\StaffPenjualan\PesananController;
 use App\Models\LaporanPembelian;
 // use App\Http\Controllers\Admin\ProductCategoryController;
 // use App\Http\Controllers\Admin\DashboardAdminController;
@@ -67,17 +66,18 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 
 Route::middleware('auth', 'role:staff_gudang')->group(function () {
-    // Route::get('/admin/laporanpembelian', [LaporanPembelianController::class, 'index'])->name('admin.laporanpembelian.index');
-    // Route::post('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('admin.laporanpembelian.konfirmasi');
+
     Route::get('/gudang/laporanpembelian', [LaporanPembelianController::class, 'getLaporanPembelianGudang'])->name('staffgudang.laporanpembelian.index');
-    Route::resource('/admin/rekap', RekapController::class)->names('admin.rekap');
-    // Route::get('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('staffgudang.laporanpembelian.konfirmasi');
     Route::put('/staffgudang/laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('staffgudang.laporanpembelian.konfirmasi');
+
+    Route::resource('/staffgudang/rekap', RekapController::class)->names('staffgudang.rekap');
 });
 
 
 Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
-    Route::resource('/admin/Pelanggan', PelangganController::class)->names('admin.pelanggan');
+    Route::resource('/staffpenjualan/Pelanggan', PelangganController::class)->names('staffpenjualan.pelanggan');
+
+    Route::resource('/staffpenjualan/Pesanan', PesananController::class)->names('staffpenjualan.pesanan');
 });
 
 

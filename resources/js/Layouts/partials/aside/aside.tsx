@@ -6,6 +6,7 @@ import {
     IconDashboard,
     IconGrid4,
     IconMacbookAir,
+    IconMacbookAirFill,
     IconNotes,
     IconPerson,
     IconSettings,
@@ -67,14 +68,16 @@ export function Aside() {
                 <>
                     <AsideLink
                         active={route().current("admin.rekap.index")}
-                        href={route("admin.rekap.index")}
+                        href={route("staffgudang.rekap.index")}
                     >
                         <IconPerson />
                         <span>Rekap</span>
                     </AsideLink>
 
                     <AsideLink
-                        active={route().current("staffgudang.laporanpembelian.index")}
+                        active={route().current(
+                            "staffgudang.laporanpembelian.index"
+                        )}
                         href={route("staffgudang.laporanpembelian.index")}
                     >
                         <IconBrandProducthunt />
@@ -86,18 +89,20 @@ export function Aside() {
             {role === "staff_penjualan" && (
                 <>
                     <AsideLink
-                        active={route().current("admin.pelanggan.index")}
-                        href={route("admin.pelanggan.index")}
+                        active={route().current(
+                            "staffpenjualan.pelanggan.index"
+                        )}
+                        href={route("staffpenjualan.pelanggan.index")}
                     >
                         <IconPerson />
                         <span>Data Pelanggan</span>
                     </AsideLink>
 
                     <AsideLink
-                        
-                        href=""
+                        active={route().current("staffpenjualan.pesanan.index")}
+                        href={route("staffpenjualan.pesanan.index")}
                     >
-                        <IconMacbookAir />
+                        <IconMacbookAirFill />
                         <span>Pesanan</span>
                     </AsideLink>
                 </>

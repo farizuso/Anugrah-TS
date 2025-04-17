@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\StaffGudang;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ class RekapController extends Controller
     {
         // Mendapatkan data Rekap dengan relasi produk
         $posts = Rekap::with('produk', 'pelanggan')->get();
-        return Inertia::render('Admin/Rekap/Index', [
+        return Inertia::render('StaffGudang/Rekap/Index', [
             'posts' => $posts
         ]);
     }
@@ -36,7 +36,7 @@ class RekapController extends Controller
             Rekap::create($data);
 
             // Redirect dengan pesan sukses
-            return redirect()->route('admin.rekap.index')->with('success', 'Data Rekap berhasil ditambahkan');
+            return redirect()->route('staffgudang.rekap.index')->with('success', 'Data Rekap berhasil ditambahkan');
         } catch (\Exception $e) {
             // Log the error if necessary
             Log::error($e->getMessage());
@@ -64,7 +64,7 @@ class RekapController extends Controller
             $rekap->update($data);
 
             // Redirect dengan pesan sukses
-            return redirect()->route('admin.rekap.index')->with('success', 'Data Rekap berhasil diubah');
+            return redirect()->route('staffgudang.rekap.index')->with('success', 'Data Rekap berhasil diubah');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Jika terjadi kesalahan terkait model tidak ditemukan
             return redirect()->back()->withErrors('Data Rekap tidak ditemukan.');
@@ -81,6 +81,6 @@ class RekapController extends Controller
     public function destroy(Rekap $rekap)
     {
         $rekap->delete();
-        return redirect()->route('admin.rekap.index')->with('success', 'Data Rekap berhasil dihapus');
+        return redirect()->route('staffgudang.rekap.index')->with('success', 'Data Rekap berhasil dihapus');
     }
 }

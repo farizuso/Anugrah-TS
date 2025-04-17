@@ -56,7 +56,10 @@ const Edit = ({ rekapedit }: EditRekap) => {
             // Set the time to noon to avoid timezone issues
             const adjustedDate = new Date(date);
             adjustedDate.setHours(12, 0, 0, 0);
-            setData({ ...data, [field]: adjustedDate.toISOString().split('T')[0] });
+            setData({
+                ...data,
+                [field]: adjustedDate.toISOString().split("T")[0],
+            });
         } else {
             setData({ ...data, [field]: "" });
         }
@@ -67,11 +70,6 @@ const Edit = ({ rekapedit }: EditRekap) => {
     const pelangganOptions = pelanggans.map((pelanggan) => ({
         value: String(pelanggan.id),
         label: pelanggan.nama_pelanggan,
-    }));
-
-    const produkOptions = produks.map((produk) => ({
-        value: String(produk.id),
-        label: produk.no_botol,
     }));
 
     const handlePelangganChange = (newValue: any) => {
@@ -89,7 +87,6 @@ const Edit = ({ rekapedit }: EditRekap) => {
         // Here, it's simply adding the value locally.
     };
 
-
     // const handleDateSelect = (field: 'tgl_keluar' | 'tgl_kembali' | 'tgl_masuk_pabrik', date: Date | undefined) => {
     //     if (date) {
     //         // Format the date and update the corresponding field
@@ -97,11 +94,9 @@ const Edit = ({ rekapedit }: EditRekap) => {
     //     }
     // };
 
-
-
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route("admin.rekap.update", rekapedit.id), {
+        put(route("staffgudang.rekap.update", rekapedit.id), {
             onSuccess: () => {
                 reset();
                 setOpen(false);
@@ -115,7 +110,11 @@ const Edit = ({ rekapedit }: EditRekap) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="sm" variant="outline_blue" onClick={() => setOpen(true)}>
+                <Button
+                    size="sm"
+                    variant="outline_blue"
+                    onClick={() => setOpen(true)}
+                >
                     <BsPencilSquare />
                 </Button>
             </DialogTrigger>
@@ -136,27 +135,14 @@ const Edit = ({ rekapedit }: EditRekap) => {
                                 onChange={handlePelangganChange}
                                 onCreateOption={handleCreate}
                                 value={pelangganOptions.find(
-                                    (option) => option.value === data.pelanggan_id
+                                    (option) =>
+                                        option.value === data.pelanggan_id
                                 )}
                             />
                             {errors.pelanggan_id && (
-                                <p className="text-red-500 text-sm">{errors.pelanggan_id}</p>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="produk_id">No Botol</Label>
-                            <CreatableSelect
-                                id="produk_id"
-                                isClearable
-                                options={produkOptions}
-                                onChange={handleProdukChange}
-                                onCreateOption={handleCreate}
-                                value={produkOptions.find(
-                                    (option) => option.value === data.produk_id
-                                )}
-                            />
-                            {errors.produk_id && (
-                                <p className="text-red-500 text-sm">{errors.produk_id}</p>
+                                <p className="text-red-500 text-sm">
+                                    {errors.pelanggan_id}
+                                </p>
                             )}
                         </div>
 
@@ -170,14 +156,14 @@ const Edit = ({ rekapedit }: EditRekap) => {
                                         className={cn(
                                             "w-full justify-start text-left font-normal",
                                             !data.tgl_keluar &&
-                                            "text-muted-foreground"
+                                                "text-muted-foreground"
                                         )}
                                     >
                                         {data.tgl_keluar
                                             ? format(
-                                                new Date(data.tgl_keluar),
-                                                "yyyy-MM-dd"
-                                            )
+                                                  new Date(data.tgl_keluar),
+                                                  "yyyy-MM-dd"
+                                              )
                                             : "Pilih Tanggal"}
                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
@@ -209,14 +195,14 @@ const Edit = ({ rekapedit }: EditRekap) => {
                                         className={cn(
                                             "w-full justify-start text-left font-normal",
                                             !data.tgl_kembali &&
-                                            "text-muted-foreground"
+                                                "text-muted-foreground"
                                         )}
                                     >
                                         {data.tgl_kembali
                                             ? format(
-                                                new Date(data.tgl_kembali),
-                                                "yyyy-MM-dd"
-                                            )
+                                                  new Date(data.tgl_kembali),
+                                                  "yyyy-MM-dd"
+                                              )
                                             : "Pilih Tanggal"}
                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
@@ -230,7 +216,10 @@ const Edit = ({ rekapedit }: EditRekap) => {
                                                 : undefined
                                         }
                                         onSelect={(date) =>
-                                            handleDateSelect("tgl_kembali", date)
+                                            handleDateSelect(
+                                                "tgl_kembali",
+                                                date
+                                            )
                                         }
                                         initialFocus
                                     />
@@ -250,14 +239,16 @@ const Edit = ({ rekapedit }: EditRekap) => {
                                         className={cn(
                                             "w-full justify-start text-left font-normal",
                                             !data.tgl_masuk_pabrik &&
-                                            "text-muted-foreground"
+                                                "text-muted-foreground"
                                         )}
                                     >
                                         {data.tgl_masuk_pabrik
                                             ? format(
-                                                new Date(data.tgl_masuk_pabrik),
-                                                "yyyy-MM-dd"
-                                            )
+                                                  new Date(
+                                                      data.tgl_masuk_pabrik
+                                                  ),
+                                                  "yyyy-MM-dd"
+                                              )
                                             : "Pilih Tanggal"}
                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
@@ -267,7 +258,9 @@ const Edit = ({ rekapedit }: EditRekap) => {
                                         mode="single"
                                         selected={
                                             data.tgl_masuk_pabrik
-                                                ? new Date(data.tgl_masuk_pabrik)
+                                                ? new Date(
+                                                      data.tgl_masuk_pabrik
+                                                  )
                                                 : undefined
                                         }
                                         onSelect={(date) =>
@@ -288,11 +281,15 @@ const Edit = ({ rekapedit }: EditRekap) => {
                                 id="keterangan"
                                 type="text"
                                 name="keterangan"
-                                onChange={(e) => setData("keterangan", e.target.value)}
+                                onChange={(e) =>
+                                    setData("keterangan", e.target.value)
+                                }
                                 value={data.keterangan}
                             />
                             {errors.keterangan && (
-                                <p className="text-red-500 text-sm">{errors.keterangan}</p>
+                                <p className="text-red-500 text-sm">
+                                    {errors.keterangan}
+                                </p>
                             )}
                         </div>
                     </div>

@@ -55,10 +55,18 @@ export interface Pesanan {
     id: number;
     tgl_pesanan: Date;
     pelanggan: Pelanggan;
-    produk: Produk;
-    quantity: number;
     total: number;
-    status_pesanan: string;
+    keterangan: string;
+    status: string;
+    details: {
+        id: number;
+        harga: Produk;
+        quantity: number;
+        produk: {
+            id: number;
+            nama_produk: string;
+        };
+    }[];
 }
 
 export interface Pembayaran {
