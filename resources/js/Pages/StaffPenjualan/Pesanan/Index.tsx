@@ -169,14 +169,14 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                 className={cn(
                                                     "w-full justify-start text-left font-normal",
                                                     !data.tgl_pesanan &&
-                                                        "text-muted-foreground"
+                                                    "text-muted-foreground"
                                                 )}
                                             >
                                                 {data.tgl_pesanan
                                                     ? format(
-                                                          data.tgl_pesanan,
-                                                          "yyyy-MM-dd"
-                                                      )
+                                                        data.tgl_pesanan,
+                                                        "yyyy-MM-dd"
+                                                    )
                                                     : "Pilih Tanggal"}
                                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                             </Button>
@@ -211,73 +211,74 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                         )}
                                     />
                                 </div>
+                                <div>
+                                    <Label>Produk</Label>
+                                    {data.produk.map((item, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex gap-2 items-center mb-2"
+                                        >
+                                            <CreatableSelect
+                                                isClearable
+                                                options={produkOptions}
+                                                onChange={(val) =>
+                                                    handleProdukChange(index, val)
+                                                }
+                                                value={produkOptions.find(
+                                                    (option) =>
+                                                        option.value === item.produk_id
+                                                )}
+                                            />
+                                            <Input
+                                                type="number"
+                                                placeholder="Harga"
+                                                className="w-32"
+                                                value={item.harga}
+                                                readOnly
+                                            />
 
-                                {data.produk.map((item, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex gap-2 items-end"
+                                            <Input
+                                                type="number"
+                                                placeholder="Qty"
+                                                className="w-24"
+                                                value={item.quantity}
+                                                onChange={(e) =>
+                                                    handleQuantityChange(
+                                                        index,
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                            <Button
+                                                variant="destructive"
+                                                type="button"
+                                                onClick={() =>
+                                                    handleRemoveRow(index)
+                                                }
+                                                disabled={data.produk.length === 1}
+                                            >
+                                                Hapus
+                                            </Button>
+                                        </div>
+                                    ))}
+
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={handleAddRow}
                                     >
-                                        <CreatableSelect
-                                            isClearable
-                                            options={produkOptions}
-                                            onChange={(val) =>
-                                                handleProdukChange(index, val)
-                                            }
-                                            value={produkOptions.find(
-                                                (opt) =>
-                                                    opt.value === item.produk_id
-                                            )}
-                                        />
+                                        + Tambah Produk
+                                    </Button>
+
+                                    <div className="space-y-1">
+                                        <Label>Total</Label>
                                         <Input
-                                            type="number"
-                                            placeholder="Harga"
-                                            className="w-32"
-                                            value={item.harga}
+                                            type="text"
+                                            value={formatRupiah(data.total)}
                                             readOnly
                                         />
-
-                                        <Input
-                                            type="number"
-                                            placeholder="Qty"
-                                            className="w-24"
-                                            value={item.quantity}
-                                            onChange={(e) =>
-                                                handleQuantityChange(
-                                                    index,
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                        <Button
-                                            variant="destructive"
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemoveRow(index)
-                                            }
-                                            disabled={data.produk.length === 1}
-                                        >
-                                            Hapus
-                                        </Button>
                                     </div>
-                                ))}
-
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    onClick={handleAddRow}
-                                >
-                                    + Tambah Produk
-                                </Button>
-
-                                <div className="space-y-1">
-                                    <Label>Total</Label>
-                                    <Input
-                                        type="text"
-                                        value={formatRupiah(data.total)}
-                                        readOnly
-                                    />
                                 </div>
-
                                 <div className="space-y-1">
                                     <Label>Keterangan</Label>
                                     <Input
