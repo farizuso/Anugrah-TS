@@ -1,14 +1,14 @@
 // src/Components/columns.ts
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Produk } from "@/types"; // Sesuaikan dengan tipe data Anda
+import { Produk } from "@/types";
 import Delete from "./Delete";
 import Edit from "./Edit";
 import { Button } from "@/Components/ui/button";
 import { Checkbox } from "@/Components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 
-// Definisikan kolom tabel produk
+// Kolom DataTable untuk Produk
 export const produkColumns: ColumnDef<Produk>[] = [
     {
         id: "select",
@@ -36,71 +36,93 @@ export const produkColumns: ColumnDef<Produk>[] = [
     },
     {
         accessorKey: "nama_produk",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="grey"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Nama Produk
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
+        header: ({ column }) => (
+            <Button
+                variant="grey"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
+            >
+                Nama Produk
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => (
             <div className="capitalize">{row.getValue("nama_produk")}</div>
         ),
     },
     {
         accessorKey: "simbol",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="grey"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Simbol
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
+        header: ({ column }) => (
+            <Button
+                variant="grey"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
+            >
+                Simbol
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => (
             <div className="capitalize">{row.getValue("simbol")}</div>
         ),
     },
     {
         accessorKey: "jenis",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="grey"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Jenis
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
+        header: ({ column }) => (
+            <Button
+                variant="grey"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
+            >
+                Jenis
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => (
             <div className="capitalize">{row.getValue("jenis")}</div>
         ),
+    },
+    {
+        id: "jumlah_stok",
+        header: ({ column }) => (
+            <Button
+                variant="grey"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
+            >
+                Stok
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        accessorFn: (row) => row.stok?.jumlah_stok ?? 0,
+        cell: ({ row }) => {
+            const stok = row.original.stok?.jumlah_stok;
+
+            if (stok === undefined || stok === null) {
+                return <div className="text-gray-400 italic">Belum ada</div>;
+            }
+
+            return stok < 5 ? (
+                <div className="text-red-600 font-semibold">
+                    Segera restok (sisa: {stok})
+                </div>
+            ) : (
+                <div>{stok}</div>
+            );
+        },
     },
     {
         accessorKey: "harga_jual",
         header: () => <div className="text-left">Harga Jual</div>,
         cell: ({ row }) => {
             const amount = parseFloat(row.getValue("harga_jual"));
-
-            // Format the amount as a Rupiah amount
             const formatted = new Intl.NumberFormat("id-ID", {
                 style: "currency",
-                currency: "IDR", // Gunakan "IDR" untuk Rupiah
+                currency: "IDR",
             }).format(amount);
 
             return <div className="font-medium">{formatted}</div>;
@@ -108,13 +130,13 @@ export const produkColumns: ColumnDef<Produk>[] = [
     },
     {
         id: "actions",
-        header: () => <div className="text-center">action</div>,
+        header: () => <div className="text-center">Action</div>,
         enableHiding: false,
         cell: ({ row }) => {
             const produk = row.original;
 
             return (
-                <div className="justify-center flex items-center gap-2 ">
+                <div className="flex justify-center items-center gap-2">
                     <Delete produkdelete={produk} />
                     <Edit produkedit={produk} />
                 </div>

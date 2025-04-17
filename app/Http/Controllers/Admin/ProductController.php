@@ -17,12 +17,12 @@ class ProductController extends Controller
      */
     public function index()
     {
-        // return Inertia::render('Admin/Produk/Index');
-        $posts = Produk::all();
+        $posts = Produk::with('stok')->get();
         return Inertia::render('Admin/Produk/Index', [
             'posts' => $posts
         ]);
     }
+
     public function store(Request $request)
     {
         $data = $request->validate([

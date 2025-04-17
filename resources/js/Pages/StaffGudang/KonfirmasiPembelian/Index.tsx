@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useForm, usePage } from "@inertiajs/react";
 import React, { FormEventHandler, useEffect } from "react";
-import { PembelianColumns } from "./PembelianColumn";
+
 import {
     Popover,
     PopoverContent,
@@ -29,6 +29,7 @@ import CreatableSelect from "react-select/creatable";
 import { LaporanDataTable } from "@/Components/LaporanDataTable";
 import { Produk, Supplier, LaporanPembelian, PageProps, User } from "@/types";
 import { DataTable } from "@/Components/DataTable";
+import { KonfirmasiColumns } from "./KonfirmasiColumn";
 
 interface LaporanPembelianProps {
     posts: LaporanPembelian[];
@@ -39,7 +40,7 @@ interface LaporanPembelianProps {
 const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
     return (
         <AdminLayout>
-            <DataTable data={posts} columns={PembelianColumns} />
+            <DataTable data={posts} columns={KonfirmasiColumns} />
         </AdminLayout>
     );
 };

@@ -69,13 +69,19 @@ export interface Pembayaran {
     status_pembayaran: string;
 }
 
+export interface Stok {
+    id: number;
+    produk_id: number;
+    jumlah_stok: number;
+}
+
 export interface Produk {
     id: number;
     nama_produk: string;
     simbol: string;
     jenis: string;
-    harga_jual: number;
-    stok: string;
+    harga_jual: string;
+    stok?: Stok | null; // tambahkan ini
 }
 
 export interface Pelanggan {

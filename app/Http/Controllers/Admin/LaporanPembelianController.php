@@ -49,7 +49,7 @@ class LaporanPembelianController extends Controller
             return $post;
         });
 
-        return Inertia::render('StaffGudang/LaporanPembelian/Index', [
+        return Inertia::render('StaffGudang/KonfirmasiPembelian/Index', [
             'posts' => $posts
         ]);
     }
@@ -193,32 +193,32 @@ class LaporanPembelianController extends Controller
 
     public function konfirmasi($id)
     {
-        try{
-        // Mencari laporan pembelian beserta detail produk
-        $laporan = LaporanPembelian::with('details.produk')->findOrFail($id);
+        try {
+            // Mencari laporan pembelian beserta detail produk
+            $laporan = LaporanPembelian::with('details.produk')->findOrFail($id);
 
-        // Mengecek apakah laporan sudah dikonfirmasi sebelumnya
-        if ($laporan->status === 'Dikonfirmasi') {
-            return back()->with('message', 'Laporan ini sudah dikonfirmasi sebelumnya');
+            // Mengecek apakah laporan sudah dikonfirmasi sebelumnya
+            if ($laporan->status === 'Dikonfirmasi') {
+                return back()->with('message', 'Laporan ini sudah dikonfirmasi sebelumnya');
+            }
+
+            // Ubah status laporan menjadi Dikonfirmasi
+            $laporan->update(['status' => 'Dikonfirmasi']);
+
+            // Proses untuk menambah stok produk
+            foreach ($laporan->details as $detail) {
+                $produk = $detail->produk;
+
+                // Pastikan stok ada atau buat stok jika belum ada
+                $stok = $produk->stok()->firstOrCreate([], ['jumlah_stok' => 0]);
+
+                // Menambah jumlah stok berdasarkan quantity dari detail pembelian
+                $stok->increment('jumlah_stok', $detail->quantity);
+            }
+
+            // return back()->with('success', 'Berhasil dikonfirmasi dan stok produk berhasil ditambahkan');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal: ' . $e->getMessage());
         }
-
-        // Ubah status laporan menjadi Dikonfirmasi
-        $laporan->update(['status' => 'Dikonfirmasi']);
-
-        // Proses untuk menambah stok produk
-        foreach ($laporan->details as $detail) {
-            $produk = $detail->produk;
-
-            // Pastikan stok ada atau buat stok jika belum ada
-            $stok = $produk->stok()->firstOrCreate([], ['jumlah_stok' => 0]);
-
-            // Menambah jumlah stok berdasarkan quantity dari detail pembelian
-            $stok->increment('jumlah_stok', $detail->quantity);
-        }
-
-        return back()->with('success', 'Berhasil dikonfirmasi dan stok produk berhasil ditambahkan');
-    } catch (\Exception $e) {
-        return back()->with('error', 'Gagal: '. $e->getMessage());
-    }
     }
 }

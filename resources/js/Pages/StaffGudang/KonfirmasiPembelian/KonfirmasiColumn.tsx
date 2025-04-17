@@ -5,9 +5,10 @@ import { Checkbox } from "@/Components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
+import { ConfirmButton } from "@/Components/ConfirmButton";
 
-export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
+export const KonfirmasiColumns: ColumnDef<LaporanPembelian>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -120,14 +121,20 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
 
             return (
                 <div className="flex justify-center items-center gap-2">
-                    <Link
+                    {/* <Link
                         href={route(
                             "staffgudang.laporanpembelian.konfirmasi",
                             laporan.id
                         )}
                     >
                         <Button variant="default">Konfirmasi</Button>
-                    </Link>
+                    </Link> */}
+                    {laporan.status !== "Dikonfirmasi" && (
+                        <ConfirmButton
+                            routeName="staffgudang.laporanpembelian.konfirmasi"
+                            routeParams={laporan.id}
+                        />
+                    )}
                 </div>
             );
         },

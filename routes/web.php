@@ -71,7 +71,8 @@ Route::middleware('auth', 'role:staff_gudang')->group(function () {
     // Route::post('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('admin.laporanpembelian.konfirmasi');
     Route::get('/gudang/laporanpembelian', [LaporanPembelianController::class, 'getLaporanPembelianGudang'])->name('staffgudang.laporanpembelian.index');
     Route::resource('/admin/rekap', RekapController::class)->names('admin.rekap');
-    Route::get('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('staffgudang.laporanpembelian.konfirmasi');
+    // Route::get('laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('staffgudang.laporanpembelian.konfirmasi');
+    Route::put('/staffgudang/laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('staffgudang.laporanpembelian.konfirmasi');
 });
 
 
