@@ -2,12 +2,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { LaporanPembelian, Pesanan, User } from "@/types";
 import { Button } from "@/Components/ui/button";
 import { Checkbox } from "@/Components/ui/checkbox";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Link } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { router } from "@inertiajs/react";
 import Delete from "./Delete";
 import Edit from "./Edit";
+import Detail from "./Detail";
 
 // Gunakan parameter opsional + default fallback
 export const PesananColumns: ColumnDef<Pesanan>[] = [
@@ -159,6 +160,7 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
                 <div className="justify-center flex items-center gap-2">
                     <Delete pesanandelete={pesanan} />
                     <Edit pesananedit={pesanan} />
+                    <Detail pesanandetail={pesanan} />
                 </div>
             );
         },

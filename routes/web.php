@@ -78,6 +78,11 @@ Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
     Route::resource('/staffpenjualan/Pelanggan', PelangganController::class)->names('staffpenjualan.pelanggan');
 
     Route::resource('/staffpenjualan/Pesanan', PesananController::class)->names('staffpenjualan.pesanan');
+    Route::get('/staffpenjualan/invoice/{id}', [PesananController::class, 'invoice'])->name('staffpenjualan.invoice.show');
+
+    Route::get('/staffpenjualan/invoice/{id}/pdf', [PesananController::class, 'invoicePdf'])->name('staffpenjualan.invoice.pdf');
+    Route::post('/staffpenjualan/pesanan/{id}/konfirmasi', [PesananController::class, 'konfirmasiPembayaran'])->name('staffpenjualan.pesanan.konfirmasi');
+    Route::post('/staffpenjualan/pesanan/{id}/ubah-metode', [PesananController::class, 'updateMetodePembayaran'])->name('staffpenjualan.pesanan.update_pembayaran');
 });
 
 

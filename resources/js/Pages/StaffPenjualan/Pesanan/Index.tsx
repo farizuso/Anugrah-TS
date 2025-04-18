@@ -46,29 +46,30 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         produk: [{ produk_id: "", quantity: "", harga: 0 }],
         total: 0,
         keterangan: "",
-        status: "",
     });
 
-    const submit: FormEventHandler = (e) => {
+    // Tambah dropdown metode pembayaran
+    const metodeOptions = [
+        { value: "Tunai", label: "Tunai" },
+        { value: "Transfer", label: "Transfer" },
+        { value: "Cicilan", label: "Cicilan" },
+    ];
+
+    // Saat submit (gunakan FormData karena ada file):
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const formattedDate = format(data.tgl_pesanan, "yyyy-MM-dd");
-
-        const produkWithHarga = data.produk.map((item) => ({
-            produk_id: item.produk_id,
-            quantity: item.quantity,
-            harga: item.harga,
-        }));
+        const formData = new FormData();
+        formData.append("tgl_pesanan", format(data.tgl_pesanan, "yyyy-MM-dd"));
+        formData.append("pelanggan_id", data.pelanggan_id);
+        formData.append("total", String(data.total));
+        formData.append("keterangan", data.keterangan);
+        formData.append("produk", JSON.stringify(data.produk));
 
         post(route("staffpenjualan.pesanan.store"), {
-            data: {
-                ...data,
-                tgl_pembelian: formattedDate,
-                produk: produkWithHarga,
-            },
-            onSuccess: () => {
-                reset();
-            },
+            data: formData,
+            forceFormData: true,
+            onSuccess: () => reset(),
         });
     };
 
@@ -169,14 +170,14 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                 className={cn(
                                                     "w-full justify-start text-left font-normal",
                                                     !data.tgl_pesanan &&
-                                                    "text-muted-foreground"
+                                                        "text-muted-foreground"
                                                 )}
                                             >
                                                 {data.tgl_pesanan
                                                     ? format(
-                                                        data.tgl_pesanan,
-                                                        "yyyy-MM-dd"
-                                                    )
+                                                          data.tgl_pesanan,
+                                                          "yyyy-MM-dd"
+                                                      )
                                                     : "Pilih Tanggal"}
                                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                             </Button>
@@ -222,11 +223,15 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                 isClearable
                                                 options={produkOptions}
                                                 onChange={(val) =>
-                                                    handleProdukChange(index, val)
+                                                    handleProdukChange(
+                                                        index,
+                                                        val
+                                                    )
                                                 }
                                                 value={produkOptions.find(
                                                     (option) =>
-                                                        option.value === item.produk_id
+                                                        option.value ===
+                                                        item.produk_id
                                                 )}
                                             />
                                             <Input
@@ -255,7 +260,9 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                 onClick={() =>
                                                     handleRemoveRow(index)
                                                 }
-                                                disabled={data.produk.length === 1}
+                                                disabled={
+                                                    data.produk.length === 1
+                                                }
                                             >
                                                 Hapus
                                             </Button>
@@ -279,6 +286,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                         />
                                     </div>
                                 </div>
+
                                 <div className="space-y-1">
                                     <Label>Keterangan</Label>
                                     <Input

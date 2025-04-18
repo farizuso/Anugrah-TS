@@ -13,11 +13,16 @@ class Pesanan extends Model
     protected $fillable = [
         'tgl_pesanan',
         'pelanggan_id',
-        'total',
         'keterangan',
-        'details',
+        'metode_pembayaran',
+        'jumlah_terbayar',
+        'bukti_transfer',
+        'is_lunas',
+        'total',
         'status',
     ];
+
+
 
     protected $casts = [
         'tgl_pesanan' => 'date',
