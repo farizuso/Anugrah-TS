@@ -2,13 +2,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import { LaporanPembelian, Pesanan, User } from "@/types";
 import { Button } from "@/Components/ui/button";
 import { Checkbox } from "@/Components/ui/checkbox";
-import { ArrowUpDown, Link } from "lucide-react";
+import { ArrowUpDown, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { router } from "@inertiajs/react";
 import Delete from "./Delete";
 import Edit from "./Edit";
 import Detail from "./Detail";
+import { Link } from "@inertiajs/react";
 
 // Gunakan parameter opsional + default fallback
 export const PesananColumns: ColumnDef<Pesanan>[] = [
@@ -54,8 +55,8 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
             const formattedDate =
                 tanggal && typeof tanggal === "string"
                     ? format(new Date(tanggal), "dd MMMM yyyy", {
-                          locale: id,
-                      })
+                        locale: id,
+                    })
                     : "-";
             return <div>{formattedDate}</div>;
         },
@@ -141,8 +142,8 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
                 status === "lunas"
                     ? "text-green-600 font-semibold"
                     : status === "belum lunas"
-                    ? "text-red-600 font-semibold"
-                    : "text-gray-700";
+                        ? "text-red-600 font-semibold"
+                        : "text-gray-700";
             return (
                 <div className={`capitalize ${className}`}>
                     {row.original.keterangan}
@@ -160,7 +161,13 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
                 <div className="justify-center flex items-center gap-2">
                     <Delete pesanandelete={pesanan} />
                     <Edit pesananedit={pesanan} />
-                    <Detail pesanandetail={pesanan} />
+                    {/* <Detail pesanandetail={pesanan} /> */}
+                    <Link
+                        href={route("staffpenjualan.pesanan.detail", pesanan.id)}
+
+                    >
+                        <Button variant="outline_yellow" size={"sm"}><Eye/></Button>
+                    </Link>
                 </div>
             );
         },

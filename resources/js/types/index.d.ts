@@ -56,11 +56,13 @@ export interface Pesanan {
     tgl_pesanan: Date;
     pelanggan: Pelanggan;
     total: number;
+    is_lunas: boolean;
     keterangan: string;
+    metode_pembayaran: string;
     status: string;
     details: {
         id: number;
-        harga: Produk;
+        harga: number;
         quantity: number;
         produk: {
             id: number;
@@ -88,7 +90,7 @@ export interface Produk {
     nama_produk: string;
     simbol: string;
     jenis: string;
-    harga_jual: string;
+    harga_jual: number;
     stok?: Stok | null; // tambahkan ini
 }
 

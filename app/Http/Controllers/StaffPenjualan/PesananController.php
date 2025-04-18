@@ -105,7 +105,15 @@ class PesananController extends Controller
         }
     }
 
+    public function detail_pesanan($id){
+        $pesanan = Pesanan::with(['pelanggan', 'details.produk'])->find($id);
+        $produkList = $pesanan->details()->get();
 
+        return Inertia::render('StaffPenjualan/Pesanan/Detail', [
+            'pesanan' => $pesanan,
+            'produkList' => $produkList,
+        ]);
+    }
 
 
     public function update(Request $request, $id)
