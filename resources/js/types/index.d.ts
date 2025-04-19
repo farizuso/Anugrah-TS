@@ -60,6 +60,7 @@ export interface Pesanan {
     keterangan: string;
     metode_pembayaran: string;
     status: string;
+    jumlah_terbayar: number;
     details: {
         id: number;
         harga: number;

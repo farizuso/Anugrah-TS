@@ -88,6 +88,9 @@ Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
     Route::post('/staffpenjualan/pesanan/{id}/kirim', [PesananController::class, 'konfirmasiKirim'])->name('staffpenjualan.pesanan.kirim');
 
     Route::post('/staffpenjualan/pesanan/{id}/selesai', [PesananController::class, 'tandaiSelesai'])->name('staffpenjualan.pesanan.selesai');
+
+    Route::get('/staffpenjualan/rekap-penjualan', [PesananController::class, 'rekapPenjualan'])->name('staffpenjualan.rekap.penjualan');
+    Route::get('/staffpenjualan/rekap-penjualan', [PesananController::class, 'rekapPenjualan'])->name('staffpenjualan.rekap.penjualan');
 });
 
 

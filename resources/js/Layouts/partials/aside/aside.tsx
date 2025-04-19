@@ -105,6 +105,16 @@ export function Aside() {
                         <IconMacbookAirFill />
                         <span>Pesanan</span>
                     </AsideLink>
+
+                    <AsideLink
+                        active={route().current(
+                            "staffpenjualan.rekap.penjualan"
+                        )}
+                        href={route("staffpenjualan.rekap.penjualan")}
+                    >
+                        <IconMacbookAirFill />
+                        <span>Rekap Laporan Penjualan</span>
+                    </AsideLink>
                 </>
             )}
         </ul>

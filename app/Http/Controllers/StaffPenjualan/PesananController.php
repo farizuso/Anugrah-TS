@@ -229,6 +229,23 @@ class PesananController extends Controller
     }
 
 
+    public function rekapPenjualan(Request $request)
+    {
+        $query = Pesanan::with('pelanggan');
+
+        if ($request->start_date && $request->end_date) {
+            $query->whereBetween('tgl_pesanan', [$request->start_date, $request->end_date]);
+        }
+
+        $rekap = $query->orderBy('tgl_pesanan', 'desc')->get();
+
+        return Inertia::render('StaffPenjualan/Pesanan/Rekap', [
+            'rekap' => $rekap,
+        ]);
+    }
+
+
+
 
     public function destroy($id)
     {
