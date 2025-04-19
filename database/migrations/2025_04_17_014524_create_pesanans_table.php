@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('bukti_transfer')->nullable(); // path/file bukti jika transfer
             $table->integer('jumlah_terbayar')->default(0); // untuk cicilan
             $table->text('keterangan')->nullable();
-            $table->string('status')->default('Belum Dikonfirmasi');
+            $table->string('status')->default('Pending');
             $table->timestamps();
         });
     }

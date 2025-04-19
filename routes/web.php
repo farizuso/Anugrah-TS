@@ -84,6 +84,10 @@ Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
     Route::post('/staffpenjualan/pesanan/{id}/konfirmasi', [PesananController::class, 'konfirmasiPembayaran'])->name('staffpenjualan.pesanan.konfirmasi');
     Route::post('/staffpenjualan/pesanan/{id}/ubah-metode', [PesananController::class, 'updateMetodePembayaran'])->name('staffpenjualan.pesanan.update_pembayaran');
     Route::get('/staffpenjualan/pesanan/{id}/detail', [PesananController::class, 'detail_pesanan'])->name('staffpenjualan.pesanan.detail');
+
+    Route::post('/staffpenjualan/pesanan/{id}/kirim', [PesananController::class, 'konfirmasiKirim'])->name('staffpenjualan.pesanan.kirim');
+
+    Route::post('/staffpenjualan/pesanan/{id}/selesai', [PesananController::class, 'tandaiSelesai'])->name('staffpenjualan.pesanan.selesai');
 });
 
 

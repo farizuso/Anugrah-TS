@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
+use App\Models\PembayaranPesanan;
 
 class PesananController extends Controller
 {
@@ -34,60 +35,37 @@ class PesananController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            // Validasi
-            $request->validate([
-                'tgl_pesanan' => 'required|date',
-                'pelanggan_id' => 'required|exists:pelanggans,id',
-                'produk' => 'required|array',
-                'produk.*.produk_id' => 'required|exists:produks,id',
-                'produk.*.harga' => 'required|numeric|min:0',
-                'produk.*.quantity' => 'required|integer|min:1',
-                // 'metode_pembayaran' => 'required|string|in:Tunai,Transfer,Cicilan',
-                'jumlah_terbayar' => 'nullable|integer|min:0',
-                'bukti_transfer' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            ]);
+        $request->validate([
+            'tgl_pesanan' => 'required|date',
+            'pelanggan_id' => 'required|exists:pelanggans,id',
+            'produk' => 'required|array',
+            'produk.*.produk_id' => 'required|exists:produks,id',
+            'produk.*.harga' => 'required|numeric|min:0',
+            'produk.*.quantity' => 'required|integer|min:1',
+        ]);
 
+        DB::beginTransaction();
+
+        try {
             $produkList = $request->produk;
 
             $total = collect($produkList)->reduce(function ($sum, $item) {
                 return $sum + ((int)$item['harga'] * (int)$item['quantity']);
             }, 0);
 
-            $jumlahBayar = 0;
-            $isLunas = false;
-            $buktiTransferPath = null;
-
-            switch ($request->metode_pembayaran) {
-                case 'Tunai':
-                case 'Transfer':
-                    // Default: bayar belakangan
-                    $jumlahBayar = 0;
-                    $isLunas = false;
-                    break;
-                case 'Cicilan':
-                    $jumlahBayar = (int) $request->jumlah_terbayar;
-                    $isLunas = $jumlahBayar >= $total;
-                    break;
-            }
-
-
-            DB::beginTransaction();
-
             $pesanan = Pesanan::create([
                 'tgl_pesanan' => $request->tgl_pesanan,
                 'pelanggan_id' => $request->pelanggan_id,
-                'keterangan' => $request->keterangan,
-                // 'metode_pembayaran' => $request->metode_pembayaran,
-                'jumlah_terbayar' => $jumlahBayar,
-                'bukti_transfer' => $buktiTransferPath,
-                'is_lunas' => $isLunas,
                 'total' => $total,
                 'status' => 'Pending',
+                'jumlah_terbayar' => 0,
+                'is_lunas' => false,
+                'keterangan' => 'Belum Lunas',
             ]);
 
             foreach ($produkList as $item) {
-                $pesanan->details()->create([
+                PesananDetail::create([
+                    'pesanan_id' => $pesanan->id,
                     'produk_id' => $item['produk_id'],
                     'harga' => $item['harga'],
                     'quantity' => $item['quantity'],
@@ -96,17 +74,18 @@ class PesananController extends Controller
 
             DB::commit();
 
-            return redirect()->route('staffpenjualan.pesanan.index')->with('success', 'Pesanan berhasil disimpan.');
+            return redirect()->route('staffpenjualan.pesanan.index')
+                ->with('success', 'Pesanan berhasil dibuat.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Gagal simpan pesanan: ' . $e->getMessage());
-
-            return back()->withErrors(['msg' => 'Terjadi kesalahan saat menyimpan pesanan.'])->withInput();
+            Log::error("Gagal simpan pesanan: " . $e->getMessage());
+            return back()->withErrors(['msg' => 'Terjadi kesalahan saat membuat pesanan.']);
         }
     }
 
-    public function detail_pesanan($id){
-        $pesanan = Pesanan::with(['pelanggan', 'details.produk'])->find($id);
+    public function detail_pesanan($id)
+    {
+        $pesanan = Pesanan::with(['pelanggan', 'details.produk', 'riwayat_pembayaran'])->findOrFail($id);
         $produkList = $pesanan->details()->get();
 
         return Inertia::render('StaffPenjualan/Pesanan/Detail', [
@@ -189,17 +168,29 @@ class PesananController extends Controller
         ]);
 
         $pesanan = Pesanan::findOrFail($id);
-        $totalBaru = $pesanan->jumlah_terbayar + $request->jumlah_terbayar;
+
+        $jumlah = $request->jumlah_terbayar;
+        $totalBaru = $pesanan->jumlah_terbayar + $jumlah;
         $isLunas = $totalBaru >= $pesanan->total;
 
+        // Upload bukti (optional)
+        $bukti = null;
         if ($request->hasFile('bukti_transfer')) {
             $bukti = $request->file('bukti_transfer')->store('bukti_transfer', 'public');
-            $pesanan->bukti_transfer = $bukti; // bisa ditimpa atau disimpan banyak (opsional)
         }
 
-        $pesanan->jumlah_terbayar = $totalBaru;
-        $pesanan->is_lunas = $isLunas;
-        $pesanan->save();
+        // ✅ Tambahkan histori pembayaran
+        PembayaranPesanan::create([
+            'pesanan_id' => $pesanan->id,
+            'jumlah_bayar' => $jumlah,
+            'bukti_transfer' => $bukti,
+        ]);
+
+        $pesanan->update([
+            'jumlah_terbayar' => $totalBaru,
+            'is_lunas' => $isLunas,
+            'keterangan' => $isLunas ? 'Lunas' : ($totalBaru > 0 ? 'Cicilan' : 'Belum Lunas'),
+        ]);
 
         return back()->with('success', 'Pembayaran berhasil dikonfirmasi.');
     }
@@ -214,11 +205,28 @@ class PesananController extends Controller
         $pesanan->metode_pembayaran = $request->metode_pembayaran;
         $pesanan->save();
 
-        return back()->with('success', 'Metode pembayaran berhasil diperbarui.');
+        return back()->with('success', 'Metode pembayaran diperbarui.');
     }
 
+    public function konfirmasiKirim($id)
+    {
+        $pesanan = Pesanan::findOrFail($id);
+        $pesanan->update(['status' => 'Dikirim']);
 
+        return back()->with('success', 'Pesanan telah dikonfirmasi sebagai Dikirim.');
+    }
 
+    public function tandaiSelesai($id)
+    {
+        $pesanan = Pesanan::findOrFail($id);
+
+        if (!$pesanan->is_lunas) {
+            return back()->withErrors(['msg' => 'Pesanan belum lunas.']);
+        }
+
+        $pesanan->update(['status' => 'Selesai']);
+        return back()->with('success', 'Pesanan telah ditandai sebagai Selesai.');
+    }
 
 
 

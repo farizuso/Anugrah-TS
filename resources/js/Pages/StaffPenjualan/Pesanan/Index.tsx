@@ -45,7 +45,6 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         pelanggan_id: "",
         produk: [{ produk_id: "", quantity: "", harga: 0 }],
         total: 0,
-        keterangan: "",
     });
 
     // Tambah dropdown metode pembayaran
@@ -63,7 +62,6 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         formData.append("tgl_pesanan", format(data.tgl_pesanan, "yyyy-MM-dd"));
         formData.append("pelanggan_id", data.pelanggan_id);
         formData.append("total", String(data.total));
-        formData.append("keterangan", data.keterangan);
         formData.append("produk", JSON.stringify(data.produk));
 
         post(route("staffpenjualan.pesanan.store"), {
@@ -285,20 +283,6 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                             readOnly
                                         />
                                     </div>
-                                </div>
-
-                                <div className="space-y-1">
-                                    <Label>Keterangan</Label>
-                                    <Input
-                                        type="text"
-                                        value={data.keterangan}
-                                        onChange={(e) =>
-                                            setData(
-                                                "keterangan",
-                                                e.target.value
-                                            )
-                                        }
-                                    />
                                 </div>
                             </CardContent>
 

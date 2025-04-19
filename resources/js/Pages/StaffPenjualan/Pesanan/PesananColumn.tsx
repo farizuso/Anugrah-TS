@@ -55,8 +55,8 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
             const formattedDate =
                 tanggal && typeof tanggal === "string"
                     ? format(new Date(tanggal), "dd MMMM yyyy", {
-                        locale: id,
-                    })
+                          locale: id,
+                      })
                     : "-";
             return <div>{formattedDate}</div>;
         },
@@ -142,11 +142,30 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
                 status === "lunas"
                     ? "text-green-600 font-semibold"
                     : status === "belum lunas"
-                        ? "text-red-600 font-semibold"
-                        : "text-gray-700";
+                    ? "text-red-600 font-semibold"
+                    : "text-gray-700";
             return (
                 <div className={`capitalize ${className}`}>
                     {row.original.keterangan}
+                </div>
+            );
+        },
+    },
+
+    {
+        accessorKey: "status",
+        header: "status",
+        cell: ({ row }) => {
+            const status = row.original.status?.toLowerCase();
+            const className =
+                status === "lunas"
+                    ? "text-green-600 font-semibold"
+                    : status === "belum lunas"
+                    ? "text-red-600 font-semibold"
+                    : "text-gray-700";
+            return (
+                <div className={`capitalize ${className}`}>
+                    {row.original.status}
                 </div>
             );
         },
@@ -163,10 +182,14 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
                     <Edit pesananedit={pesanan} />
                     {/* <Detail pesanandetail={pesanan} /> */}
                     <Link
-                        href={route("staffpenjualan.pesanan.detail", pesanan.id)}
-
+                        href={route(
+                            "staffpenjualan.pesanan.detail",
+                            pesanan.id
+                        )}
                     >
-                        <Button variant="outline_yellow" size={"sm"}><Eye/></Button>
+                        <Button variant="outline_yellow" size={"sm"}>
+                            <Eye />
+                        </Button>
                     </Link>
                 </div>
             );

@@ -13,7 +13,8 @@ const Invoice = ({ pesanan }: InvoiceProps) => {
             <h1 className="text-2xl font-bold mb-4">Invoice Pesanan</h1>
             <div className="mb-4">
                 <p>
-                    <strong>Tanggal:</strong> {pesanan.tgl_pesanan}
+                    <strong>Tanggal:</strong>{" "}
+                    {pesanan.tgl_pesanan.toLocaleString("id-ID")}
                 </p>
                 <p>
                     <strong>Pelanggan:</strong>{" "}

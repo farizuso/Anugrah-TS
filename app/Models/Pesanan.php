@@ -13,13 +13,13 @@ class Pesanan extends Model
     protected $fillable = [
         'tgl_pesanan',
         'pelanggan_id',
-        'keterangan',
-        'metode_pembayaran',
-        'jumlah_terbayar',
-        'bukti_transfer',
-        'is_lunas',
         'total',
         'status',
+        'jumlah_terbayar',
+        'metode_pembayaran',
+        'keterangan',
+        'is_lunas',
+        'bukti_transfer',
     ];
 
 
@@ -36,5 +36,10 @@ class Pesanan extends Model
     public function details()
     {
         return $this->hasMany(PesananDetail::class, 'pesanan_id');
+    }
+
+    public function riwayat_pembayaran()
+    {
+        return $this->hasMany(PembayaranPesanan::class);
     }
 }

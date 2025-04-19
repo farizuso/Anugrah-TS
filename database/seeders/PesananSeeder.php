@@ -13,7 +13,7 @@ class PesananSeeder extends Seeder
 {
     public function run(): void
     {
-        // Tambahkan produk jika belum ada
+        // Pastikan ada produk dan pelanggan
         if (Produk::count() === 0) {
             Produk::insert([
                 ['nama_produk' => 'Oksigen'],
@@ -24,41 +24,34 @@ class PesananSeeder extends Seeder
             ]);
         }
 
-        // Pastikan pelanggan tersedia
         if (Pelanggan::count() === 0) {
             $this->call(PelangganSeeder::class);
         }
 
         $produks = Produk::all();
         $pelanggans = Pelanggan::all();
-        $metodes = ['Tunai', 'Transfer', 'Cicilan'];
 
         foreach (range(1, 5) as $i) {
             $tgl = Carbon::now()->subDays(rand(1, 30))->format('Y-m-d');
-            $pelangganTerpilih = $pelanggans->random();
-            $keterangan = rand(0, 1) ? 'Lunas' : 'Belum Lunas';
-            $metode = $metodes[array_rand($metodes)];
-            $total = 0;
+            $pelanggan = $pelanggans->random();
 
-            // Dummy nilai default
-            $isLunas = false;
-            $jumlahBayar = 0;
-
-            // Buat dulu kosong, total dihitung nanti
+            // Buat pesanan tanpa metode pembayaran
             $pesanan = Pesanan::create([
                 'tgl_pesanan' => $tgl,
-                'pelanggan_id' => $pelangganTerpilih->id,
-                'keterangan' => $keterangan,
-                'metode_pembayaran' => $metode,
-                'total' => 0,
+                'pelanggan_id' => $pelanggan->id,
                 'status' => 'Pending',
                 'is_lunas' => false,
                 'jumlah_terbayar' => 0,
+                'keterangan' => 'Belum Lunas',
+                'total' => 0,
             ]);
 
+            $total = 0;
+
+            // Tambahkan detail produk
             foreach ($produks->random(rand(2, 4)) as $produk) {
                 $harga = rand(10000, 50000);
-                $qty = rand(1, 10);
+                $qty = rand(1, 5);
 
                 PesananDetail::create([
                     'pesanan_id' => $pesanan->id,
@@ -70,22 +63,16 @@ class PesananSeeder extends Seeder
                 $total += $harga * $qty;
             }
 
-            // Simulasikan status pembayaran
-            if ($metode === 'Tunai') {
-                $isLunas = true;
-                $jumlahBayar = $total;
-            } elseif ($metode === 'Transfer') {
-                $jumlahBayar = $total;
-                // anggap masih perlu verifikasi → is_lunas tetap false
-            } elseif ($metode === 'Cicilan') {
-                $jumlahBayar = floor($total / 2);
-                $isLunas = $jumlahBayar >= $total;
-            }
+            // Simulasikan sebagian ada yang sudah dibayar
+            $dibayar = rand(0, $total); // bisa 0, cicilan, atau full
 
             $pesanan->update([
                 'total' => $total,
-                'jumlah_terbayar' => $jumlahBayar,
-                'is_lunas' => $isLunas,
+                'jumlah_terbayar' => $dibayar,
+                'is_lunas' => $dibayar >= $total,
+                'keterangan' => $dibayar >= $total
+                    ? 'Lunas'
+                    : ($dibayar > 0 ? 'Cicilan' : 'Belum Lunas'),
             ]);
         }
     }

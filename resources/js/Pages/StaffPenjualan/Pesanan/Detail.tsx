@@ -15,7 +15,7 @@ import {
 } from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
 import { FaEye } from "react-icons/fa";
-import { Pesanan } from "@/types";
+import { Pembayaran, Pesanan } from "@/types";
 import ConfirmPembayaran from "@/Components/ConfirmPembayaran";
 import { format } from "date-fns";
 import { Label } from "@/Components/ui/label";
@@ -24,6 +24,7 @@ import AdminLayout from "@/Layouts/AdminLayout";
 
 interface DetailProps {
     pesanan: Pesanan;
+    riwayat_pembayaran: Pembayaran[];
 }
 
 const Detail = ({ pesanan }: DetailProps) => {
@@ -32,10 +33,7 @@ const Detail = ({ pesanan }: DetailProps) => {
     const handleUpdatePembayaran = (metode: string) => {
         if (confirm("Yakin ingin mengubah metode pembayaran?")) {
             router.post(
-                route(
-                    "staffpenjualan.pesanan.update_pembayaran",
-                    pesanan.id
-                ),
+                route("staffpenjualan.pesanan.update_pembayaran", pesanan.id),
                 { metode_pembayaran: metode },
                 {
                     preserveScroll: true,
@@ -55,9 +53,7 @@ const Detail = ({ pesanan }: DetailProps) => {
             {/* HEADER */}
             <div className="bg-blue-700 text-white px-6 py-4 rounded-t-md">
                 <h2 className="text-2xl font-semibold">Detail Transaksi</h2>
-                <p className="text-sm mt-1">
-                    Detail transaksi # {pesanan.id}
-                </p>
+                <p className="text-sm mt-1">Detail transaksi # {pesanan.id}</p>
             </div>
 
             <div className="p-6 space-y-6">
@@ -78,9 +74,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                         </p>
                         <p>
                             metode pembayaran:{" "}
-                            <strong>
-                                {pesanan.metode_pembayaran || "-"}
-                            </strong>
+                            <strong>{pesanan.metode_pembayaran || "-"}</strong>
                         </p>
                         <p>
                             status pembayaran:{" "}
@@ -102,21 +96,16 @@ const Detail = ({ pesanan }: DetailProps) => {
                         <p>
                             penerima:{" "}
                             <strong>
-                                {pesanan.pelanggan?.nama_pelanggan ||
-                                    "-"}
+                                {pesanan.pelanggan?.nama_pelanggan || "-"}
                             </strong>
                         </p>
                         <p>
                             alamat:{" "}
-                            <strong>
-                                {pesanan.pelanggan?.alamat || "-"}
-                            </strong>
+                            <strong>{pesanan.pelanggan?.alamat || "-"}</strong>
                         </p>
                         <p>
                             no. telp:{" "}
-                            <strong>
-                                {pesanan.pelanggan?.no_hp || "-"}
-                            </strong>
+                            <strong>{pesanan.pelanggan?.no_hp || "-"}</strong>
                         </p>
                     </div>
                 </div>
@@ -126,12 +115,8 @@ const Detail = ({ pesanan }: DetailProps) => {
                     <table className="w-full border text-sm">
                         <thead className="bg-gray-200">
                             <tr>
-                                <th className="text-left px-4 py-2">
-                                    Produk
-                                </th>
-                                <th className="text-left px-4 py-2">
-                                    Jumlah
-                                </th>
+                                <th className="text-left px-4 py-2">Produk</th>
+                                <th className="text-left px-4 py-2">Jumlah</th>
                                 <th className="text-left px-4 py-2">
                                     Harga/unit
                                 </th>
@@ -181,10 +166,10 @@ const Detail = ({ pesanan }: DetailProps) => {
                     </table>
                 </div>
 
-                {/* UBAH METODE PEMBAYARAN */}
+                {/* Pilih METODE PEMBAYARAN */}
                 <div>
                     <Label className="mb-1 block">
-                        Ubah Metode Pembayaran
+                        Pilih Metode Pembayaran
                     </Label>
                     <Select
                         defaultValue={pesanan.metode_pembayaran || ""}
@@ -195,16 +180,14 @@ const Detail = ({ pesanan }: DetailProps) => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="tunai">Tunai</SelectItem>
-                            <SelectItem value="transfer">
-                                Transfer
-                            </SelectItem>
+                            <SelectItem value="transfer">Transfer</SelectItem>
                             <SelectItem value="cicilan">Cicilan</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
 
-                {/* TOMBOL CETAK */}
-                <div className="flex gap-3">
+                {/* TOMBOL CETAK DAN PENGIRIMAN */}
+                <div className="flex gap-3 flex-wrap mt-4">
                     <Button
                         variant="outline"
                         onClick={() =>
@@ -222,16 +205,47 @@ const Detail = ({ pesanan }: DetailProps) => {
                     <Button
                         onClick={() =>
                             window.open(
-                                route(
-                                    "staffpenjualan.invoice.pdf",
-                                    pesanan.id
-                                ),
+                                route("staffpenjualan.invoice.pdf", pesanan.id),
                                 "_blank"
                             )
                         }
                     >
                         Cetak Tanda Terima
                     </Button>
+
+                    {/* ✅ KONFIRMASI PENGIRIMAN */}
+                    {pesanan.status === "Pending" && (
+                        <Button
+                            variant="secondary"
+                            onClick={() =>
+                                router.post(
+                                    route(
+                                        "staffpenjualan.pesanan.kirim",
+                                        pesanan.id
+                                    )
+                                )
+                            }
+                        >
+                            Konfirmasi Pengiriman
+                        </Button>
+                    )}
+
+                    {/* ✅ TANDAI SELESAI */}
+                    {pesanan.status === "Dikirim" && pesanan.is_lunas && (
+                        <Button
+                            variant="success"
+                            onClick={() =>
+                                router.post(
+                                    route(
+                                        "staffpenjualan.pesanan.selesai",
+                                        pesanan.id
+                                    )
+                                )
+                            }
+                        >
+                            Tandai Selesai
+                        </Button>
+                    )}
                 </div>
 
                 {/* FORM PEMBAYARAN */}
@@ -241,6 +255,70 @@ const Detail = ({ pesanan }: DetailProps) => {
                     <div className="pt-4 border-t">
                         <p className="text-red-600 mb-2">Status: Belum Lunas</p>
                         <ConfirmPembayaran pesananId={pesanan.id} />
+                        {pesanan.riwayat_pembayaran.length > 0 && (
+                            <div className="mt-6">
+                                <h4 className="font-semibold mb-2">
+                                    Riwayat Pembayaran:
+                                </h4>
+                                <ul className="space-y-2">
+                                    {pesanan.riwayat_pembayaran.map(
+                                        (riwayat, idx) => (
+                                            <li
+                                                key={idx}
+                                                className="border p-3 rounded bg-gray-50 text-sm"
+                                            >
+                                                <div>
+                                                    <strong>
+                                                        Rp{" "}
+                                                        {Number(
+                                                            riwayat.jumlah_bayar
+                                                        ).toLocaleString(
+                                                            "id-ID"
+                                                        )}
+                                                    </strong>{" "}
+                                                    –{" "}
+                                                    {new Date(
+                                                        riwayat.created_at
+                                                    ).toLocaleDateString(
+                                                        "id-ID"
+                                                    )}
+                                                </div>
+                                                {riwayat.bukti_transfer && (
+                                                    <div>
+                                                        <a
+                                                            href={`/storage/${riwayat.bukti_transfer}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-blue-600 hover:underline flex items-center gap-1"
+                                                        >
+                                                            <FaEye className="text-sm" />{" "}
+                                                            Lihat Bukti Transfer
+                                                        </a>
+
+                                                        {riwayat.bukti_transfer
+                                                            .toLowerCase()
+                                                            .includes(
+                                                                ".pdf"
+                                                            ) ? (
+                                                            <iframe
+                                                                src={`/storage/${riwayat.bukti_transfer}`}
+                                                                className="w-full h-64 mt-2 border rounded"
+                                                            ></iframe>
+                                                        ) : (
+                                                            <img
+                                                                src={`/storage/${riwayat.bukti_transfer}`}
+                                                                alt="Bukti Transfer"
+                                                                className="mt-2 max-w-xs rounded border"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </li>
+                                        )
+                                    )}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
