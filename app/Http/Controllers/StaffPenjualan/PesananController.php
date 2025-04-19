@@ -157,7 +157,7 @@ class PesananController extends Controller
         $pesanan = Pesanan::with(['pelanggan', 'details.produk'])->findOrFail($id);
 
         $pdf = Pdf::loadView('pdf.invoice', ['pesanan' => $pesanan]);
-        return $pdf->download("invoice-{$pesanan->id}.pdf");
+        return $pdf->stream("invoice-{$pesanan->id}.pdf");
     }
 
     public function konfirmasiPembayaran(Request $request, $id)
@@ -220,9 +220,9 @@ class PesananController extends Controller
     {
         $pesanan = Pesanan::findOrFail($id);
 
-        if (!$pesanan->is_lunas) {
-            return back()->withErrors(['msg' => 'Pesanan belum lunas.']);
-        }
+        // if (!$pesanan->is_lunas) {
+        //     return back()->withErrors(['msg' => 'Pesanan belum lunas.']);
+        // }
 
         $pesanan->update(['status' => 'Selesai']);
         return back()->with('success', 'Pesanan telah ditandai sebagai Selesai.');

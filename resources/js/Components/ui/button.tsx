@@ -26,6 +26,7 @@ const buttonVariants = cva(
         outline_blue: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white ",
         outline_black: "border-2 border-gray-300 text-gray-400 hover:bg-white hover:text-gray-400",
         outline_yellow: "border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white",
+        success: "bg-green-500 text-white hover:bg-green-600",
       },
       size: {
         default: "h-10 px-4 py-2",

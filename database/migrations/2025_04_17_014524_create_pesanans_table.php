@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('tgl_pesanan');
             $table->foreignId('pelanggan_id');
             $table->integer('total')->default(0); // bisa nullable jika awalnya tidak langsung dihitung
-            $table->string('metode_pembayaran'); // "tunai", "transfer", "cicilan"
+            $table->string('metode_pembayaran')->nullable(); // "tunai", "transfer", "cicilan"
             $table->boolean('is_lunas')->default(false);
             $table->string('bukti_transfer')->nullable(); // path/file bukti jika transfer
             $table->integer('jumlah_terbayar')->default(0); // untuk cicilan

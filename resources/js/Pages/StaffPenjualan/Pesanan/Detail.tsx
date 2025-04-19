@@ -19,8 +19,9 @@ import { Pembayaran, Pesanan } from "@/types";
 import ConfirmPembayaran from "@/Components/ConfirmPembayaran";
 import { format } from "date-fns";
 import { Label } from "@/Components/ui/label";
-import { router, usePage } from "@inertiajs/react";
+import { router, useForm, usePage } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
+import { Input } from "@/Components/ui/input";
 
 interface DetailProps {
     pesanan: Pesanan;
@@ -30,19 +31,33 @@ interface DetailProps {
 const Detail = ({ pesanan }: DetailProps) => {
     const [open, setOpen] = useState(false);
 
+    const { data, setData, post, progress, errors, reset } = useForm({
+        jumlah_terbayar: "",
+        bukti_transfer: null as File | null,
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route("staffpenjualan.pesanan.konfirmasi", pesanan.id), {
+            // forceFormData: true,
+            onSuccess: () => reset(),
+        });
+    };
+
+    
+
     const handleUpdatePembayaran = (metode: string) => {
-        if (confirm("Yakin ingin mengubah metode pembayaran?")) {
-            router.post(
-                route("staffpenjualan.pesanan.update_pembayaran", pesanan.id),
-                { metode_pembayaran: metode },
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        console.log("Metode pembayaran diperbarui");
-                    },
-                }
-            );
-        }
+        router.post(
+            route("staffpenjualan.pesanan.update_pembayaran", pesanan.id),
+            { metode_pembayaran: metode },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    console.log("Metode pembayaran diperbarui");
+                },
+            }
+        );
+
     };
 
     const formatRupiah = (angka: number) =>
@@ -168,6 +183,7 @@ const Detail = ({ pesanan }: DetailProps) => {
 
                 {/* Pilih METODE PEMBAYARAN */}
                 <div>
+
                     <Label className="mb-1 block">
                         Pilih Metode Pembayaran
                     </Label>
@@ -184,10 +200,11 @@ const Detail = ({ pesanan }: DetailProps) => {
                             <SelectItem value="cicilan">Cicilan</SelectItem>
                         </SelectContent>
                     </Select>
+
                 </div>
 
                 {/* TOMBOL CETAK DAN PENGIRIMAN */}
-                <div className="flex gap-3 flex-wrap mt-4">
+                <div className="flex gap-3 flex-row mt-4">
                     <Button
                         variant="outline"
                         onClick={() =>
@@ -212,26 +229,8 @@ const Detail = ({ pesanan }: DetailProps) => {
                     >
                         Cetak Tanda Terima
                     </Button>
-
-                    {/* ✅ KONFIRMASI PENGIRIMAN */}
-                    {pesanan.status === "Pending" && (
-                        <Button
-                            variant="secondary"
-                            onClick={() =>
-                                router.post(
-                                    route(
-                                        "staffpenjualan.pesanan.kirim",
-                                        pesanan.id
-                                    )
-                                )
-                            }
-                        >
-                            Konfirmasi Pengiriman
-                        </Button>
-                    )}
-
                     {/* ✅ TANDAI SELESAI */}
-                    {pesanan.status === "Dikirim" && pesanan.is_lunas && (
+                    {pesanan.status === "Dikirim" && (
                         <Button
                             variant="success"
                             onClick={() =>
@@ -246,15 +245,70 @@ const Detail = ({ pesanan }: DetailProps) => {
                             Tandai Selesai
                         </Button>
                     )}
+                    {/* ✅ KONFIRMASI PENGIRIMAN */}
+                    {pesanan.status === "Pending" && (
+                        <Button
+                            variant="default"
+                            onClick={() =>
+                                router.post(
+                                    route(
+                                        "staffpenjualan.pesanan.kirim",
+                                        pesanan.id
+                                    )
+                                )
+                            }
+                        >
+                            Konfirmasi Pengiriman
+                        </Button>
+                    )}
                 </div>
+
 
                 {/* FORM PEMBAYARAN */}
                 {pesanan.keterangan === "Lunas" ? (
                     <p className="text-green-600">Keterangan: Sudah Lunas</p>
+
                 ) : (
                     <div className="pt-4 border-t">
                         <p className="text-red-600 mb-2">Status: Belum Lunas</p>
-                        <ConfirmPembayaran pesananId={pesanan.id} />
+
+                        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                            <div>
+                                <Label>Jumlah Pembayaran</Label>
+                                <Input
+                                    type="number"
+                                    value={data.jumlah_terbayar}
+                                    onChange={(e) => setData("jumlah_terbayar", e.target.value)}
+                                />
+                                {errors.jumlah_terbayar && (
+                                    <div className="text-red-500 text-sm">
+                                        {errors.jumlah_terbayar}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div>
+                                <Label>Bukti Transfer (opsional)</Label>
+                                <Input
+                                    type="file"
+                                    onChange={(e) =>
+                                        setData("bukti_transfer", e.target.files?.[0] || null)
+                                    }
+                                />
+                                {errors.bukti_transfer && (
+                                    <div className="text-red-500 text-sm">
+                                        {errors.bukti_transfer}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex gap-3">
+                                <Button type="submit" disabled={progress !== null}>
+                                    {progress ? "Menyimpan..." : "Konfirmasi Pembayaran"}
+                                </Button>
+
+                            </div>
+                        </form>
+
                         {pesanan.riwayat_pembayaran.length > 0 && (
                             <div className="mt-6">
                                 <h4 className="font-semibold mb-2">
