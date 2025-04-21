@@ -37,6 +37,7 @@ class PesananController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'tgl_pesanan' => 'required|date',
             'pelanggan_id' => 'required|exists:pelanggans,id',
