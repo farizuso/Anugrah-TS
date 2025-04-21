@@ -51,6 +51,15 @@ export interface Supplier {
     no_telp: number;
 }
 
+export interface Pembayaran {
+    id: number;
+    pesanan_id: number;
+    jumlah_bayar: number;
+    bukti_transfer?: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Pesanan {
     id: number;
     tgl_pesanan: Date;
@@ -70,14 +79,7 @@ export interface Pesanan {
             nama_produk: string;
         };
     }[];
-}
-
-export interface Pembayaran {
-    id: number;
-    pesanan: Pesanan;
-    metode_pembayaran: string;
-    jumlah_dibayar: number;
-    status_pembayaran: string;
+    riwayat_pembayaran: Pembayaran[]; // ✅ updated: required field
 }
 
 export interface Stok {

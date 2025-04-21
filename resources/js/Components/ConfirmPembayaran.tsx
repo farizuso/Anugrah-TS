@@ -1,41 +1,70 @@
 import React, { useState } from "react";
-import { useForm } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
+import { useForm } from "@inertiajs/react";
+import { toast } from "react-toastify";
 
-const ConfirmPembayaran = ({ pesananId }: { pesananId: number }) => {
-    const { data, setData, post, progress, errors, reset } = useForm({
-        jumlah_terbayar: "",
+interface Props {
+    pesananId: number;
+    sisaTagihan: number;
+}
+
+const ConfirmPembayaran = ({ pesananId, sisaTagihan }: Props) => {
+    const { data, setData, post, processing, reset, errors } = useForm({
+        jumlah_terbayar: 0,
         bukti_transfer: null as File | null,
     });
 
+    const formatRupiah = (angka: number): string =>
+        new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            minimumFractionDigits: 0,
+        }).format(angka);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("staffpenjualan.pesanan.konfirmasi", pesananId), {
+
+        if (data.jumlah_terbayar > sisaTagihan) {
+            toast.error("Jumlah pembayaran melebihi sisa tagihan.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("jumlah_terbayar", String(data.jumlah_terbayar));
+        if (data.bukti_transfer) {
+            formData.append("bukti_transfer", data.bukti_transfer);
+        }
+        post(route("staffpenjualan.pesanan.konfirmasi_pembayaran", pesananId), {
+            data: formData,
             forceFormData: true,
             onSuccess: () => reset(),
         });
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
             <div>
                 <Label>Jumlah Pembayaran</Label>
                 <Input
-                    type="number"
-                    value={data.jumlah_terbayar}
-                    onChange={(e) => setData("jumlah_terbayar", e.target.value)}
+                    type="text"
+                    value={formatRupiah(data.jumlah_terbayar)}
+                    onChange={(e) => {
+                        const raw = e.target.value.replace(/[^\d]/g, "");
+                        const angka = parseInt(raw || "0");
+                        setData("jumlah_terbayar", angka);
+                    }}
                 />
                 {errors.jumlah_terbayar && (
-                    <div className="text-red-500 text-sm">
+                    <p className="text-sm text-red-500">
                         {errors.jumlah_terbayar}
-                    </div>
+                    </p>
                 )}
             </div>
 
             <div>
-                <Label>Bukti Transfer (opsional)</Label>
+                <Label>Bukti Transfer (Opsional)</Label>
                 <Input
                     type="file"
                     onChange={(e) =>
@@ -43,14 +72,14 @@ const ConfirmPembayaran = ({ pesananId }: { pesananId: number }) => {
                     }
                 />
                 {errors.bukti_transfer && (
-                    <div className="text-red-500 text-sm">
+                    <p className="text-sm text-red-500">
                         {errors.bukti_transfer}
-                    </div>
+                    </p>
                 )}
             </div>
 
-            <Button type="submit" disabled={progress !== null}>
-                {progress ? "Menyimpan..." : "Konfirmasi Pembayaran"}
+            <Button type="submit" disabled={processing}>
+                {processing ? "Menyimpan..." : "Konfirmasi Pembayaran"}
             </Button>
         </form>
     );

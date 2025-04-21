@@ -14,7 +14,7 @@ import { Label } from "@/Components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useForm, usePage } from "@inertiajs/react";
-import React, { FormEventHandler, useEffect } from "react";
+import React, { useEffect } from "react";
 import { PesananColumns } from "./PesananColumn";
 import {
     Popover,
@@ -27,8 +27,16 @@ import { Calendar } from "@/Components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { LaporanDataTable } from "@/Components/LaporanDataTable";
-import { Produk, Supplier, PageProps, Pesanan, Pelanggan } from "@/types";
+import {
+    Produk,
+    Supplier,
+    PageProps,
+    Pesanan,
+    Pelanggan,
+    Pembayaran,
+} from "@/types";
 import { DataTable } from "@/Components/DataTable";
+import { toast } from "react-toastify";
 
 interface PesananProps {
     posts: Pesanan[];
@@ -47,16 +55,38 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         total: 0,
     });
 
-    // Tambah dropdown metode pembayaran
     const metodeOptions = [
         { value: "Tunai", label: "Tunai" },
         { value: "Transfer", label: "Transfer" },
         { value: "Cicilan", label: "Cicilan" },
     ];
 
-    // Saat submit (gunakan FormData karena ada file):
+    const validateForm = () => {
+        if (!data.pelanggan_id) {
+            toast.error("Pelanggan harus dipilih.");
+            return false;
+        }
+
+        for (const [index, item] of data.produk.entries()) {
+            if (!item.produk_id) {
+                toast.error(`Produk baris ${index + 1} belum dipilih.`);
+                return false;
+            }
+            if (!item.quantity || parseInt(item.quantity) <= 0) {
+                toast.error(
+                    `Jumlah pada baris ${index + 1} harus lebih dari 0.`
+                );
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validateForm()) return;
 
         const formData = new FormData();
         formData.append("tgl_pesanan", format(data.tgl_pesanan, "yyyy-MM-dd"));
@@ -67,7 +97,17 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         post(route("staffpenjualan.pesanan.store"), {
             data: formData,
             forceFormData: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                if (!Object.keys(errors).length) {
+                    toast.success("Pesanan berhasil disimpan.");
+                    reset();
+                }
+            },
+            onError: (err) => {
+                if (err.message) {
+                    toast.error(err.message);
+                }
+            },
         });
     };
 

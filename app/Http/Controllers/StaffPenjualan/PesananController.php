@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use App\Models\PembayaranPesanan;
+use App\Models\Stok;
 
 class PesananController extends Controller
 {
@@ -33,6 +34,7 @@ class PesananController extends Controller
         ]);
     }
 
+
     public function store(Request $request)
     {
         $request->validate([
@@ -49,6 +51,16 @@ class PesananController extends Controller
         try {
             $produkList = $request->produk;
 
+            // ✅ Validasi stok cukup dulu
+            foreach ($produkList as $item) {
+                $stok = Stok::where('produk_id', $item['produk_id'])->first();
+                if ($stok && $stok->jumlah_stok < $item['quantity']) {
+                    return response()->json([
+                        'message' => "Stok untuk produk {$item['produk_id']} tidak mencukupi.",
+                    ], 422);
+                }
+            }
+
             $total = collect($produkList)->reduce(function ($sum, $item) {
                 return $sum + ((int)$item['harga'] * (int)$item['quantity']);
             }, 0);
@@ -64,24 +76,31 @@ class PesananController extends Controller
             ]);
 
             foreach ($produkList as $item) {
+                // Simpan detail
                 PesananDetail::create([
                     'pesanan_id' => $pesanan->id,
                     'produk_id' => $item['produk_id'],
                     'harga' => $item['harga'],
                     'quantity' => $item['quantity'],
                 ]);
+
+                // ✅ Kurangi stok
+                $stok = Stok::where('produk_id', $item['produk_id'])->first();
+                $stok->jumlah_stok -= $item['quantity'];
+                $stok->save();
             }
 
             DB::commit();
 
             return redirect()->route('staffpenjualan.pesanan.index')
-                ->with('success', 'Pesanan berhasil dibuat.');
+                ->with('success', 'Pesanan berhasil dibuat dan stok diperbarui.');
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error("Gagal simpan pesanan: " . $e->getMessage());
-            return back()->withErrors(['msg' => 'Terjadi kesalahan saat membuat pesanan.']);
+            return back()->withErrors(['msg' => $e->getMessage()]);
         }
     }
+
 
     public function detail_pesanan($id)
     {

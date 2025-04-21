@@ -25,28 +25,16 @@ import { Input } from "@/Components/ui/input";
 
 interface DetailProps {
     pesanan: Pesanan;
-    riwayat_pembayaran: Pembayaran[];
 }
 
 const Detail = ({ pesanan }: DetailProps) => {
     const [open, setOpen] = useState(false);
 
-    const { data, setData, post, progress, errors, reset } = useForm({
-        jumlah_terbayar: "",
-        bukti_transfer: null as File | null,
-    });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route("staffpenjualan.pesanan.konfirmasi", pesanan.id), {
-            // forceFormData: true,
-            onSuccess: () => reset(),
-        });
-    };
-
-    
+    const formatRupiah = (angka: number) =>
+        `Rp ${angka.toLocaleString("id-ID")}`;
 
     const handleUpdatePembayaran = (metode: string) => {
+        if (pesanan.metode_pembayaran) return;
         router.post(
             route("staffpenjualan.pesanan.update_pembayaran", pesanan.id),
             { metode_pembayaran: metode },
@@ -57,22 +45,16 @@ const Detail = ({ pesanan }: DetailProps) => {
                 },
             }
         );
-
     };
-
-    const formatRupiah = (angka: number) =>
-        `Rp ${angka.toLocaleString("id-ID")}`;
 
     return (
         <AdminLayout>
-            {/* HEADER */}
             <div className="bg-blue-700 text-white px-6 py-4 rounded-t-md">
                 <h2 className="text-2xl font-semibold">Detail Transaksi</h2>
                 <p className="text-sm mt-1">Detail transaksi # {pesanan.id}</p>
             </div>
 
             <div className="p-6 space-y-6">
-                {/* INFO 2 KOLOM */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
                         <p className="font-semibold mb-1">
@@ -103,6 +85,16 @@ const Detail = ({ pesanan }: DetailProps) => {
                                 {pesanan.status || "-"}
                             </strong>
                         </p>
+                        {pesanan.keterangan === "Cicilan" && (
+                            <p className="text-orange-600 mt-1">
+                                Sisa tagihan:{" "}
+                                <strong>
+                                    {formatRupiah(
+                                        pesanan.total - pesanan.jumlah_terbayar
+                                    )}
+                                </strong>
+                            </p>
+                        )}
                     </div>
                     <div>
                         <p className="font-semibold mb-1">
@@ -125,7 +117,6 @@ const Detail = ({ pesanan }: DetailProps) => {
                     </div>
                 </div>
 
-                {/* TABEL PRODUK */}
                 <div className="overflow-x-auto">
                     <table className="w-full border text-sm">
                         <thead className="bg-gray-200">
@@ -181,15 +172,14 @@ const Detail = ({ pesanan }: DetailProps) => {
                     </table>
                 </div>
 
-                {/* Pilih METODE PEMBAYARAN */}
                 <div>
-
                     <Label className="mb-1 block">
                         Pilih Metode Pembayaran
                     </Label>
                     <Select
                         defaultValue={pesanan.metode_pembayaran || ""}
                         onValueChange={handleUpdatePembayaran}
+                        disabled={!!pesanan.metode_pembayaran}
                     >
                         <SelectTrigger className="w-[200px]">
                             <SelectValue placeholder="Pilih metode" />
@@ -200,25 +190,9 @@ const Detail = ({ pesanan }: DetailProps) => {
                             <SelectItem value="cicilan">Cicilan</SelectItem>
                         </SelectContent>
                     </Select>
-
                 </div>
 
-                {/* TOMBOL CETAK DAN PENGIRIMAN */}
                 <div className="flex gap-3 flex-row mt-4">
-                    <Button
-                        variant="outline"
-                        onClick={() =>
-                            window.open(
-                                route(
-                                    "staffpenjualan.invoice.show",
-                                    pesanan.id
-                                ),
-                                "_blank"
-                            )
-                        }
-                    >
-                        Cetak Invoice
-                    </Button>
                     <Button
                         onClick={() =>
                             window.open(
@@ -229,7 +203,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                     >
                         Cetak Tanda Terima
                     </Button>
-                    {/* ✅ TANDAI SELESAI */}
+
                     {pesanan.status === "Dikirim" && (
                         <Button
                             variant="success"
@@ -245,7 +219,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                             Tandai Selesai
                         </Button>
                     )}
-                    {/* ✅ KONFIRMASI PENGIRIMAN */}
+
                     {pesanan.status === "Pending" && (
                         <Button
                             variant="default"
@@ -263,116 +237,71 @@ const Detail = ({ pesanan }: DetailProps) => {
                     )}
                 </div>
 
-
-                {/* FORM PEMBAYARAN */}
-                {pesanan.keterangan === "Lunas" ? (
-                    <p className="text-green-600">Keterangan: Sudah Lunas</p>
-
-                ) : (
+                {pesanan.keterangan !== "Lunas" && (
                     <div className="pt-4 border-t">
                         <p className="text-red-600 mb-2">Status: Belum Lunas</p>
+                        <ConfirmPembayaran
+                            pesananId={pesanan.id}
+                            sisaTagihan={
+                                pesanan.total - pesanan.jumlah_terbayar
+                            }
+                        />
+                    </div>
+                )}
 
-                        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                            <div>
-                                <Label>Jumlah Pembayaran</Label>
-                                <Input
-                                    type="number"
-                                    value={data.jumlah_terbayar}
-                                    onChange={(e) => setData("jumlah_terbayar", e.target.value)}
-                                />
-                                {errors.jumlah_terbayar && (
-                                    <div className="text-red-500 text-sm">
-                                        {errors.jumlah_terbayar}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div>
-                                <Label>Bukti Transfer (opsional)</Label>
-                                <Input
-                                    type="file"
-                                    onChange={(e) =>
-                                        setData("bukti_transfer", e.target.files?.[0] || null)
-                                    }
-                                />
-                                {errors.bukti_transfer && (
-                                    <div className="text-red-500 text-sm">
-                                        {errors.bukti_transfer}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex gap-3">
-                                <Button type="submit" disabled={progress !== null}>
-                                    {progress ? "Menyimpan..." : "Konfirmasi Pembayaran"}
-                                </Button>
-
-                            </div>
-                        </form>
-
-                        {pesanan.riwayat_pembayaran.length > 0 && (
-                            <div className="mt-6">
-                                <h4 className="font-semibold mb-2">
-                                    Riwayat Pembayaran:
-                                </h4>
-                                <ul className="space-y-2">
-                                    {pesanan.riwayat_pembayaran.map(
-                                        (riwayat, idx) => (
-                                            <li
-                                                key={idx}
-                                                className="border p-3 rounded bg-gray-50 text-sm"
-                                            >
-                                                <div>
-                                                    <strong>
-                                                        Rp{" "}
-                                                        {Number(
-                                                            riwayat.jumlah_bayar
-                                                        ).toLocaleString(
-                                                            "id-ID"
-                                                        )}
-                                                    </strong>{" "}
-                                                    –{" "}
-                                                    {new Date(
-                                                        riwayat.created_at
-                                                    ).toLocaleDateString(
-                                                        "id-ID"
-                                                    )}
-                                                </div>
-                                                {riwayat.bukti_transfer && (
-                                                    <div>
-                                                        <a
-                                                            href={`/storage/${riwayat.bukti_transfer}`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-blue-600 hover:underline flex items-center gap-1"
-                                                        >
-                                                            <FaEye className="text-sm" />{" "}
-                                                            Lihat Bukti Transfer
-                                                        </a>
-
-                                                        {riwayat.bukti_transfer
-                                                            .toLowerCase()
-                                                            .includes(
-                                                                ".pdf"
-                                                            ) ? (
-                                                            <iframe
-                                                                src={`/storage/${riwayat.bukti_transfer}`}
-                                                                className="w-full h-64 mt-2 border rounded"
-                                                            ></iframe>
-                                                        ) : (
-                                                            <img
-                                                                src={`/storage/${riwayat.bukti_transfer}`}
-                                                                alt="Bukti Transfer"
-                                                                className="mt-2 max-w-xs rounded border"
-                                                            />
-                                                        )}
-                                                    </div>
+                {pesanan.riwayat_pembayaran?.length > 0 && (
+                    <div className="mt-6 pt-4 border-t">
+                        <h4 className="font-semibold mb-2">
+                            Riwayat Pembayaran
+                        </h4>
+                        <ul className="space-y-2">
+                            {pesanan.riwayat_pembayaran.map(
+                                (pembayaran, idx) => (
+                                    <li
+                                        key={idx}
+                                        className="border p-3 rounded bg-gray-50 text-sm"
+                                    >
+                                        <div>
+                                            <strong>
+                                                Rp{" "}
+                                                {Number(
+                                                    pembayaran.jumlah_bayar
+                                                ).toLocaleString("id-ID")}
+                                            </strong>{" "}
+                                            -{" "}
+                                            {new Date(
+                                                pembayaran.created_at
+                                            ).toLocaleDateString("id-ID")}
+                                        </div>
+                                        {pembayaran.bukti_transfer && (
+                                            <div className="mt-1">
+                                                <a
+                                                    href={`/storage/${pembayaran.bukti_transfer}`}
+                                                    target="_blank"
+                                                    className="text-blue-600 hover:underline"
+                                                >
+                                                    Lihat Bukti Transfer
+                                                </a>
+                                                {pembayaran.bukti_transfer.endsWith(
+                                                    ".pdf"
+                                                ) ? (
+                                                    <iframe
+                                                        src={`/storage/${pembayaran.bukti_transfer}`}
+                                                        className="w-full h-64 mt-2 border rounded"
+                                                    ></iframe>
+                                                ) : (
+                                                    <img
+                                                        src={`/storage/${pembayaran.bukti_transfer}`}
+                                                        alt="Bukti Transfer"
+                                                        className="mt-2 max-w-xs rounded border"
+                                                    />
                                                 )}
-                                            </li>
-                                        )
-                                    )}
-                                </ul>
-                            </div>
-                        )}
+                                            </div>
+                                        )}
+                                    </li>
+                                )
+                            )}
+                        </ul>
                     </div>
                 )}
             </div>
