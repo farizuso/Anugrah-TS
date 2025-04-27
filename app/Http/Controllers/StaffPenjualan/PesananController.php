@@ -39,7 +39,12 @@ class PesananController extends Controller
 
     public function store(Request $request)
     {
+<<<<<<< HEAD
         $validator = Validator::make($request->all(), [
+=======
+
+        $request->validate([
+>>>>>>> ed512fde71415c9410d93315c4fdb2e85cf8c15a
             'tgl_pesanan' => 'required|date',
             'pelanggan_id' => 'required|exists:pelanggans,id',
             'jenis_pesanan' => 'required|in:jual,sewa',
