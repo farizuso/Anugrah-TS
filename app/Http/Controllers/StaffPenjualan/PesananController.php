@@ -14,6 +14,8 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use App\Models\PembayaranPesanan;
 use App\Models\Stok;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class PesananController extends Controller
 {
@@ -37,38 +39,58 @@ class PesananController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'tgl_pesanan' => 'required|date',
             'pelanggan_id' => 'required|exists:pelanggans,id',
-            'produk' => 'required|array',
+            'jenis_pesanan' => 'required|in:jual,sewa',
+            'produk' => 'required|array|min:1',
             'produk.*.produk_id' => 'required|exists:produks,id',
             'produk.*.harga' => 'required|numeric|min:0',
             'produk.*.quantity' => 'required|integer|min:1',
         ]);
 
-        DB::beginTransaction();
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Validasi gagal. Silakan periksa kembali form Anda.');
+        }
 
-        try {
-            $produkList = $request->produk;
+        $produkList = $request->produk;
+        $jenisPesanan = $request->jenis_pesanan;
+        $jaminanSewa = 1200000;
 
-            // ✅ Validasi stok cukup dulu
+        // Validasi stok hanya untuk pesanan jenis "jual"
+        if ($jenisPesanan === 'jual') {
             foreach ($produkList as $item) {
                 $stok = Stok::where('produk_id', $item['produk_id'])->first();
                 if ($stok && $stok->jumlah_stok < $item['quantity']) {
-                    return response()->json([
-                        'message' => "Stok untuk produk {$item['produk_id']} tidak mencukupi.",
-                    ], 422);
+                    return redirect()->back()
+                        ->with('error', "Stok untuk produk ID {$item['produk_id']} tidak mencukupi.")
+                        ->withInput();
                 }
             }
+        }
 
-            $total = collect($produkList)->reduce(function ($sum, $item) {
-                return $sum + ((int)$item['harga'] * (int)$item['quantity']);
-            }, 0);
+        DB::beginTransaction();
+
+        try {
+            $total = 0;
+            foreach ($produkList as $item) {
+                $jumlah = (int) $item['quantity'];
+
+                $subtotal = $jenisPesanan === 'sewa'
+                    ? $jumlah * $jaminanSewa
+                    : $jumlah * (int)$item['harga'];
+
+                $total += $subtotal;
+            }
 
             $pesanan = Pesanan::create([
                 'tgl_pesanan' => $request->tgl_pesanan,
                 'pelanggan_id' => $request->pelanggan_id,
                 'total' => $total,
+                'jenis_pesanan' => $jenisPesanan,
                 'status' => 'Pending',
                 'jumlah_terbayar' => 0,
                 'is_lunas' => false,
@@ -76,40 +98,54 @@ class PesananController extends Controller
             ]);
 
             foreach ($produkList as $item) {
-                // Simpan detail
+                $harga = $jenisPesanan === 'sewa' ? $jaminanSewa : $item['harga'];
+
                 PesananDetail::create([
                     'pesanan_id' => $pesanan->id,
                     'produk_id' => $item['produk_id'],
-                    'harga' => $item['harga'],
+                    'harga' => $harga,
                     'quantity' => $item['quantity'],
                 ]);
 
-                // ✅ Kurangi stok
-                $stok = Stok::where('produk_id', $item['produk_id'])->first();
-                $stok->jumlah_stok -= $item['quantity'];
-                $stok->save();
+                if ($jenisPesanan === 'jual') {
+                    $stok = Stok::where('produk_id', $item['produk_id'])->first();
+                    if ($stok) {
+                        $stok->jumlah_stok -= $item['quantity'];
+                        $stok->save();
+                    }
+                }
             }
 
             DB::commit();
 
             return redirect()->route('staffpenjualan.pesanan.index')
-                ->with('success', 'Pesanan berhasil dibuat dan stok diperbarui.');
+                ->with('success', 'Pesanan berhasil disimpan.');
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error("Gagal simpan pesanan: " . $e->getMessage());
-            return back()->withErrors(['msg' => $e->getMessage()]);
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat membuat pesanan.')
+                ->withInput();
         }
     }
+
+
+
+
+
 
 
     public function detail_pesanan($id)
     {
         $pesanan = Pesanan::with(['pelanggan', 'details.produk', 'riwayat_pembayaran'])->findOrFail($id);
-        $produkList = $pesanan->details()->get();
+
+        // 👇 debug cek apakah `jenis` masuk
+        foreach ($pesanan->details as $detail) {
+            Log::info("Produk: {$detail->produk->nama_produk}, Jenis: {$detail->produk->jenis}");
+        }
 
         return Inertia::render('StaffPenjualan/Pesanan/Detail', [
             'pesanan' => $pesanan,
-            'produkList' => $produkList,
         ]);
     }
 
@@ -248,7 +284,7 @@ class PesananController extends Controller
     }
 
 
-    public function rekapPenjualan(Request $request)
+    public function LaporanPenjualan(Request $request)
     {
         $query = Pesanan::with('pelanggan');
 
@@ -256,10 +292,10 @@ class PesananController extends Controller
             $query->whereBetween('tgl_pesanan', [$request->start_date, $request->end_date]);
         }
 
-        $rekap = $query->orderBy('tgl_pesanan', 'desc')->get();
+        $penjualan = $query->orderBy('tgl_pesanan', 'desc')->get();
 
-        return Inertia::render('StaffPenjualan/Pesanan/Rekap', [
-            'rekap' => $rekap,
+        return Inertia::render('StaffPenjualan/Pesanan/Penjualan', [
+            'penjualan' => $penjualan,
         ]);
     }
 

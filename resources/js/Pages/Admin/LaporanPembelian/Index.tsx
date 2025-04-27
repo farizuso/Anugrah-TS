@@ -14,7 +14,7 @@ import { Label } from "@/Components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useForm, usePage } from "@inertiajs/react";
-import React, { FormEventHandler, useEffect } from "react";
+import React, { FormEventHandler, useEffect, useState } from "react";
 import { PembelianColumns } from "./PembelianColumn";
 import {
     Popover,
@@ -22,13 +22,21 @@ import {
     PopoverTrigger,
 } from "@/Components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { Calendar } from "@/Components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { LaporanDataTable } from "@/Components/LaporanDataTable";
 import { Produk, Supplier, LaporanPembelian, PageProps } from "@/types";
 import { DataTable } from "@/Components/DataTable";
+import { toast } from "react-toastify";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
 
 interface LaporanPembelianProps {
     posts: LaporanPembelian[];
@@ -59,9 +67,24 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                 ...data,
                 tgl_pembelian: formattedDate,
             },
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                setData({
+                    tgl_pembelian: new Date(),
+                    supplier_id: "",
+                    produk: [{ produk_id: "", harga: "", quantity: "" }],
+                    total: 0,
+                    keterangan: "",
+                    status: "",
+                });
+                setSelectedSupplier(null);
+                setSelectedProduk([null]);
+            },
         });
     };
+
+    const [selectedSupplier, setSelectedSupplier] = useState<any>(null);
+    const [selectedProduk, setSelectedProduk] = useState<any[]>([null]);
 
     const handleProdukChange = (index: number, value: any) => {
         const newProduk = [...data.produk];
@@ -86,6 +109,7 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
             ...data.produk,
             { produk_id: "", harga: "", quantity: "" },
         ]);
+        setSelectedProduk([...selectedProduk, null]); // ini penting
     };
 
     const handleRemoveRow = (index: number) => {
@@ -117,6 +141,26 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
             style: "currency",
             currency: "IDR",
         }).format(number);
+
+    const formatRupiahInput = (value: string): string => {
+        const numberString = value.replace(/[^,\d]/g, "");
+        const split = numberString.split(",");
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            const separator = sisa ? "." : "";
+            rupiah += separator + ribuan.join(".");
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+        return rupiah ? "Rp " + rupiah : "";
+    };
+
+    const parseRupiahToNumber = (value: string): string => {
+        return value.replace(/[^0-9]/g, "");
+    };
 
     useEffect(() => {
         const totalHarga = data.produk.reduce((acc, curr) => {
@@ -198,12 +242,16 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                                     <CreatableSelect
                                         isClearable
                                         options={supplierOptions}
-                                        onChange={handleSupplierChange}
-                                        onCreateOption={handleCreate}
-                                        value={supplierOptions.find(
-                                            (opt) =>
-                                                opt.value === data.supplier_id
-                                        )}
+                                        onChange={(option) => {
+                                            setSelectedSupplier(option);
+                                            setData(
+                                                "supplier_id",
+                                                option?.value || ""
+                                            );
+                                        }}
+                                        // onCreateOption={handleCreate}
+                                        value={selectedSupplier}
+                                        placeholder="Pilih Supplier"
                                     />
                                 </div>
 
@@ -215,26 +263,37 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                                         <CreatableSelect
                                             isClearable
                                             options={produkOptions}
-                                            onChange={(val) =>
-                                                handleProdukChange(index, val)
+                                            onChange={(val) => {
+                                                handleProdukChange(index, val);
+                                                const updated = [
+                                                    ...selectedProduk,
+                                                ];
+                                                updated[index] = val;
+                                                setSelectedProduk(updated);
+                                            }}
+                                            value={
+                                                selectedProduk[index] || null
                                             }
-                                            value={produkOptions.find(
-                                                (opt) =>
-                                                    opt.value === item.produk_id
-                                            )}
+                                            placeholder="Pilih Produk"
                                         />
+
                                         <Input
-                                            type="number"
+                                            type="text"
                                             placeholder="Harga"
                                             className="w-32"
-                                            value={item.harga}
+                                            value={formatRupiahInput(
+                                                item.harga
+                                            )}
                                             onChange={(e) =>
                                                 handleHargaChange(
                                                     index,
-                                                    e.target.value
+                                                    parseRupiahToNumber(
+                                                        e.target.value
+                                                    )
                                                 )
                                             }
                                         />
+
                                         <Input
                                             type="number"
                                             placeholder="Qty"
@@ -276,19 +335,33 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                                         readOnly
                                     />
                                 </div>
-
-                                <div className="space-y-1">
-                                    <Label>Keterangan</Label>
-                                    <Input
-                                        type="text"
+                                <div>
+                                    <Label className="mb-1 block">
+                                        Keterangan Pembayaran
+                                    </Label>
+                                    <Select
                                         value={data.keterangan}
-                                        onChange={(e) =>
-                                            setData(
-                                                "keterangan",
-                                                e.target.value
-                                            )
+                                        onValueChange={(value) =>
+                                            setData("keterangan", value)
                                         }
-                                    />
+                                    >
+                                        <SelectTrigger className="w-[200px]">
+                                            <SelectValue placeholder="Pilih keterangan" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Lunas">
+                                                Lunas
+                                            </SelectItem>
+                                            <SelectItem value="Belum Lunas">
+                                                Belum Lunas
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.keterangan && (
+                                        <p className="text-sm text-red-500">
+                                            {errors.keterangan}
+                                        </p>
+                                    )}
                                 </div>
                             </CardContent>
 

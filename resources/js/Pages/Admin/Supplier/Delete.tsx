@@ -46,9 +46,9 @@ const Delete = ({ supplierdelete }: DeleteSupplier) => {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Confirm</AlertDialogTitle>
+                        <AlertDialogTitle>Konfirmasi</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete it permanently?
+                            apakah anda ingin menghapus data ini ?
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

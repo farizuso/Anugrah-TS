@@ -17,6 +17,7 @@ class Pesanan extends Model
         'status',
         'jumlah_terbayar',
         'metode_pembayaran',
+        'jenis_pesanan',
         'keterangan',
         'is_lunas',
         'bukti_transfer',
@@ -42,4 +43,11 @@ class Pesanan extends Model
     {
         return $this->hasMany(PembayaranPesanan::class);
     }
+
+    // public function produks()
+    // {
+    //     return $this->belongsToMany(Produk::class, 'pesanan_details', 'pesanan_id', 'produk_id')
+    //         ->withPivot('quantity', 'harga')
+    //         ->withTimestamps();
+    // }
 }

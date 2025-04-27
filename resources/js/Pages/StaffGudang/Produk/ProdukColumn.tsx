@@ -2,14 +2,12 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Produk } from "@/types";
-import Delete from "./Delete";
-import Edit from "./Edit";
 import { Button } from "@/Components/ui/button";
 import { Checkbox } from "@/Components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 
 // Kolom DataTable untuk Produk
-export const produkColumns: ColumnDef<Produk>[] = [
+export const ProdukColumns: ColumnDef<Produk>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -126,21 +124,6 @@ export const produkColumns: ColumnDef<Produk>[] = [
             }).format(amount);
 
             return <div className="font-medium">{formatted}</div>;
-        },
-    },
-    {
-        id: "actions",
-        header: () => <div className="text-center">Action</div>,
-        enableHiding: false,
-        cell: ({ row }) => {
-            const produk = row.original;
-
-            return (
-                <div className="flex justify-center items-center gap-2">
-                    <Delete produkdelete={produk} />
-                    <Edit produkedit={produk} />
-                </div>
-            );
         },
     },
 ];

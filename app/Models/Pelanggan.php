@@ -19,4 +19,9 @@ class Pelanggan extends Model
     {
         return $this->hasMany(Rekap::class);
     }
+
+    public function sewa_tabung()
+    {
+        return $this->hasMany(SewaTabung::class);
+    }
 }

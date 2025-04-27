@@ -15,7 +15,7 @@ import {
 } from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
 import { FaEye } from "react-icons/fa";
-import { Pembayaran, Pesanan } from "@/types";
+import { Pembayaran, Pesanan, Produk } from "@/types";
 import ConfirmPembayaran from "@/Components/ConfirmPembayaran";
 import { format } from "date-fns";
 import { Label } from "@/Components/ui/label";
@@ -29,6 +29,8 @@ interface DetailProps {
 
 const Detail = ({ pesanan }: DetailProps) => {
     const [open, setOpen] = useState(false);
+
+    const isSewaTabung = pesanan.jenis_pesanan === "sewa";
 
     const formatRupiah = (angka: number) =>
         `Rp ${angka.toLocaleString("id-ID")}`;
@@ -60,6 +62,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                         <p className="font-semibold mb-1">
                             Informasi Pemesanan
                         </p>
+
                         <p>
                             tanggal pesanan:{" "}
                             <strong>
@@ -85,6 +88,25 @@ const Detail = ({ pesanan }: DetailProps) => {
                                 {pesanan.status || "-"}
                             </strong>
                         </p>
+
+                        {isSewaTabung && (
+                            <div className="mt-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-3 rounded">
+                                <p className="font-semibold">
+                                    🛢️ Pesanan ini adalah{" "}
+                                    <span className="underline">
+                                        Sewa Tabung
+                                    </span>
+                                    .
+                                </p>
+                                <p>
+                                    Masa sewa 6 bulan. Jika tidak dikembalikan,
+                                    jaminan sebesar{" "}
+                                    <strong>Rp1.200.000/tabung</strong> akan
+                                    hangus.
+                                </p>
+                            </div>
+                        )}
+
                         {pesanan.keterangan === "Cicilan" && (
                             <p className="text-orange-600 mt-1">
                                 Sisa tagihan:{" "}

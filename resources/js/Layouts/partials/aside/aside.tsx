@@ -83,6 +83,13 @@ export function Aside() {
                         <IconBrandProducthunt />
                         <span>Laporan Pembelian</span>
                     </AsideLink>
+                    <AsideLink
+                        active={route().current("staffgudang.produk.index")}
+                        href={route("staffgudang.produk.index")}
+                    >
+                        <IconBrandProducthunt />
+                        <span>Produk</span>
+                    </AsideLink>
                 </>
             )}
 
@@ -108,12 +115,14 @@ export function Aside() {
 
                     <AsideLink
                         active={route().current(
-                            "staffpenjualan.rekap.penjualan"
+                            "staffpenjualan.laporanPenjualan.penjualan"
                         )}
-                        href={route("staffpenjualan.rekap.penjualan")}
+                        href={route(
+                            "staffpenjualan.laporanPenjualan.penjualan"
+                        )}
                     >
                         <IconMacbookAirFill />
-                        <span>Rekap Laporan Penjualan</span>
+                        <span>Laporan Penjualan</span>
                     </AsideLink>
                 </>
             )}

@@ -108,6 +108,7 @@ const Index = ({ posts }: SupplierProps) => {
                                             )
                                         }
                                         value={data.nama_supplier}
+                                        placeholder="Masukkan Nama Supplier"
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -120,19 +121,34 @@ const Index = ({ posts }: SupplierProps) => {
                                             setData("alamat", e.target.value)
                                         }
                                         value={data.alamat}
+                                        placeholder="Masukkan Alamat"
                                     />
                                 </div>
                                 <div className="space-y-1">
                                     <Label htmlFor="new">No_Telp</Label>
                                     <Input
-                                        id="new"
-                                        type="text"
+                                        id="no_telp"
+                                        className="col-span-3"
                                         name="no_telp"
-                                        onChange={(e) =>
-                                            setData("no_telp", e.target.value)
-                                        }
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
                                         value={data.no_telp}
+                                        onChange={(e) =>
+                                            setData(
+                                                "no_telp",
+                                                e.target.value.replace(
+                                                    /\D/g,
+                                                    ""
+                                                )
+                                            )
+                                        }
+                                        placeholder="Masukkan no_telp"
                                     />
+                                    {errors.no_telp && (
+                                        <p className="text-sm text-red-600">
+                                            {errors.no_telp}
+                                        </p>
+                                    )}
                                 </div>
                             </CardContent>
                             <CardFooter>

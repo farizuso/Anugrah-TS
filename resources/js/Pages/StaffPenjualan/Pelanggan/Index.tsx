@@ -87,6 +87,7 @@ const TabsDemo = ({ posts }: PelangganProps) => {
                                             )
                                         }
                                         value={data.nama_pelanggan}
+                                        placeholder="Masukkan nama pelanggan"
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -99,19 +100,34 @@ const TabsDemo = ({ posts }: PelangganProps) => {
                                             setData("alamat", e.target.value)
                                         }
                                         value={data.alamat}
+                                        placeholder="Masukkan alamat"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="new">No Hp Aktif</Label>
+                                    <Label htmlFor="no_hp">No. Telepon</Label>
                                     <Input
-                                        id="new"
-                                        type="text"
+                                        id="no_hp"
                                         name="no_hp"
-                                        onChange={(e) =>
-                                            setData("no_hp", e.target.value)
-                                        }
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
                                         value={data.no_hp}
+                                        onChange={(e) =>
+                                            setData(
+                                                "no_hp",
+                                                e.target.value.replace(
+                                                    /\D/g,
+                                                    ""
+                                                )
+                                            )
+                                        }
+                                        placeholder="Masukkan nomor telepon"
                                     />
+
+                                    {errors.no_hp && (
+                                        <p className="text-sm text-red-600">
+                                            {errors.no_hp}
+                                        </p>
+                                    )}
                                 </div>
                             </CardContent>
                             <CardFooter>

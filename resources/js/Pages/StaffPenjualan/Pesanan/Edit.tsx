@@ -10,7 +10,7 @@ import {
 } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { PageProps, LaporanPembelian, Produk, Pesanan } from "@/types";
+import { PageProps, Produk, Pesanan } from "@/types";
 import { useForm, usePage } from "@inertiajs/react";
 import React, { useEffect, useState } from "react";
 import { BsPencilSquare } from "react-icons/bs";
@@ -31,18 +31,23 @@ interface EditPesanan {
 
 const Edit = ({ pesananedit }: EditPesanan) => {
     const [open, setOpen] = useState(false);
-    const { produks = [] } = usePage<PageProps>().props;
+    const { produks = [], pelanggans = [] } = usePage<PageProps>().props;
 
     const produkOptions = produks.map((produk: Produk) => ({
         value: String(produk.id),
         label: produk.nama_produk,
     }));
 
+    const pelangganOptions = pelanggans.map((pel) => ({
+        value: String(pel.id),
+        label: pel.nama_pelanggan,
+    }));
+
     const { data, setData, put, processing, errors, reset } = useForm({
         tgl_pesanan: pesananedit.tgl_pesanan
             ? new Date(pesananedit.tgl_pesanan)
             : new Date(),
-        pelanggan_id: String(pesananedit.pelanggan.id) || "", // gunakan id, bukan nama
+        pelanggan_id: String(pesananedit.pelanggan.id) || "",
         produk: pesananedit.details.map((item) => ({
             produk_id: String(item.produk.id),
             harga: String(item.harga),
@@ -51,6 +56,12 @@ const Edit = ({ pesananedit }: EditPesanan) => {
         keterangan: pesananedit.keterangan || "",
         total: pesananedit.total || 0,
     });
+
+    const formatRupiah = (number: number): string =>
+        new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+        }).format(number);
 
     useEffect(() => {
         const total = data.produk.reduce((sum, p) => {
@@ -61,20 +72,24 @@ const Edit = ({ pesananedit }: EditPesanan) => {
         setData("total", total);
     }, [data.produk]);
 
-    const { pelanggans = [] } = usePage<PageProps>().props;
-
-    const pelangganOptions = pelanggans.map((pel) => ({
-        value: String(pel.id),
-        label: pel.nama_pelanggan,
-    }));
-
     const handlePelangganChange = (selected: any) => {
         setData("pelanggan_id", selected ? selected.value : "");
     };
 
     const handleProdukChange = (index: number, selected: any) => {
         const newProduk = [...data.produk];
-        newProduk[index].produk_id = selected ? selected.value : "";
+        if (selected) {
+            newProduk[index].produk_id = selected.value;
+            const selectedProduk = produks.find(
+                (p) => String(p.id) === selected.value
+            );
+            if (selectedProduk) {
+                newProduk[index].harga = String(selectedProduk.harga_jual); // ambil harga produk baru
+            }
+        } else {
+            newProduk[index].produk_id = "";
+            newProduk[index].harga = "";
+        }
         setData("produk", newProduk);
     };
 
@@ -133,9 +148,9 @@ const Edit = ({ pesananedit }: EditPesanan) => {
 
             <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle>Edit Laporan Pembelian</DialogTitle>
+                    <DialogTitle>Edit Pesanan</DialogTitle>
                     <DialogDescription>
-                        Ubah informasi pembelian di bawah ini.
+                        Perbarui informasi pesanan di bawah ini.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -199,14 +214,13 @@ const Edit = ({ pesananedit }: EditPesanan) => {
                                     />
                                 </div>
                                 <Input
-                                    type="number"
-                                    className="w-32"
+                                    type="text"
                                     placeholder="Harga"
-                                    value={item.harga}
-                                    onChange={(e) =>
-                                        handleHargaChange(index, e.target.value)
-                                    }
+                                    className="w-32"
+                                    value={formatRupiah(Number(item.harga))}
+                                    readOnly
                                 />
+
                                 <Input
                                     type="number"
                                     className="w-24"

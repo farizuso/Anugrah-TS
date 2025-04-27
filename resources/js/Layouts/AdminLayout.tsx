@@ -15,7 +15,7 @@ import React, { useEffect } from "react";
 import { ApplicationLogo } from "@/Components/application-logo";
 import { PageProps } from "@/types";
 import { Aside } from "@/Layouts/partials/aside/aside";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { LogOut, Menu, User } from "lucide-react";
 import Toastify from "@/Components/Toastify";
 
@@ -60,8 +60,8 @@ const AdminLayout = ({
     return (
         <>
             <Head title={title} />
-            {flash?.success && <Toastify />}
-            {flash?.error && <Toastify />}
+            {/* {flash?.success && <Toastify />} */}
+            {/* {flash?.error && <Toastify />} */}
             <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
                 <div className="hidden border-r bg-muted/40 md:block">
                     <div className="flex h-full max-h-screen flex-col gap-2">
@@ -169,6 +169,7 @@ const AdminLayout = ({
                     </header>
                     <main className=" min-w-full flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
                         {children}
+                        <Toastify />
                     </main>
                 </div>
             </div>

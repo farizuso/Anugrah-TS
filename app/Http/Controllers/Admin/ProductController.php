@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreProdukRequest;
 use Inertia\Inertia;
 use App\Http\Requests\UpdateProdukRequest;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -25,17 +26,33 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'nama_produk' => 'required',
-            'simbol' => 'required',
-            'jenis' => 'required',
-            'harga_jual' => 'required',
-        ]);
+        try {
+            $data = $request->validate([
+                'nama_produk' => 'required',
+                'simbol' => 'required',
+                'kategori' => 'required',
+                'harga_jual' => 'required',
+            ]);
 
-        Produk::create($data);
+            Produk::create($data);
 
-        return redirect()->route('admin.produk.index')->with('success', 'Data Produk berhasil ditambahkan');
+            return redirect()->route('admin.produk.index')->with('success', 'Data Produk berhasil ditambahkan');
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menambahkan data: ' . $e->getMessage());
+        }
     }
+    public function getProdukGudang()
+    {
+        // Ambil semua data produk beserta relasi stok jika ada
+        $posts = Produk::with('stok')->get();
+
+        return Inertia::render('StaffGudang/Produk/Index', [
+            'posts' => $posts,
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -52,7 +69,7 @@ class ProductController extends Controller
         $produk->update([
             'nama_produk' => $request->nama_produk,
             'simbol' => $request->simbol,
-            'jenis' => $request->jenis,
+            'kategori' => $request->kategori,
             'harga_jual' => $request->harga_jual
         ]);
         return redirect()->route('admin.produk.index')->with('success', 'data Produk berhasil diubah');

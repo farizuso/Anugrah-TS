@@ -77,9 +77,10 @@ export interface Pesanan {
         produk: {
             id: number;
             nama_produk: string;
+            jenis_pesanan: "jual" | "sewa"; // ✅ tambahkan agar bisa digunakan di Detail.tsx
         };
     }[];
-    riwayat_pembayaran: Pembayaran[]; // ✅ updated: required field
+    riwayat_pembayaran: Pembayaran[];
 }
 
 export interface Stok {
@@ -92,9 +93,9 @@ export interface Produk {
     id: number;
     nama_produk: string;
     simbol: string;
-    jenis: string;
+    kategori: string;
     harga_jual: number;
-    stok?: Stok | null; // tambahkan ini
+    stok?: Stok | null;
 }
 
 export interface Pelanggan {
@@ -126,6 +127,7 @@ export type PageProps<
     };
     produks: Produk[];
     pelanggans: Pelanggan[];
+    suppliers?: Supplier[];
     LaporanPembelian: LaporanPembelian[];
 };
 

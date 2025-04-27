@@ -16,7 +16,7 @@ use App\Models\Stok;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Validator;
 
 class LaporanPembelianController extends Controller
 {
@@ -55,6 +55,7 @@ class LaporanPembelianController extends Controller
     }
 
 
+
     // Export Excel langsung download
     public function export(Request $request)
     {
@@ -69,7 +70,7 @@ class LaporanPembelianController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'tgl_pembelian' => 'required|date',
             'supplier_id' => 'required|exists:suppliers,id',
             'produk' => 'required|array|min:1',
@@ -79,42 +80,47 @@ class LaporanPembelianController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        try {
-            // Format tanggal sesuai yang diinginkan
-            $tglFix = Carbon::parse($validated['tgl_pembelian'])->format('Y-m-d');
-        } catch (\Exception $e) {
-            return back()->withErrors(['tgl_pembelian' => 'Format tanggal tidak valid.']);
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Validasi gagal. Silakan periksa kembali form Anda.');
         }
 
-        // Menjalankan transaksi untuk memastikan atomisitas
-        DB::transaction(function () use ($validated, $tglFix) {
-            // Ambil supplier berdasarkan supplier_id
-            $supplierId = $validated['supplier_id'];
-            $supplier = Supplier::find($supplierId);
-            $namaSupplier = $supplier?->nama_supplier;  // Nama supplier diambil dari relasi
+        try {
+            $validated = $validator->validated();
+            $tglFix = Carbon::parse($validated['tgl_pembelian'])->format('Y-m-d');
 
-            // Membuat laporan pembelian
-            $pembelian = LaporanPembelian::create([
-                'tgl_pembelian' => $tglFix,
-                'supplier_id' => $supplierId,
-                'keterangan' => $validated['keterangan'] ?? null,
-                'total' => collect($validated['produk'])->sum(fn($item) => $item['harga'] * $item['quantity']),
-            ]);
+            DB::transaction(function () use ($validated, $tglFix) {
+                $supplierId = $validated['supplier_id'];
+                $supplier = Supplier::find($supplierId);
 
-            // Menyimpan detail produk
-            foreach ($validated['produk'] as $item) {
-                LaporanPembelianDetail::create([
-                    'laporan_pembelian_id' => $pembelian->id,
-                    'produk_id' => $item['produk_id'],
-                    'harga' => $item['harga'],
-                    'quantity' => $item['quantity'],
+                $pembelian = LaporanPembelian::create([
+                    'tgl_pembelian' => $tglFix,
+                    'supplier_id' => $supplierId,
+                    'keterangan' => $validated['keterangan'] ?? null,
+                    'total' => collect($validated['produk'])->sum(fn($item) => $item['harga'] * $item['quantity']),
                 ]);
-            }
-        });
 
-        // Redirect ke halaman laporan pembelian setelah berhasil menyimpan data
-        return redirect()->route('admin.laporanpembelian.index')
-            ->with('success', 'Data Laporan Pembelian berhasil disimpan');
+                foreach ($validated['produk'] as $item) {
+                    LaporanPembelianDetail::create([
+                        'laporan_pembelian_id' => $pembelian->id,
+                        'produk_id' => $item['produk_id'],
+                        'harga' => $item['harga'],
+                        'quantity' => $item['quantity'],
+                    ]);
+                }
+            });
+
+            return redirect()->route('admin.laporanpembelian.index')
+                ->with('success', 'Data Laporan Pembelian berhasil disimpan');
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat menambahkan data: ' . $e->getMessage());
+        }
     }
 
     /**

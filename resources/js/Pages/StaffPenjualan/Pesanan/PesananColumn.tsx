@@ -154,22 +154,27 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
 
     {
         accessorKey: "status",
-        header: "status",
+        header: "Status",
         cell: ({ row }) => {
-            const status = row.original.status?.toLowerCase();
-            const className =
-                status === "lunas"
-                    ? "text-green-600 font-semibold"
-                    : status === "belum lunas"
-                    ? "text-red-600 font-semibold"
-                    : "text-gray-700";
+            const status = row.getValue("status") as string;
+
+            const badgeClass =
+                {
+                    Pending: "bg-yellow-400 text-black font-bold",
+                    Dikirim: "bg-blue-500 text-white font-bold",
+                    Selesai: "bg-green-600 text-white font-bold",
+                }[status] || "bg-gray-500 text-white font-bold";
+
             return (
-                <div className={`capitalize ${className}`}>
-                    {row.original.status}
+                <div
+                    className={`capitalize inline-flex items-center px-3 py-1 rounded-full ${badgeClass}`}
+                >
+                    {status}
                 </div>
             );
         },
     },
+
     {
         id: "actions",
         header: () => <div className="text-center">Action</div>,

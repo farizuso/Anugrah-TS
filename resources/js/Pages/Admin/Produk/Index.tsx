@@ -14,8 +14,9 @@ import { DataTable } from "@/Components/DataTable";
 import { PageProps, Produk } from "@/types";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useForm, usePage } from "@inertiajs/react";
-import { FormEventHandler } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { produkColumns } from "./produkColumn";
+import { toast } from "react-toastify";
 
 interface ProdukProps {
     posts: Produk[];
@@ -36,7 +37,7 @@ const TabsDemo = ({ posts }: ProdukProps) => {
     } = useForm({
         nama_produk: "",
         simbol: "",
-        jenis: "",
+        kategori: "",
         harga_jual: "",
     });
 
@@ -44,14 +45,28 @@ const TabsDemo = ({ posts }: ProdukProps) => {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        console.log(data);
-        // router.post("/todos", data, {
-        //     onSuccess: () => reset(),
-        // });
+
         post(route("admin.produk.store"), {
             onSuccess: () => reset(),
         });
     };
+
+    const [formattedHarga, setFormattedHarga] = useState("");
+
+    // Format ke rupiah
+    const formatRupiah = (value: string | number) => {
+        const number =
+            typeof value === "string" ? value.replace(/\D/g, "") : value;
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            minimumFractionDigits: 0,
+        }).format(Number(number));
+    };
+
+    useEffect(() => {
+        setFormattedHarga(formatRupiah(data.harga_jual));
+    }, [data.harga_jual]);
 
     return (
         <AdminLayout>
@@ -86,6 +101,7 @@ const TabsDemo = ({ posts }: ProdukProps) => {
                                             )
                                         }
                                         value={data.nama_produk}
+                                        placeholder="Masukkan nama produk"
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -98,33 +114,43 @@ const TabsDemo = ({ posts }: ProdukProps) => {
                                             setData("simbol", e.target.value)
                                         }
                                         value={data.simbol}
+                                        placeholder="Masukkan simbol"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="new">Jenis</Label>
+                                    <Label htmlFor="new">Kategori</Label>
                                     <Input
                                         id="new"
                                         type="text"
-                                        name="jenis"
+                                        name="kategori"
                                         onChange={(e) =>
-                                            setData("jenis", e.target.value)
+                                            setData("kategori", e.target.value)
                                         }
-                                        value={data.jenis}
+                                        value={data.kategori}
+                                        placeholder="Masukkan kategori produk"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="new">Harga Jual</Label>
+                                    <Label htmlFor="harga_jual">
+                                        Harga Jual
+                                    </Label>
                                     <Input
-                                        id="new"
+                                        id="harga_jual"
                                         type="text"
                                         name="harga_jual"
-                                        onChange={(e) =>
-                                            setData(
-                                                "harga_jual",
-                                                e.target.value
-                                            )
-                                        }
-                                        value={data.harga_jual}
+                                        value={formattedHarga}
+                                        onChange={(e) => {
+                                            const rawValue =
+                                                e.target.value.replace(
+                                                    /\D/g,
+                                                    ""
+                                                );
+                                            setData("harga_jual", rawValue);
+                                            setFormattedHarga(
+                                                formatRupiah(rawValue)
+                                            );
+                                        }}
+                                        placeholder="Contoh: Rp 120.000"
                                     />
                                 </div>
                             </CardContent>

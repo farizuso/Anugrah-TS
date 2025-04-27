@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\StaffGudang\RekapController;
 use App\Http\Controllers\StaffPenjualan\PelangganController;
 use App\Http\Controllers\StaffPenjualan\PesananController;
+use App\Http\Controllers\StaffPenjualan\SewaTabungController;
 use App\Models\LaporanPembelian;
 // use App\Http\Controllers\Admin\ProductCategoryController;
 // use App\Http\Controllers\Admin\DashboardAdminController;
@@ -67,8 +68,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 Route::middleware('auth', 'role:staff_gudang')->group(function () {
 
-    Route::get('/gudang/laporanpembelian', [LaporanPembelianController::class, 'getLaporanPembelianGudang'])->name('staffgudang.laporanpembelian.index');
+    Route::get('/staffgudang/laporanpembelian', [LaporanPembelianController::class, 'getLaporanPembelianGudang'])->name('staffgudang.laporanpembelian.index');
     Route::put('/staffgudang/laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('staffgudang.laporanpembelian.konfirmasi');
+
+    Route::get('/staffgudang/produk', [ProductController::class, 'getProdukGudang'])->name('staffgudang.produk.index');
+
+
 
     Route::resource('/staffgudang/rekap', RekapController::class)->names('staffgudang.rekap');
 });
@@ -89,8 +94,8 @@ Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
 
     Route::post('/staffpenjualan/pesanan/{id}/selesai', [PesananController::class, 'tandaiSelesai'])->name('staffpenjualan.pesanan.selesai');
 
-    Route::get('/staffpenjualan/rekap-penjualan', [PesananController::class, 'rekapPenjualan'])->name('staffpenjualan.rekap.penjualan');
-    Route::get('/staffpenjualan/rekap-penjualan', [PesananController::class, 'rekapPenjualan'])->name('staffpenjualan.rekap.penjualan');
+
+    Route::get('/staffpenjualan/laporan-penjualan', [PesananController::class, 'laporanPenjualan'])->name('staffpenjualan.laporanPenjualan.penjualan');
 });
 
 

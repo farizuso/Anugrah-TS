@@ -12,8 +12,9 @@ class Produk extends Model
     protected $fillable = [
         'nama_produk',
         'simbol',
-        'jenis',
+        'kategori',
         'harga_jual',
+        // 'jenis',
     ];
 
     public function rekaps()
@@ -24,4 +25,11 @@ class Produk extends Model
     {
         return $this->hasOne(Stok::class);
     }
+
+    // public function pesanans()
+    // {
+    //     return $this->belongsToMany(Pesanan::class, 'pesanan_details', 'produk_id', 'pesanan_id')
+    //         ->withPivot('quantity', 'harga')
+    //         ->withTimestamps();
+    // }
 }

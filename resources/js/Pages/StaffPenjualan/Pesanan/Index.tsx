@@ -1,5 +1,3 @@
-// File: resources/js/Pages/LaporanPembelian/TabsDemo.tsx
-
 import { Button } from "@/Components/ui/button";
 import {
     Card,
@@ -14,7 +12,7 @@ import { Label } from "@/Components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useForm, usePage } from "@inertiajs/react";
-import React, { useEffect } from "react";
+import React, { FormEventHandler, useEffect, useState } from "react";
 import { PesananColumns } from "./PesananColumn";
 import {
     Popover,
@@ -26,16 +24,8 @@ import { format } from "date-fns";
 import { Calendar } from "@/Components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
-import { LaporanDataTable } from "@/Components/LaporanDataTable";
-import {
-    Produk,
-    Supplier,
-    PageProps,
-    Pesanan,
-    Pelanggan,
-    Pembayaran,
-} from "@/types";
 import { DataTable } from "@/Components/DataTable";
+import { Produk, PageProps, Pesanan, Pelanggan } from "@/types";
 import { toast } from "react-toastify";
 
 interface PesananProps {
@@ -48,78 +38,44 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
     const pageProps = usePage<PageProps>();
     const auth = pageProps.props.auth;
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, reset } = useForm({
         tgl_pesanan: new Date(),
         pelanggan_id: "",
+        jenis_pesanan: "jual", // ✅ jenis_pesanan di level pesanan
         produk: [{ produk_id: "", quantity: "", harga: 0 }],
         total: 0,
     });
 
-    const metodeOptions = [
-        { value: "Tunai", label: "Tunai" },
-        { value: "Transfer", label: "Transfer" },
-        { value: "Cicilan", label: "Cicilan" },
-    ];
+    const [selectedPelanggan, setSelectedPelanggan] = useState<any>(null);
+    const [selectedProduk, setSelectedProduk] = useState<any[]>([]);
 
-    const validateForm = () => {
-        if (!data.pelanggan_id) {
-            toast.error("Pelanggan harus dipilih.");
-            return false;
-        }
+    const pelangganOptions = pelanggans.map((p) => ({
+        value: String(p.id),
+        label: p.nama_pelanggan,
+    }));
 
-        for (const [index, item] of data.produk.entries()) {
-            if (!item.produk_id) {
-                toast.error(`Produk baris ${index + 1} belum dipilih.`);
-                return false;
-            }
-            if (!item.quantity || parseInt(item.quantity) <= 0) {
-                toast.error(
-                    `Jumlah pada baris ${index + 1} harus lebih dari 0.`
-                );
-                return false;
-            }
-        }
+    const produkOptions = produks.map((produk) => ({
+        value: String(produk.id),
+        label: produk.nama_produk,
+    }));
 
-        return true;
-    };
+    const formatRupiah = (number: number): string =>
+        new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+        }).format(number);
 
-    const submit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!validateForm()) return;
-
-        const formData = new FormData();
-        formData.append("tgl_pesanan", format(data.tgl_pesanan, "yyyy-MM-dd"));
-        formData.append("pelanggan_id", data.pelanggan_id);
-        formData.append("total", String(data.total));
-        formData.append("produk", JSON.stringify(data.produk));
-
-        post(route("staffpenjualan.pesanan.store"), {
-            data: formData,
-            forceFormData: true,
-            onSuccess: () => {
-                if (!Object.keys(errors).length) {
-                    toast.success("Pesanan berhasil disimpan.");
-                    reset();
-                }
-            },
-            onError: (err) => {
-                if (err.message) {
-                    toast.error(err.message);
-                }
-            },
-        });
-    };
-
-    const handleProdukChange = (index: number, value: any) => {
-        const produkTerpilih = produks.find(
-            (produk) => String(produk.id) === value?.value
-        );
-
+    const handleProdukChange = (index: number, option: any) => {
+        const produk = produks.find((p) => String(p.id) === option?.value);
         const newProduk = [...data.produk];
-        newProduk[index].produk_id = value?.value || "";
-        newProduk[index].harga = Number(produkTerpilih?.harga_jual) || 0;
+        newProduk[index].produk_id = option?.value || "";
+        newProduk[index].harga =
+            data.jenis_pesanan === "sewa" ? 1200000 : produk?.harga_jual || 0;
         setData("produk", newProduk);
+
+        const updatedSelected = [...selectedProduk];
+        updatedSelected[index] = option;
+        setSelectedProduk(updatedSelected);
     };
 
     const handleQuantityChange = (index: number, value: string) => {
@@ -133,15 +89,21 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
             ...data.produk,
             { produk_id: "", quantity: "", harga: 0 },
         ]);
+        setSelectedProduk([...selectedProduk, null]);
     };
 
     const handleRemoveRow = (index: number) => {
         const newProduk = [...data.produk];
         newProduk.splice(index, 1);
         setData("produk", newProduk);
+
+        const newSelected = [...selectedProduk];
+        newSelected.splice(index, 1);
+        setSelectedProduk(newSelected);
     };
 
     const handlePelangganChange = (option: any) => {
+        setSelectedPelanggan(option);
         setData("pelanggan_id", option?.value || "");
     };
 
@@ -149,21 +111,23 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         alert(`Tambah pelanggan baru: ${inputValue}`);
     };
 
-    const produkOptions = produks.map((produk) => ({
-        value: String(produk.id),
-        label: produk.nama_produk,
-    }));
+    const submit: FormEventHandler = (e) => {
+        e.preventDefault();
 
-    const pelangganOptions = pelanggans.map((pelanggan) => ({
-        value: String(pelanggan.id),
-        label: pelanggan.nama_pelanggan,
-    }));
+        const formData = new FormData();
 
-    const formatRupiah = (number: number): string =>
-        new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-        }).format(number);
+        post(route("staffpenjualan.pesanan.store"), {
+            data: formData,
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                reset();
+                setSelectedPelanggan(null);
+                setSelectedProduk([null]);
+                setData("produk", [{ produk_id: "", quantity: "", harga: 0 }]); // menambahkan 1 baris produk kosong
+            },
+        });
+    };
 
     useEffect(() => {
         const totalHarga = data.produk.reduce((acc, curr) => {
@@ -211,12 +175,10 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                         "text-muted-foreground"
                                                 )}
                                             >
-                                                {data.tgl_pesanan
-                                                    ? format(
-                                                          data.tgl_pesanan,
-                                                          "yyyy-MM-dd"
-                                                      )
-                                                    : "Pilih Tanggal"}
+                                                {format(
+                                                    data.tgl_pesanan,
+                                                    "yyyy-MM-dd"
+                                                )}
                                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                             </Button>
                                         </PopoverTrigger>
@@ -238,18 +200,36 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                 </div>
 
                                 <div className="flex flex-col gap-2">
+                                    <Label>Jenis Pesanan</Label>
+                                    <select
+                                        className="border rounded px-2 py-1"
+                                        value={data.jenis_pesanan}
+                                        onChange={(e) =>
+                                            setData(
+                                                "jenis_pesanan",
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+                                        <option value="jual">Penjualan</option>
+                                        <option value="sewa">
+                                            Sewa Tabung
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div className="flex flex-col gap-2">
                                     <Label>Nama Pelanggan</Label>
                                     <CreatableSelect
                                         isClearable
+                                        value={selectedPelanggan}
                                         options={pelangganOptions}
                                         onChange={handlePelangganChange}
-                                        onCreateOption={handleCreate}
-                                        value={pelangganOptions.find(
-                                            (opt) =>
-                                                opt.value === data.pelanggan_id
-                                        )}
+                                        // onCreateOption={handleCreate}
+                                        placeholder="Pilih pelanggan"
                                     />
                                 </div>
+
                                 <div>
                                     <Label>Produk</Label>
                                     {data.produk.map((item, index) => (
@@ -260,24 +240,45 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                             <CreatableSelect
                                                 isClearable
                                                 options={produkOptions}
+                                                value={
+                                                    selectedProduk[index] ||
+                                                    null
+                                                }
                                                 onChange={(val) =>
                                                     handleProdukChange(
                                                         index,
                                                         val
                                                     )
                                                 }
-                                                value={produkOptions.find(
-                                                    (option) =>
-                                                        option.value ===
-                                                        item.produk_id
-                                                )}
+                                                placeholder="Pilih produk"
                                             />
                                             <Input
-                                                type="number"
+                                                type="text"
                                                 placeholder="Harga"
                                                 className="w-32"
-                                                value={item.harga}
-                                                readOnly
+                                                value={formatRupiah(
+                                                    Number(item.harga)
+                                                )}
+                                                readOnly={
+                                                    data.jenis_pesanan ===
+                                                    "sewa"
+                                                }
+                                                onChange={(e) => {
+                                                    const raw =
+                                                        e.target.value.replace(
+                                                            /\D/g,
+                                                            ""
+                                                        );
+                                                    const newProduk = [
+                                                        ...data.produk,
+                                                    ];
+                                                    newProduk[index].harga =
+                                                        parseInt(raw) || 0;
+                                                    setData(
+                                                        "produk",
+                                                        newProduk
+                                                    );
+                                                }}
                                             />
 
                                             <Input
@@ -306,7 +307,6 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                             </Button>
                                         </div>
                                     ))}
-
                                     <Button
                                         type="button"
                                         variant="secondary"
@@ -315,7 +315,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                         + Tambah Produk
                                     </Button>
 
-                                    <div className="space-y-1">
+                                    <div className="space-y-1 mt-4">
                                         <Label>Total</Label>
                                         <Input
                                             type="text"

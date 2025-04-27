@@ -10,7 +10,7 @@ import {
 } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { PageProps, LaporanPembelian, Produk } from "@/types";
+import { PageProps, LaporanPembelian, Produk, Supplier } from "@/types";
 import { useForm, usePage } from "@inertiajs/react";
 import React, { useEffect, useState } from "react";
 import { BsPencilSquare } from "react-icons/bs";
@@ -24,6 +24,13 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import CreatableSelect from "react-select/creatable";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
 
 interface EditLaporanPembelian {
     pembelianedit: LaporanPembelian;
@@ -31,18 +38,25 @@ interface EditLaporanPembelian {
 
 const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
     const [open, setOpen] = useState(false);
-    const { produks = [] } = usePage<PageProps>().props;
+    const { produks = [], suppliers = [] } = usePage<PageProps>().props;
 
     const produkOptions = produks.map((produk: Produk) => ({
         value: String(produk.id),
         label: produk.nama_produk,
     }));
 
+    const supplierOptions = suppliers.map((supplier: Supplier) => ({
+        value: String(supplier.id),
+        label: supplier.nama_supplier,
+    }));
+
     const { data, setData, put, processing, errors, reset } = useForm({
         tgl_pembelian: pembelianedit.tgl_pembelian
             ? new Date(pembelianedit.tgl_pembelian)
             : new Date(),
-        nama_supplier: pembelianedit.supplier.nama_supplier || "",
+        supplier_id: pembelianedit.supplier.id
+            ? String(pembelianedit.supplier.id)
+            : "",
         produk: pembelianedit.details.map((item) => ({
             produk_id: String(item.produk.id),
             harga: String(item.harga),
@@ -51,6 +65,10 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
         keterangan: pembelianedit.keterangan || "",
         total: pembelianedit.total || 0,
     });
+
+    const [selectedSupplier, setSelectedSupplier] = useState<any>(
+        supplierOptions.find((opt) => opt.value === data.supplier_id) || null
+    );
 
     useEffect(() => {
         const total = data.produk.reduce((sum, p) => {
@@ -96,6 +114,32 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
         if (date) {
             setData("tgl_pembelian", date);
         }
+    };
+
+    const formatRupiah = (number: number): string =>
+        new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+        }).format(number);
+
+    const formatRupiahInput = (value: string): string => {
+        const numberString = value.replace(/[^,\d]/g, "");
+        const split = numberString.split(",");
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            const separator = sisa ? "." : "";
+            rupiah += separator + ribuan.join(".");
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+        return rupiah ? "Rp " + rupiah : "";
+    };
+
+    const parseRupiahToNumber = (value: string): string => {
+        return value.replace(/[^0-9]/g, "");
     };
 
     const submit = (e: React.FormEvent) => {
@@ -163,11 +207,14 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
 
                     <div className="space-y-2">
                         <Label>Nama Supplier</Label>
-                        <Input
-                            value={data.nama_supplier}
-                            onChange={(e) =>
-                                setData("nama_supplier", e.target.value)
-                            }
+                        <CreatableSelect
+                            isClearable
+                            options={supplierOptions}
+                            onChange={(option) => {
+                                setSelectedSupplier(option);
+                                setData("supplier_id", option?.value || "");
+                            }}
+                            value={selectedSupplier}
                         />
                     </div>
 
@@ -189,14 +236,18 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
                                     />
                                 </div>
                                 <Input
-                                    type="number"
-                                    className="w-32"
+                                    type="text"
                                     placeholder="Harga"
-                                    value={item.harga}
+                                    className="w-32"
+                                    value={formatRupiahInput(item.harga)}
                                     onChange={(e) =>
-                                        handleHargaChange(index, e.target.value)
+                                        handleHargaChange(
+                                            index,
+                                            parseRupiahToNumber(e.target.value)
+                                        )
                                     }
                                 />
+
                                 <Input
                                     type="number"
                                     className="w-24"
@@ -227,23 +278,34 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
 
                     <div>
                         <Label>Total</Label>
-                        <Input
-                            value={new Intl.NumberFormat("id-ID", {
-                                style: "currency",
-                                currency: "IDR",
-                            }).format(data.total)}
-                            disabled
-                        />
+                        <Input value={formatRupiah(data.total)} disabled />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label>Keterangan</Label>
-                        <Input
-                            value={data.keterangan}
-                            onChange={(e) =>
-                                setData("keterangan", e.target.value)
+                    <div>
+                        <Label className="mb-1 block">
+                            Keterangan Pembayaran
+                        </Label>
+                        <Select
+                            defaultValue={data.keterangan || ""}
+                            onValueChange={(value) =>
+                                setData("keterangan", value)
                             }
-                        />
+                        >
+                            <SelectTrigger className="w-[200px]">
+                                <SelectValue placeholder="" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Lunas">Lunas</SelectItem>
+                                <SelectItem value="Belum Lunas">
+                                    Belum Lunas
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        {errors.keterangan && (
+                            <p className="text-sm text-red-500">
+                                {errors.keterangan}
+                            </p>
+                        )}
                     </div>
 
                     <DialogFooter>

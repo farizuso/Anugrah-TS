@@ -52,68 +52,84 @@ const Edit = ({ pelangganedit }: EditPelanggan) => {
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Edit profile</DialogTitle>
-                    <DialogDescription>
-                        Make changes to your profile here. Click save when
-                        you're done.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">
-                            Nama Pelanggan
-                        </Label>
-                        <Input
-                            id="nama_pelanggan"
-                            // defaultValue="Pedro Duarte"
-                            className="col-span-3"
-                            name="nama_pelanggan"
-                            value={data.nama_pelanggan}
-                            onChange={(e) =>
-                                setData("nama_pelanggan", e.target.value)
-                            }
-                            placeholder="masukkan nama pelanggan"
-                        />
+                <form onSubmit={submit}>
+                    <DialogHeader>
+                        <DialogTitle>Edit profile</DialogTitle>
+                        <DialogDescription>
+                            Make changes to your profile here. Click save when
+                            you're done.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label
+                                htmlFor="nama_pelanggan"
+                                className="text-right"
+                            >
+                                Nama Pelanggan
+                            </Label>
+                            <Input
+                                id="nama_pelanggan"
+                                className="col-span-3"
+                                name="nama_pelanggan"
+                                value={data.nama_pelanggan}
+                                onChange={(e) =>
+                                    setData("nama_pelanggan", e.target.value)
+                                }
+                                placeholder="Masukkan nama pelanggan"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="alamat" className="text-right">
+                                Alamat
+                            </Label>
+                            <Input
+                                id="alamat"
+                                className="col-span-3"
+                                name="alamat"
+                                value={data.alamat}
+                                onChange={(e) =>
+                                    setData("alamat", e.target.value)
+                                }
+                                placeholder="Masukkan alamat"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="no_hp" className="text-right">
+                                No. HP
+                            </Label>
+                            <Input
+                                id="no_hp"
+                                className="col-span-3"
+                                name="no_hp"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                value={data.no_hp}
+                                onChange={(e) =>
+                                    setData(
+                                        "no_hp",
+                                        e.target.value.replace(/\D/g, "")
+                                    )
+                                }
+                                placeholder="Masukkan no_hp"
+                            />
+                            {errors.no_hp && (
+                                <p className="text-sm text-red-600">
+                                    {errors.no_hp}
+                                </p>
+                            )}
+                        </div>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">
-                            Alamat
-                        </Label>
-                        <Input
-                            id="alamat"
-                            // defaultValue="Pedro Duarte"
-                            className="col-span-3"
-                            name="alamat"
-                            value={data.alamat}
-                            onChange={(e) => setData("alamat", e.target.value)}
-                            placeholder="masukkan Alamat"
-                        />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">
-                            No Hp Aktif
-                        </Label>
-                        <Input
-                            id="no_hp"
-                            // defaultValue="Pedro Duarte"
-                            className="col-span-3"
-                            name="no_hp"
-                            value={data.no_hp}
-                            onChange={(e) => setData("no_hp", e.target.value)}
-                            placeholder="masukkan No Hp Aktif"
-                        />
-                    </div>
-                </div>
-                <DialogFooter>
-                    <Button
-                        type="submit"
-                        disabled={processing}
-                        onClick={submit}
-                    >
-                        Save changes
-                    </Button>
-                </DialogFooter>
+
+                    <DialogFooter>
+                        <Button type="submit" disabled={processing}>
+                            Save changes
+                        </Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog>
     );

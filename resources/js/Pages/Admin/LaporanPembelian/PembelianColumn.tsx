@@ -150,6 +150,27 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         },
     },
     {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+            const status = row.getValue("status") as string;
+
+            const badgeClass =
+                {
+                    Dikonfirmasi: "bg-green-500 text-white font-bold",
+                    "Belum Dikonfirmasi": "bg-yellow-500 text-black font-bold",
+                }[status] || "bg-gray-500 text-white font-bold";
+
+            return (
+                <div
+                    className={`capitalize inline-flex items-center px-3 py-1 rounded-full ${badgeClass}`}
+                >
+                    {status}
+                </div>
+            );
+        },
+    },
+    {
         id: "actions",
         header: () => <div className="text-center">Action</div>,
         enableHiding: false,
