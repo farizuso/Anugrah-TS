@@ -31,6 +31,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
+import { CommandCombobox } from "@/Components/ui/CommandCombobox";
 
 interface EditLaporanPembelian {
     pembelianedit: LaporanPembelian;
@@ -156,10 +157,13 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
         });
     };
 
+    // --- Import tetap sama seperti yang kamu buat ---
+
+    // di dalam function Edit
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline_blue" size="sm">
+                <Button variant="outline_blue" size="sm" type="button">
                     <BsPencilSquare />
                 </Button>
             </DialogTrigger>
@@ -179,6 +183,7 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
+                                    type="button"
                                     className={cn(
                                         "w-full justify-start text-left font-normal",
                                         !data.tgl_pembelian &&
@@ -205,16 +210,16 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
                         </Popover>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                         <Label>Nama Supplier</Label>
-                        <CreatableSelect
-                            isClearable
+                        <CommandCombobox
                             options={supplierOptions}
-                            onChange={(option) => {
-                                setSelectedSupplier(option);
-                                setData("supplier_id", option?.value || "");
-                            }}
-                            value={selectedSupplier}
+                            value={data.supplier_id}
+                            onValueChange={(value) =>
+                                setData("supplier_id", value)
+                            }
+                            placeholder="Pilih Supplier"
+                            searchPlaceholder="Cari supplier..."
                         />
                     </div>
 
@@ -223,18 +228,17 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
                         {data.produk.map((item, index) => (
                             <div key={index} className="flex items-end gap-2">
                                 <div className="w-full">
-                                    <CreatableSelect
-                                        isClearable
+                                    <CommandCombobox
                                         options={produkOptions}
-                                        value={produkOptions.find(
-                                            (opt) =>
-                                                opt.value === item.produk_id
-                                        )}
-                                        onChange={(val) =>
-                                            handleProdukChange(index, val)
+                                        value={item.produk_id}
+                                        onValueChange={(value) =>
+                                            handleProdukChange(index, { value })
                                         }
+                                        placeholder="Pilih Produk"
+                                        searchPlaceholder="Cari produk..."
                                     />
                                 </div>
+
                                 <Input
                                     type="text"
                                     placeholder="Harga"
@@ -257,6 +261,7 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
                                         handleQtyChange(index, e.target.value)
                                     }
                                 />
+
                                 <Button
                                     type="button"
                                     variant="destructive"
@@ -267,6 +272,7 @@ const Edit = ({ pembelianedit }: EditLaporanPembelian) => {
                                 </Button>
                             </div>
                         ))}
+
                         <Button
                             type="button"
                             variant="secondary"

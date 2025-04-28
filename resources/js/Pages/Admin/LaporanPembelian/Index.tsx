@@ -37,6 +37,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
+import { CommandCombobox } from "@/Components/ui/CommandCombobox";
 
 interface LaporanPembelianProps {
     posts: LaporanPembelian[];
@@ -239,19 +240,14 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
 
                                 <div className="flex flex-col gap-2">
                                     <Label>Nama Supplier</Label>
-                                    <CreatableSelect
-                                        isClearable
+                                    <CommandCombobox
                                         options={supplierOptions}
-                                        onChange={(option) => {
-                                            setSelectedSupplier(option);
-                                            setData(
-                                                "supplier_id",
-                                                option?.value || ""
-                                            );
-                                        }}
-                                        // onCreateOption={handleCreate}
-                                        value={selectedSupplier}
+                                        value={data.supplier_id}
+                                        onValueChange={(value) =>
+                                            setData("supplier_id", value)
+                                        }
                                         placeholder="Pilih Supplier"
+                                        searchPlaceholder="Cari supplier..."
                                     />
                                 </div>
 
@@ -260,21 +256,16 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                                         key={index}
                                         className="flex gap-2 items-end"
                                     >
-                                        <CreatableSelect
-                                            isClearable
+                                        <CommandCombobox
                                             options={produkOptions}
-                                            onChange={(val) => {
-                                                handleProdukChange(index, val);
-                                                const updated = [
-                                                    ...selectedProduk,
-                                                ];
-                                                updated[index] = val;
-                                                setSelectedProduk(updated);
-                                            }}
-                                            value={
-                                                selectedProduk[index] || null
+                                            value={item.produk_id}
+                                            onValueChange={(value) =>
+                                                handleProdukChange(index, {
+                                                    value,
+                                                })
                                             }
                                             placeholder="Pilih Produk"
+                                            searchPlaceholder="Cari produk..."
                                         />
 
                                         <Input
