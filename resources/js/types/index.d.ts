@@ -129,6 +129,7 @@ export type PageProps<
     pelanggans: Pelanggan[];
     suppliers?: Supplier[];
     LaporanPembelian: LaporanPembelian[];
+    pesanans: Pesanan[];
 };
 
 export interface DebouncedWindowSizeOptions {

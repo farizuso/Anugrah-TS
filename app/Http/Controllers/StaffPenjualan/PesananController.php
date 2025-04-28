@@ -294,7 +294,7 @@ class PesananController extends Controller
 
         $penjualan = $query->orderBy('tgl_pesanan', 'desc')->get();
 
-        return Inertia::render('StaffPenjualan/Pesanan/Penjualan', [
+        return Inertia::render('StaffPenjualan/LaporanPenjualan/Index', [
             'penjualan' => $penjualan,
         ]);
     }

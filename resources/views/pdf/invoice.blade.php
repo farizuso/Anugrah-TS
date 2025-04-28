@@ -22,6 +22,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
+            border: 1px solid #ccc;
         }
         .info-box {
             width: 48%;
@@ -57,6 +58,22 @@
             font-style: italic;
             font-size: 10px;
         }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 11px;
+        }
+
+        .info-table td {
+            border: 0px;
+            /* text-align: right; */
+        }
+
+        /* .info-table td.right {
+            text-align: right;
+        } */
     </style>
 </head>
 <body>
@@ -69,7 +86,7 @@
         <h2>Invoice Pesanan</h2>
     </div>
 
-    <div class="info-section">
+    {{-- <div class="info-section">
         <div class="info-box">
             <h4>Informasi Pemesanan</h4>
             <p>Tanggal Pesanan: <strong>{{ \Carbon\Carbon::parse($pesanan->tgl_pesanan)->format('d M Y') }}</strong></p>
@@ -84,7 +101,30 @@
             <p>Alamat: {{ $pesanan->alamat_pengiriman }}</p>
             <p>No. Telp: {{ $pesanan->no_telp_pengiriman }}</p>
         </div>
-    </div>
+    </div> --}}
+
+    <table class="info-table">
+        <tr>
+            <td style="font-weight: bold">Informasi Pemesanan</td>
+            <td class="right" style="font-weight: bold">Informasi Pengiriman</td>
+        </tr>
+        <tr>
+            <td>Tanggal Pesanan: {{ \Carbon\Carbon::parse($pesanan->tgl_pesanan)->format('d M Y') }}</td>
+            <td class="right">Penerima: {{ $pesanan->pelanggan->nama_pelanggan }}</td>
+        </tr>
+        <tr></tr>
+            <td>Metode Pembayaran: {{ ucfirst($pesanan->metode_pembayaran) }}</td>
+            <td class="right">Alamat: {{ $pesanan->alamat_pengiriman }}</td>
+        </tr>
+        <tr>
+            <td>Status Pembayaran: {{ $pesanan->status_pembayaran }}</td>
+            <td class="right">No. Telp: {{ $pesanan->no_telp_pengiriman }}</td>
+        </tr>
+        <tr>
+            <td>Status Pengiriman: {{ $pesanan->status }}</td>
+            <td class="right"></td>
+        </tr>
+    </table>
 
     @if($pesanan->is_sewa)
     <div class="highlight">
