@@ -57,82 +57,79 @@ const Edit = ({ supplieredit }: EditSupplier) => {
                     <BsPencilSquare />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-                <form onSubmit={submit}>
-                    <DialogHeader>
-                        <DialogTitle>Edit Data Supplier</DialogTitle>
-                        <DialogDescription>
-                            Make changes to your profile here. Click save when
-                            you're done.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        {/* input nama supplier */}
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label
-                                htmlFor="nama_supplier"
-                                className="text-right"
-                            >
-                                Nama Supplier
-                            </Label>
-                            <Input
-                                id="nama_supplier"
-                                className="col-span-3"
-                                name="nama_supplier"
-                                value={data.nama_supplier}
-                                onChange={(e) =>
-                                    setData("nama_supplier", e.target.value)
-                                }
-                                placeholder="masukkan nama supplier"
-                            />
-                        </div>
+            <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                    <DialogTitle>Edit Data Supplier</DialogTitle>
+                    <DialogDescription>
+                        Masukkan data supplier
+                    </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={submit} className="grid gap-4 py-4">
+                    {/* input nama supplier */}
+                    <div className="grid gap-2">
+                        <Label
+                            htmlFor="nama_supplier"
+                            
+                        >
+                            Nama Supplier
+                        </Label>
+                        <Input
+                            id="nama_supplier"
+                            className="col-span-3"
+                            name="nama_supplier"
+                            value={data.nama_supplier}
+                            onChange={(e) =>
+                                setData("nama_supplier", e.target.value)
+                            }
+                            placeholder="masukkan nama supplier"
+                        />
+                    </div>
 
-                        {/* input alamat */}
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="alamat" className="text-right">
-                                Alamat
-                            </Label>
-                            <Input
-                                id="alamat"
-                                className="col-span-3"
-                                name="alamat"
-                                value={data.alamat}
-                                onChange={(e) =>
-                                    setData("alamat", e.target.value)
-                                }
-                                placeholder="masukkan alamat"
-                            />
-                        </div>
+                    {/* input alamat */}
+                    <div className="grid gap-2">
+                        <Label htmlFor="alamat" >
+                            Alamat
+                        </Label>
+                        <Input
+                            id="alamat"
+                            className="col-span-3"
+                            name="alamat"
+                            value={data.alamat}
+                            onChange={(e) =>
+                                setData("alamat", e.target.value)
+                            }
+                            placeholder="masukkan alamat"
+                        />
+                    </div>
 
-                        {/* input no_telp */}
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="no_telp" className="text-right">
-                                No_Telp
-                            </Label>
-                            <Input
-                                id="no_telp"
-                                className="col-span-3"
-                                name="no_telp"
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                value={data.no_telp}
-                                onChange={(e) =>
-                                    setData(
-                                        "no_telp",
-                                        parseInt(
-                                            e.target.value.replace(/\D/g, ""),
-                                            10
-                                        ) || 0
-                                    )
-                                }
-                                placeholder="Masukkan no_telp"
-                            />
-                            {errors.no_telp && (
-                                <p className="text-sm text-red-600">
-                                    {errors.no_telp}
-                                </p>
-                            )}
-                        </div>
+                    {/* input no_telp */}
+                    <div className="grid gap-2">
+                        <Label htmlFor="no_telp" >
+                            No_Telp
+                        </Label>
+                        <Input
+                            id="no_telp"
+                            className="col-span-3"
+                            name="no_telp"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            value={data.no_telp}
+                            onChange={(e) =>
+                                setData(
+                                    "no_telp",
+                                    parseInt(
+                                        e.target.value.replace(/\D/g, ""),
+                                        10
+                                    ) || 0
+                                )
+                            }
+                            placeholder="Masukkan no_telp"
+                        />
+                        {errors.no_telp && (
+                            <p className="text-sm text-red-600">
+                                {errors.no_telp}
+                            </p>
+                        )}
                     </div>
                     <DialogFooter>
                         <Button type="submit" disabled={processing}>
