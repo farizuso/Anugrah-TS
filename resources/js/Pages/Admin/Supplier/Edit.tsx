@@ -67,7 +67,16 @@ const Edit = ({ supplieredit }: EditSupplier) => {
                 <form onSubmit={submit} className="grid gap-4 py-4">
                     {/* input nama supplier */}
                     <div className="grid gap-2">
+<<<<<<< HEAD
                         <Label htmlFor="nama_supplier">Nama Supplier</Label>
+=======
+                        <Label
+                            htmlFor="nama_supplier"
+                            
+                        >
+                            Nama Supplier
+                        </Label>
+>>>>>>> 4a353c010b36dbbb3628b7b9814d8db66f57f85e
                         <Input
                             id="nama_supplier"
                             className="col-span-3"
@@ -82,20 +91,38 @@ const Edit = ({ supplieredit }: EditSupplier) => {
 
                     {/* input alamat */}
                     <div className="grid gap-2">
+<<<<<<< HEAD
                         <Label htmlFor="alamat">Alamat</Label>
+=======
+                        <Label htmlFor="alamat" >
+                            Alamat
+                        </Label>
+>>>>>>> 4a353c010b36dbbb3628b7b9814d8db66f57f85e
                         <Input
                             id="alamat"
                             className="col-span-3"
                             name="alamat"
                             value={data.alamat}
+<<<<<<< HEAD
                             onChange={(e) => setData("alamat", e.target.value)}
+=======
+                            onChange={(e) =>
+                                setData("alamat", e.target.value)
+                            }
+>>>>>>> 4a353c010b36dbbb3628b7b9814d8db66f57f85e
                             placeholder="masukkan alamat"
                         />
                     </div>
 
                     {/* input no_telp */}
                     <div className="grid gap-2">
+<<<<<<< HEAD
                         <Label htmlFor="no_telp">No_Telp</Label>
+=======
+                        <Label htmlFor="no_telp" >
+                            No_Telp
+                        </Label>
+>>>>>>> 4a353c010b36dbbb3628b7b9814d8db66f57f85e
                         <Input
                             id="no_telp"
                             className="col-span-3"

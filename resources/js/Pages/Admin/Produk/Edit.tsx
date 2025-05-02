@@ -75,7 +75,7 @@ const Edit = ({ produkedit }: EditProduk) => {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[480px]">
+            <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle>Edit Produk</DialogTitle>
                     <DialogDescription>
