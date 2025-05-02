@@ -32,7 +32,9 @@ class PesananSeeder extends Seeder
         $pelanggans = Pelanggan::all();
 
         foreach (range(1, 5) as $i) {
-            $tgl = Carbon::now()->subDays(rand(1, 30))->format('Y-m-d');
+            $tgl = Carbon::now()->subMonths(rand(0, 5))->subDays(rand(0, 28));
+
+
             $pelanggan = $pelanggans->random();
 
             // Buat pesanan tanpa metode pembayaran

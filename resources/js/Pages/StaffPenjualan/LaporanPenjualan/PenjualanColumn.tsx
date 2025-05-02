@@ -14,11 +14,51 @@ import { Link } from "@inertiajs/react";
 // Gunakan parameter opsional + default fallback
 export const PenjualanColumns: ColumnDef<Pesanan>[] = [
     {
+        id: "select",
+        header: ({ table }) => (
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) =>
+                    table.toggleAllPageRowsSelected(!!value)
+                }
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
         accessorKey: "tgl_pesanan",
-        header: "Tanggal",
+        header: ({ column }) => (
+            <Button
+                variant="default"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
+            >
+                Tgl.Pesanan
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => {
-            const tgl_pesanan = row.original.tgl_pesanan;
-            return format(new Date(tgl_pesanan), "dd-MM-yyyy");
+            const tanggal = row.getValue("tgl_pesanan");
+            const formattedDate =
+                tanggal && typeof tanggal === "string"
+                    ? format(new Date(tanggal), "dd MMMM yyyy", {
+                          locale: id,
+                      })
+                    : "-";
+            return <div>{formattedDate}</div>;
         },
     },
     {
@@ -32,45 +72,82 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
         cell: ({ row }) => row.original.pelanggan?.nama_pelanggan || "-",
     },
     {
-        accessorKey: "total",
-        header: "Total",
+        header: "Total Tagihan",
         cell: ({ row }) => {
-            const formatRupiah = (angka: number) =>
-                `Rp ${angka.toLocaleString("id-ID")}`;
-            return (
-                <div className="text-right">
-                    {formatRupiah(row.original.total)}
-                </div>
-            );
+            const total = row.original.total;
+            const formatted = new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+            }).format(total);
+            return <div className="font-bold text-red-600">{formatted}</div>;
+        },
+        footer: ({ table }) => {
+            const totalSeluruh = table
+                .getFilteredRowModel()
+                .rows.reduce((sum, row) => sum + row.original.total, 0);
+            const formatted = new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+            }).format(totalSeluruh);
+            return <div className="font-bold text-green-700">{formatted}</div>;
         },
     },
     {
         accessorKey: "jumlah_terbayar",
         header: "Dibayar",
         cell: ({ row }) => {
-            const formatRupiah = (angka: number) =>
-                `Rp ${angka.toLocaleString("id-ID")}`;
+            const totalTerbayar = row.original.jumlah_terbayar;
+            const formatted = new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+            }).format(totalTerbayar);
+
             return (
-                <div className="text-right">
-                    {formatRupiah(row.original.jumlah_terbayar)}
+                <div className="font-bold text-green-600 text-left">
+                    {formatted}
+                </div>
+            );
+        },
+    },
+
+    {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+            const status = row.getValue("status") as string;
+
+            const badgeClass =
+                {
+                    Pending: "bg-yellow-400 text-black font-bold",
+                    Dikirim: "bg-blue-500 text-white font-bold",
+                    Selesai: "bg-green-600 text-white font-bold",
+                }[status] || "bg-gray-500 text-white font-bold";
+
+            return (
+                <div
+                    className={`capitalize inline-flex items-center px-3 py-1 rounded-full ${badgeClass}`}
+                >
+                    {status}
                 </div>
             );
         },
     },
     {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => (
-            <div className="text-center capitalize">{row.original.status}</div>
-        ),
-    },
-    {
         accessorKey: "keterangan",
-        header: "Pembayaran",
-        cell: ({ row }) => (
-            <div className="text-center capitalize">
-                {row.original.keterangan}
-            </div>
-        ),
+        header: "Keterangan",
+        cell: ({ row }) => {
+            const status = row.original.keterangan?.toLowerCase();
+            const className =
+                status === "lunas"
+                    ? "text-green-600 font-semibold"
+                    : status === "belum lunas"
+                    ? "text-red-600 font-semibold"
+                    : "text-gray-700";
+            return (
+                <div className={`capitalize ${className}`}>
+                    {row.original.keterangan}
+                </div>
+            );
+        },
     },
 ];

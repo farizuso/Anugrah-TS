@@ -131,7 +131,7 @@ const TabsDemo = ({ posts }: PelangganProps) => {
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button>Save Produk</Button>
+                                <Button>Simpan Data Pelanggan</Button>
                             </CardFooter>
                         </form>
                     </Card>

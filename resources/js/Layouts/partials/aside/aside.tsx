@@ -38,13 +38,13 @@ export function Aside() {
                         <span>Laporan Pembelian</span>
                     </AsideLink>
 
-                    <AsideLink
+                    {/* <AsideLink
                         active={route().current("admin.laporanpenjualan.index")}
                         href={route("admin.laporanpenjualan.index")}
                     >
                         <IconStoreFill />
                         <span>Laporan Penjualan</span>
-                    </AsideLink>
+                    </AsideLink> */}
 
                     <AsideLink
                         active={route().current("admin.produk.index")}
@@ -72,6 +72,14 @@ export function Aside() {
                     >
                         <IconPerson />
                         <span>Rekap</span>
+                    </AsideLink>
+
+                    <AsideLink
+                        active={route().current("admin.stok-log.index")}
+                        href={route("staffgudang.stok-log.index")}
+                    >
+                        <IconPerson />
+                        <span>Stok Logs</span>
                     </AsideLink>
 
                     <AsideLink

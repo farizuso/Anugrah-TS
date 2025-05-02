@@ -18,6 +18,8 @@ import { Aside } from "@/Layouts/partials/aside/aside";
 import { toast, ToastContainer } from "react-toastify";
 import { LogOut, Menu, User } from "lucide-react";
 import Toastify from "@/Components/Toastify";
+import { ThemeProvider } from "@/Components/theme-provider";
+import { ModeToggle } from "@/Components/mode-toggle";
 
 const AdminLayout = ({
     title,
@@ -58,20 +60,23 @@ const AdminLayout = ({
     //     return <div>Memuat data pengguna...</div>; // atau spinner
     // }
     return (
-        <>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <Head title={title} />
-            {/* {flash?.success && <Toastify />} */}
-            {/* {flash?.error && <Toastify />} */}
+
             <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-                <div className="hidden border-r bg-muted/40 md:block">
+                <div className="hidden border-r bg-muted/40 dark:bg-muted md:block">
                     <div className="flex h-full max-h-screen flex-col gap-2">
                         <div className="flex h-14 items-center justify-center border-b px-4 lg:h-[60px] lg:px-6">
                             <Link
                                 href="/"
                                 className="flex items-center gap-2 font-semibold"
                             >
-                                <ApplicationLogo className="size-6 fill-foreground" />
-                                <span className="">Acme Inc</span>
+                                <img
+                                    src="/assets/img/logo.png"
+                                    alt="Logo"
+                                    className="h-6 w-auto"
+                                />
+                                {/* <span>Acme Inc</span> */}
                             </Link>
                         </div>
                         <div className="flex-1 py-1">
@@ -79,6 +84,7 @@ const AdminLayout = ({
                         </div>
                     </div>
                 </div>
+
                 <div className="flex flex-col">
                     <header className="flex h-14 items-center justify-between lg:justify-end gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
                         <Sheet>
@@ -98,7 +104,7 @@ const AdminLayout = ({
                                         className="flex items-center gap-2 font-semibold"
                                     >
                                         <ApplicationLogo className="size-6 fill-foreground" />
-                                        <span className="">Acme Inc</span>
+                                        <span>Acme Inc</span>
                                     </Link>
                                 </div>
                                 <div className="-mt-2">
@@ -106,6 +112,10 @@ const AdminLayout = ({
                                 </div>
                             </SheetContent>
                         </Sheet>
+
+                        {/* Tambahkan ModeToggle di sini */}
+                        <ModeToggle />
+
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <div className="items-center gap-3 cursor-pointer flex">
@@ -117,16 +127,16 @@ const AdminLayout = ({
                                         alt="avatar"
                                     />
                                     <div className="flex-col w-auto hidden md:flex">
-                                        <span className="text-sm font-semibold line-clamp-1 text-white lg:text-black">
+                                        <span className="text-sm font-semibold line-clamp-1 text-foreground">
                                             {auth?.user?.name ?? "Guest"}
                                         </span>
-                                        <span className="text-xs font-medium text-gray-400">
+                                        <span className="text-xs font-medium text-muted-foreground">
                                             {auth?.user?.email ??
                                                 "guest@example.com"}
                                         </span>
                                     </div>
                                     <svg
-                                        className="hidden md:block ml-2 text-white lg:text-black"
+                                        className="hidden md:block ml-2 text-foreground"
                                         xmlns="http://www.w3.org/2000/svg"
                                         width={24}
                                         height={24}
@@ -144,14 +154,14 @@ const AdminLayout = ({
                                 </div>
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent className="w-56 mt-2 bg-white">
+                            <DropdownMenuContent className="w-56 mt-2 bg-popover text-popover-foreground">
                                 <DropdownMenuLabel>
                                     My Account
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
                                     <Link href="/siswa/profile">
-                                        <DropdownMenuItem className=" cursor-pointer">
+                                        <DropdownMenuItem className="cursor-pointer">
                                             <User className="mr-2 h-4 w-4" />
                                             <span>Profile</span>
                                         </DropdownMenuItem>
@@ -159,7 +169,7 @@ const AdminLayout = ({
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <Link href={route("logout")} method="post">
-                                    <DropdownMenuItem className=" cursor-pointer">
+                                    <DropdownMenuItem className="cursor-pointer">
                                         <LogOut className="mr-2 h-4 w-4" />
                                         <span>Log out</span>
                                     </DropdownMenuItem>
@@ -167,13 +177,14 @@ const AdminLayout = ({
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </header>
-                    <main className=" min-w-full flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+
+                    <main className="min-w-full flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background text-foreground">
                         {children}
                         <Toastify />
                     </main>
                 </div>
             </div>
-        </>
+        </ThemeProvider>
     );
 };
 

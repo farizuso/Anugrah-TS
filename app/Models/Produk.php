@@ -26,10 +26,8 @@ class Produk extends Model
         return $this->hasOne(Stok::class);
     }
 
-    // public function pesanans()
-    // {
-    //     return $this->belongsToMany(Pesanan::class, 'pesanan_details', 'produk_id', 'pesanan_id')
-    //         ->withPivot('quantity', 'harga')
-    //         ->withTimestamps();
-    // }
+    public function stokLogs()
+    {
+        return $this->hasMany(StokLog::class);
+    }
 }

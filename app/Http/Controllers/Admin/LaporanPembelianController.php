@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanPembelianExport;
 use App\Models\Stok;
+use App\Models\StokLog;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -53,6 +54,8 @@ class LaporanPembelianController extends Controller
             'posts' => $posts
         ]);
     }
+
+
 
 
 
@@ -197,6 +200,9 @@ class LaporanPembelianController extends Controller
         return redirect()->back()->with('success', 'Data berhasil dihapus.');
     }
 
+
+
+
     public function konfirmasi($id)
     {
         try {
@@ -220,9 +226,19 @@ class LaporanPembelianController extends Controller
 
                 // Menambah jumlah stok berdasarkan quantity dari detail pembelian
                 $stok->increment('jumlah_stok', $detail->quantity);
+
+                // Membuat log stok
+                StokLog::create([
+                    'produk_id' => $produk->id,
+                    'tipe' => 'masuk',
+                    'jumlah' => $detail->quantity,
+                    'sisa_stok' => $stok->jumlah_stok, // <- tambahkan ini
+                    'keterangan' => 'Stok masuk dari ' . ($laporan->supplier->nama_supplier ?? 'Supplier Tidak Diketahui'),
+                    'tanggal' => now(),
+                ]);
             }
 
-            // return back()->with('success', 'Berhasil dikonfirmasi dan stok produk berhasil ditambahkan');
+            return back()->with('success', 'Berhasil dikonfirmasi dan stok produk berhasil ditambahkan');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal: ' . $e->getMessage());
         }

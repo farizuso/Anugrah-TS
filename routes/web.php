@@ -2,18 +2,17 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\TodoController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\LaporanPembelianController;
 use App\Http\Controllers\Admin\LaporanPenjualanController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\StaffGudang\RekapController;
+use App\Http\Controllers\StaffGudang\StokLogController;
 use App\Http\Controllers\StaffPenjualan\PelangganController;
 use App\Http\Controllers\StaffPenjualan\PesananController;
 use App\Http\Controllers\StaffPenjualan\SewaTabungController;
-use App\Models\LaporanPembelian;
-// use App\Http\Controllers\Admin\ProductCategoryController;
-// use App\Http\Controllers\Admin\DashboardAdminController;
+use App\Http\Controllers\Dashboard\DashboardController;
+
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,9 +27,9 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Admin/Dashboard/Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('admin.dashboard');
+Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
+
 
 Route::middleware('auth',)->group(function () {
 
@@ -61,8 +60,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/admin/laporanpembelian/{id}', [LaporanPembelianController::class, 'destroy'])->name('admin.laporanpembelian.destroy');
     Route::post('/admin/laporanpembelian', [LaporanPembelianController::class, 'store'])->name('admin.laporanpembelian.store');
     Route::get('/admin/laporanpembelian/export', [LaporanPembelianController::class, 'export'])->name('admin.laporanpembelian.export');
-
-    Route::get('/admin/laporanpenjualan', [LaporanPenjualanController::class, 'index'])->name('admin.laporanpenjualan.index');
 });
 
 
@@ -76,7 +73,10 @@ Route::middleware('auth', 'role:staff_gudang')->group(function () {
 
 
     Route::resource('/staffgudang/rekap', RekapController::class)->names('staffgudang.rekap');
+
+    Route::get('/staffgudang/stok-log', [StokLogController::class, 'index'])->name('staffgudang.stok-log.index');
 });
+
 
 
 Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
@@ -86,6 +86,8 @@ Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
     Route::get('/staffpenjualan/invoice/{id}', [PesananController::class, 'invoice'])->name('staffpenjualan.invoice.show');
 
     Route::get('/staffpenjualan/invoice/{id}/pdf', [PesananController::class, 'invoicePdf'])->name('staffpenjualan.invoice.pdf');
+    Route::get('/staffpenjualan/pesanan/{id}/tanda-terima-kosong', [PesananController::class, 'tandaTerimaKosongPdf'])->name('staffpenjualan.tandaTerima.kosong');
+
     Route::post('/staffpenjualan/pesanan/{id}/konfirmasi', [PesananController::class, 'konfirmasiPembayaran'])->name('staffpenjualan.pesanan.konfirmasi_pembayaran');
     Route::post('/staffpenjualan/pesanan/{id}/ubah-metode', [PesananController::class, 'updateMetodePembayaran'])->name('staffpenjualan.pesanan.update_pembayaran');
     Route::get('/staffpenjualan/pesanan/{id}/detail', [PesananController::class, 'detail_pesanan'])->name('staffpenjualan.pesanan.detail');

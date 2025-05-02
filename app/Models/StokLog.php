@@ -5,25 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PesananDetail extends Model
+class StokLog extends Model
 {
     //
     use HasFactory;
 
     protected $fillable = [
-        'pesanan_id',
         'produk_id',
-        'harga',
-        'quantity',
+        'tipe',
+        'jumlah',
+        'sisa_stok',
+        'keterangan',
+        'tanggal',
     ];
 
     public function produk()
     {
         return $this->belongsTo(Produk::class);
-    }
-
-    public function pesanan()
-    {
-        return $this->belongsTo(Pesanan::class);
     }
 }

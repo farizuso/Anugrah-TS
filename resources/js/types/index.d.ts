@@ -115,6 +115,29 @@ export interface Rekap {
     pelanggan: Pelanggan;
 }
 
+export interface DashboardData {
+    totalRevenue: number;
+    totalPurchases: number;
+    totalSales: number;
+    totalStock: number;
+    recentSales: SalesProps[];
+}
+
+export interface SalesProps {
+    name: string; // nama_pelanggan
+    phone: string; // no_hp
+    totalAmount: string; // "Rp 12.000.000"
+}
+
+export interface MonthlySales {
+    month: string; // contoh: Jan, Feb
+    total: number;
+}
+export interface LowStock {
+    nama: string;
+    stok: number;
+}
+
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>
 > = T & {
@@ -130,6 +153,13 @@ export type PageProps<
     suppliers?: Supplier[];
     LaporanPembelian: LaporanPembelian[];
     pesanans: Pesanan[];
+
+    // 👇 Tambahkan untuk dashboard
+    totalRevenue?: number;
+    totalPurchases?: number;
+    totalSales?: number;
+    totalStock?: number;
+    recentSales?: SalesProps[];
 };
 
 export interface DebouncedWindowSizeOptions {

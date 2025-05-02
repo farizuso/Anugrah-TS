@@ -14,6 +14,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use App\Models\PembayaranPesanan;
 use App\Models\Stok;
+use App\Models\StokLog;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -87,6 +88,7 @@ class PesananController extends Controller
             }
 
             $pesanan = Pesanan::create([
+
                 'tgl_pesanan' => $request->tgl_pesanan,
                 'pelanggan_id' => $request->pelanggan_id,
                 'total' => $total,
@@ -95,7 +97,10 @@ class PesananController extends Controller
                 'jumlah_terbayar' => 0,
                 'is_lunas' => false,
                 'keterangan' => 'Belum Lunas',
+
             ]);
+            $pelanggan = Pelanggan::find($request->pelanggan_id);
+
 
             foreach ($produkList as $item) {
                 $harga = $jenisPesanan === 'sewa' ? $jaminanSewa : $item['harga'];
@@ -112,6 +117,20 @@ class PesananController extends Controller
                     if ($stok) {
                         $stok->jumlah_stok -= $item['quantity'];
                         $stok->save();
+
+                        // Membuat log pengurangan stok
+                        try {
+                            StokLog::create([
+                                'produk_id' => $item['produk_id'],
+                                'tipe' => 'keluar',
+                                'jumlah' => $item['quantity'],
+                                'sisa_stok' => $stok->jumlah_stok, // <- tambahkan ini
+                                'keterangan' => 'Stok keluar karena pesanan dari ' . $pelanggan->nama_pelanggan,
+                                'tanggal' => now(),
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Gagal membuat stok log: ' . $e->getMessage());
+                        }
                     }
                 }
             }
@@ -128,6 +147,7 @@ class PesananController extends Controller
                 ->withInput();
         }
     }
+
 
 
 
@@ -213,6 +233,14 @@ class PesananController extends Controller
 
         $pdf = Pdf::loadView('pdf.invoice', ['pesanan' => $pesanan]);
         return $pdf->stream("invoice-{$pesanan->id}.pdf");
+    }
+
+    public function tandaTerimaKosongPdf($id)
+    {
+        $pesanan = Pesanan::with(['pelanggan', 'details.produk'])->findOrFail($id);
+
+        $pdf = Pdf::loadView('pdf.tanda-terima-kosong', ['pesanan' => $pesanan]);
+        return $pdf->stream("tanda-terima-kosong-{$pesanan->id}.pdf");
     }
 
     public function konfirmasiPembayaran(Request $request, $id)

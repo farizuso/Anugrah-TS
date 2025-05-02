@@ -24,6 +24,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import CreatableSelect from "react-select/creatable";
+import { CommandCombobox } from "@/Components/ui/CommandCombobox";
 
 interface EditPesanan {
     pesananedit: Pesanan;
@@ -186,13 +187,14 @@ const Edit = ({ pesananedit }: EditPesanan) => {
 
                     <div className="flex flex-col gap-2">
                         <Label>Nama Pelanggan</Label>
-                        <CreatableSelect
-                            isClearable
+                        <CommandCombobox
                             options={pelangganOptions}
-                            onChange={handlePelangganChange}
-                            value={pelangganOptions.find(
-                                (opt) => opt.value === data.pelanggan_id
-                            )}
+                            value={data.pelanggan_id}
+                            onValueChange={(value) =>
+                                setData("pelanggan_id", value)
+                            }
+                            placeholder="Pilih Supplier"
+                            searchPlaceholder="Cari Supplier..."
                         />
                     </div>
 
@@ -201,16 +203,16 @@ const Edit = ({ pesananedit }: EditPesanan) => {
                         {data.produk.map((item, index) => (
                             <div key={index} className="flex items-end gap-2">
                                 <div className="w-full">
-                                    <CreatableSelect
-                                        isClearable
+                                    <CommandCombobox
                                         options={produkOptions}
-                                        value={produkOptions.find(
-                                            (opt) =>
-                                                opt.value === item.produk_id
-                                        )}
-                                        onChange={(val) =>
-                                            handleProdukChange(index, val)
+                                        value={item.produk_id}
+                                        onValueChange={(value) =>
+                                            handleProdukChange(index, {
+                                                value,
+                                            })
                                         }
+                                        placeholder="Pilih Produk"
+                                        searchPlaceholder="Cari produk..."
                                     />
                                 </div>
                                 <Input
@@ -257,16 +259,6 @@ const Edit = ({ pesananedit }: EditPesanan) => {
                                 currency: "IDR",
                             }).format(data.total)}
                             disabled
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>Keterangan</Label>
-                        <Input
-                            value={data.keterangan}
-                            onChange={(e) =>
-                                setData("keterangan", e.target.value)
-                            }
                         />
                     </div>
 

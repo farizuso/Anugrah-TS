@@ -27,6 +27,7 @@ import CreatableSelect from "react-select/creatable";
 import { DataTable } from "@/Components/DataTable";
 import { Produk, PageProps, Pesanan, Pelanggan } from "@/types";
 import { toast } from "react-toastify";
+import { CommandCombobox } from "@/Components/ui/CommandCombobox";
 
 interface PesananProps {
     posts: Pesanan[];
@@ -220,13 +221,14 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
 
                                 <div className="flex flex-col gap-2">
                                     <Label>Nama Pelanggan</Label>
-                                    <CreatableSelect
-                                        isClearable
-                                        value={selectedPelanggan}
+                                    <CommandCombobox
                                         options={pelangganOptions}
-                                        onChange={handlePelangganChange}
-                                        // onCreateOption={handleCreate}
-                                        placeholder="Pilih pelanggan"
+                                        value={data.pelanggan_id}
+                                        onValueChange={(value) =>
+                                            setData("pelanggan_id", value)
+                                        }
+                                        placeholder="Pilih Pelanggan"
+                                        searchPlaceholder="Cari Pelanggan..."
                                     />
                                 </div>
 
@@ -237,20 +239,16 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                             key={index}
                                             className="flex gap-2 items-center mb-2"
                                         >
-                                            <CreatableSelect
-                                                isClearable
+                                            <CommandCombobox
                                                 options={produkOptions}
-                                                value={
-                                                    selectedProduk[index] ||
-                                                    null
+                                                value={item.produk_id}
+                                                onValueChange={(value) =>
+                                                    handleProdukChange(index, {
+                                                        value,
+                                                    })
                                                 }
-                                                onChange={(val) =>
-                                                    handleProdukChange(
-                                                        index,
-                                                        val
-                                                    )
-                                                }
-                                                placeholder="Pilih produk"
+                                                placeholder="Pilih Produk"
+                                                searchPlaceholder="Cari produk..."
                                             />
                                             <Input
                                                 type="text"

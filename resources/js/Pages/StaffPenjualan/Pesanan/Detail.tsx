@@ -226,6 +226,21 @@ const Detail = ({ pesanan }: DetailProps) => {
                         Cetak Tanda Terima
                     </Button>
 
+                    <Button
+                        variant="outline"
+                        onClick={() =>
+                            window.open(
+                                route(
+                                    "staffpenjualan.tandaTerima.kosong",
+                                    pesanan.id
+                                ),
+                                "_blank"
+                            )
+                        }
+                    >
+                        Cetak Botol Kosong
+                    </Button>
+
                     {pesanan.status === "Dikirim" && (
                         <Button
                             variant="success"
