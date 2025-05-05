@@ -2,40 +2,33 @@
 
 namespace Database\Seeders;
 
+use App\Models\Pesanan;
+use App\Models\Rekap;
 use Carbon\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class RekapSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $rekaps = [
-            [
-                'id' => 1,
-                'tgl_keluar' => Carbon::now(),
-                'tgl_kembali' => Carbon::now(),
-                'tgl_masuk_pabrik' => Carbon::now(),
-                'keterangan' => "keluar pabrik",
-                'produk_id' => 1,
-                'pelanggan_id' => 1,
-            ],
-            [
-                'id' => 2,
-                'tgl_keluar' => Carbon::now(),
-                'tgl_kembali' => Carbon::now(),
-                'tgl_masuk_pabrik' => Carbon::now(),
-                'keterangan' => "masuk pabrik",
-                'produk_id' => 2,
-                'pelanggan_id' => 2,
-            ]
-            ];
+        $pesanans = Pesanan::with(['pelanggan', 'details'])->get();
+        $counter = 1;
 
-            foreach ($rekaps as $rekap){
-                \App\Models\Rekap::create($rekap);
+        foreach ($pesanans as $pesanan) {
+            foreach ($pesanan->details as $detail) {
+                // Simulasi tiap detail punya 1-2 tabung keluar
+                foreach (range(1, rand(1, 2)) as $_) {
+                    Rekap::create([
+                        'pesanan_id' => $pesanan->id,
+                        'pelanggan_id' => $pesanan->pelanggan_id, // ⬅️ ambil dari pesanan
+                        'produk_id' => $detail->produk_id,
+                        'nomor_tabung' => 'TBG-' . str_pad($counter++, 3, '0', STR_PAD_LEFT),
+                        'tanggal_keluar' => $pesanan->tgl_pesanan,
+                        'tanggal_kembali' => null, // bisa dibuat random juga kalau mau
+                        'status' => 'keluar',
+                    ]);
+                }
             }
+        }
     }
 }

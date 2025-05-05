@@ -172,7 +172,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                                     </td>
                                 </tr>
                             ))}
-                            <tr className="border-t">
+                            {/* <tr className="border-t">
                                 <td className="px-4 py-2" colSpan={3}>
                                     Biaya Pengiriman
                                 </td>
@@ -181,7 +181,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                                         pesanan.biaya_pengiriman || 0
                                     )}
                                 </td>
-                            </tr>
+                            </tr> */}
                             <tr className="font-bold border-t bg-gray-100">
                                 <td className="px-4 py-2" colSpan={3}>
                                     Total

@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('rekaps', function (Blueprint $table) {
             $table->id();
-            $table->date('tgl_keluar');    
-            $table->date('tgl_kembali');
-            $table->date('tgl_masuk_pabrik');
-            $table->string('keterangan');
-            $table->foreignId('produk_id');
-            $table->foreignId('pelanggan_id');
+            $table->foreignId('pesanan_id')->constrained()->onDelete('cascade');
+            $table->foreignId('pelanggan_id')->constrained()->onDelete('cascade');
+            $table->foreignId('produk_id')->constrained()->onDelete('cascade');
+            $table->string('nomor_tabung')->unique(); // misal: TBG001
+            $table->dateTime('tanggal_keluar')->nullable();
+            $table->dateTime('tanggal_kembali')->nullable();
+            $table->enum('status', ['keluar', 'kembali'])->default('keluar');
             $table->timestamps();
         });
     }

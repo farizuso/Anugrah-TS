@@ -11,7 +11,6 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Supplier } from "@/types";
-// import { Todo, TodoWithMethod } from "@/types"
 import { useForm } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import { BsPencilSquare } from "react-icons/bs";
@@ -19,9 +18,10 @@ import { BsPencilSquare } from "react-icons/bs";
 interface EditSupplier {
     supplieredit: Supplier;
 }
+
 const Edit = ({ supplieredit }: EditSupplier) => {
     const [open, setOpen] = useState(false);
-    const { put, data, setData, post, processing, errors, reset } = useForm({
+    const { put, data, setData, processing, errors } = useForm({
         nama_supplier: supplieredit.nama_supplier,
         alamat: supplieredit.alamat,
         no_telp: supplieredit.no_telp,
@@ -29,15 +29,13 @@ const Edit = ({ supplieredit }: EditSupplier) => {
 
     useEffect(() => {
         setData({
-            ...data,
             nama_supplier: supplieredit.nama_supplier,
             alamat: supplieredit.alamat,
             no_telp: supplieredit.no_telp,
         });
     }, [supplieredit]);
-    console.log(supplieredit);
 
-    const submit = (e: any) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
         put(route("admin.supplier.update", supplieredit.id), {
             onSuccess: () => {
@@ -67,19 +65,9 @@ const Edit = ({ supplieredit }: EditSupplier) => {
                 <form onSubmit={submit} className="grid gap-4 py-4">
                     {/* input nama supplier */}
                     <div className="grid gap-2">
-<<<<<<< HEAD
                         <Label htmlFor="nama_supplier">Nama Supplier</Label>
-=======
-                        <Label
-                            htmlFor="nama_supplier"
-                            
-                        >
-                            Nama Supplier
-                        </Label>
->>>>>>> 4a353c010b36dbbb3628b7b9814d8db66f57f85e
                         <Input
                             id="nama_supplier"
-                            className="col-span-3"
                             name="nama_supplier"
                             value={data.nama_supplier}
                             onChange={(e) =>
@@ -91,41 +79,21 @@ const Edit = ({ supplieredit }: EditSupplier) => {
 
                     {/* input alamat */}
                     <div className="grid gap-2">
-<<<<<<< HEAD
                         <Label htmlFor="alamat">Alamat</Label>
-=======
-                        <Label htmlFor="alamat" >
-                            Alamat
-                        </Label>
->>>>>>> 4a353c010b36dbbb3628b7b9814d8db66f57f85e
                         <Input
                             id="alamat"
-                            className="col-span-3"
                             name="alamat"
                             value={data.alamat}
-<<<<<<< HEAD
                             onChange={(e) => setData("alamat", e.target.value)}
-=======
-                            onChange={(e) =>
-                                setData("alamat", e.target.value)
-                            }
->>>>>>> 4a353c010b36dbbb3628b7b9814d8db66f57f85e
                             placeholder="masukkan alamat"
                         />
                     </div>
 
                     {/* input no_telp */}
                     <div className="grid gap-2">
-<<<<<<< HEAD
-                        <Label htmlFor="no_telp">No_Telp</Label>
-=======
-                        <Label htmlFor="no_telp" >
-                            No_Telp
-                        </Label>
->>>>>>> 4a353c010b36dbbb3628b7b9814d8db66f57f85e
+                        <Label htmlFor="no_telp">No Telp</Label>
                         <Input
                             id="no_telp"
-                            className="col-span-3"
                             name="no_telp"
                             inputMode="numeric"
                             pattern="[0-9]*"
@@ -133,10 +101,7 @@ const Edit = ({ supplieredit }: EditSupplier) => {
                             onChange={(e) =>
                                 setData(
                                     "no_telp",
-                                    parseInt(
-                                        e.target.value.replace(/\D/g, ""),
-                                        10
-                                    ) || 0
+                                    e.target.value.replace(/\D/g, "")
                                 )
                             }
                             placeholder="Masukkan no_telp"
@@ -147,6 +112,7 @@ const Edit = ({ supplieredit }: EditSupplier) => {
                             </p>
                         )}
                     </div>
+
                     <DialogFooter>
                         <Button type="submit" disabled={processing}>
                             Save changes
@@ -157,4 +123,5 @@ const Edit = ({ supplieredit }: EditSupplier) => {
         </Dialog>
     );
 };
+
 export default Edit;

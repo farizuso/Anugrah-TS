@@ -61,13 +61,21 @@ export function Aside() {
                         <IconToolbox />
                         <span>Supplier</span>
                     </AsideLink>
+
+                    <AsideLink
+                        active={route().current("admin.stok-log.index")}
+                        href={route("admin.stok-log.index")}
+                    >
+                        <IconPerson />
+                        <span>Stok Logs</span>
+                    </AsideLink>
                 </>
             )}
 
             {role === "staff_gudang" && (
                 <>
                     <AsideLink
-                        active={route().current("admin.rekap.index")}
+                        active={route().current("staffgudang.rekap.index")}
                         href={route("staffgudang.rekap.index")}
                     >
                         <IconPerson />
@@ -75,7 +83,7 @@ export function Aside() {
                     </AsideLink>
 
                     <AsideLink
-                        active={route().current("admin.stok-log.index")}
+                        active={route().current("staffgudang.stok-log.index")}
                         href={route("staffgudang.stok-log.index")}
                     >
                         <IconPerson />
@@ -131,6 +139,16 @@ export function Aside() {
                     >
                         <IconMacbookAirFill />
                         <span>Laporan Penjualan</span>
+                    </AsideLink>
+
+                    <AsideLink
+                        active={route().current(
+                            "staffpenjualan.stok-log.index"
+                        )}
+                        href={route("staffpenjualan.stok-log.index")}
+                    >
+                        <IconPerson />
+                        <span>Stok Logs</span>
                     </AsideLink>
                 </>
             )}

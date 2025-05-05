@@ -45,10 +45,13 @@ class Pesanan extends Model
     }
 
 
-    // public function produks()
-    // {
-    //     return $this->belongsToMany(Produk::class, 'pesanan_details', 'pesanan_id', 'produk_id')
-    //         ->withPivot('quantity', 'harga')
-    //         ->withTimestamps();
-    // }
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class);
+    }
+
+    public function rekaps()
+    {
+        return $this->hasMany(Rekap::class);
+    }
 }

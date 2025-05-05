@@ -27,78 +27,76 @@ import * as React from "react";
 import { DataTable } from "@/Components/DataTable";
 import { rekapColumns } from "./rekapColumn";
 import CreatableSelect from "react-select/creatable";
+import Select from "react-select";
 
 interface RekapProps {
     posts: Rekap[];
+    pelanggans: any[];
+    produks: any[];
+    pesanans: any[]; // daftar pesanan yang dikirim dan belum direkap
 }
 
-const Index = ({ posts }: RekapProps) => {
-    const flash = usePage<PageProps>().props.flash;
-    console.log(flash);
+const Index = ({ posts, pesanans }: RekapProps) => {
     const [date, setDate] = React.useState<Date>();
 
-    const {
-        delete: destroy,
-        data,
-        setData,
-        post,
-        processing,
-        errors,
-        reset,
-    } = useForm({
-        no_botol: "",
-        tgl_keluar: "",
-        tgl_kembali: "",
-        tgl_masuk_pabrik: "",
-        keterangan: "",
-        produk_id: "",
+    const { data, setData, post, processing, reset } = useForm({
+        pesanan_id: "",
         pelanggan_id: "",
+        produk_id: "",
+        nomor_tabung: "",
+        tanggal_keluar: "",
+        tanggal_kembali: "",
+        status: "keluar", // default status
     });
 
-    const { pelanggans = [] } = usePage<PageProps>().props;
-    const { produks = [] } = usePage<PageProps>().props;
+    // Tambahan state di atas
+    const [nomorTabungList, setNomorTabungList] = React.useState([""]);
 
-    // State to store pelanggan options
-    const [pelangganOptions, setPelangganOptions] = React.useState(
-        pelanggans?.map((pelanggan) => ({
-            value: String(pelanggan.id),
-            label: pelanggan.nama_pelanggan,
-        })) || []
-    );
-
-    const handlePelangganChange = (newValue: any) => {
-        setData("pelanggan_id", newValue ? String(newValue.value) : "");
-    };
-    const handleProdukChange = (newValue: any) => {
-        setData("produk_id", newValue ? String(newValue.value) : "");
+    const handleTabungChange = (index: number, value: string) => {
+        const updated = [...nomorTabungList];
+        updated[index] = value;
+        setNomorTabungList(updated);
     };
 
-    const handleCreate = (inputValue: string) => {
-        const newOption = { value: inputValue, label: inputValue };
-        setPelangganOptions([...pelangganOptions, newOption]);
-        setData("pelanggan_id", inputValue);
-        setData("produk_id", inputValue);
+    const addTabungField = () => {
+        setNomorTabungList([...nomorTabungList, ""]);
+    };
+
+    const removeTabungField = (index: number) => {
+        if (nomorTabungList.length > 1) {
+            const updated = [...nomorTabungList];
+            updated.splice(index, 1);
+            setNomorTabungList(updated);
+        }
+    };
+    const pesananOptions = pesanans.map((p) => ({
+        value: p.id,
+        label: `${p.kode_pesanan} - ${p.pelanggan.nama_pelanggan}`,
+        pelanggan_id: p.pelanggan_id,
+        tgl_keluar: p.tanggal_kirim,
+        produk_id: p.produk_id, // jika tersedia
+    }));
+
+    const handlePesananChange = (selected: any) => {
+        setData("pesanan_id", selected?.value || "");
+        setData("pelanggan_id", selected?.pelanggan_id || "");
+        setData("produk_id", selected?.produk_id || "");
+        setData("tgl_keluar", selected?.tgl_keluar || "");
     };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route("staffgudang.rekap.store"), {
-            onSuccess: () => reset(),
+            data: {
+                nomor_tabung: nomorTabungList, // kirim sebagai array
+                tgl_keluar: data.tgl_keluar,
+                tgl_kembali: data.tgl_kembali,
+            },
+            onSuccess: () => {
+                reset();
+                setNomorTabungList([""]); // reset tabung input
+            },
         });
-    };
-
-    const handleDateSelect = (field: any, date: any) => {
-        if (date) {
-            // Set the time to noon to avoid timezone issues
-            const adjustedDate = new Date(date);
-            adjustedDate.setHours(12, 0, 0, 0);
-            setData({
-                ...data,
-                [field]: adjustedDate.toISOString().split("T")[0],
-            });
-        } else {
-            setData({ ...data, [field]: "" });
-        }
     };
 
     return (
@@ -117,185 +115,113 @@ const Index = ({ posts }: RekapProps) => {
                             <CardHeader>
                                 <CardTitle>Tambah Data Rekap</CardTitle>
                                 <CardDescription>
-                                    Masukkan data rekap.
+                                    Masukkan data rekap. Bisa otomatis dari
+                                    pesanan.
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-2">
-                                <div className="flex flex-col gap-2">
-                                    <Label htmlFor="pelanggan_id">
-                                        Nama Pelanggan
-                                    </Label>
-                                    <CreatableSelect
-                                        id="pelanggan_id"
-                                        isClearable
-                                        options={pelangganOptions}
-                                        onChange={handlePelangganChange}
-                                        onCreateOption={handleCreate}
-                                        value={pelangganOptions.find(
-                                            (option) =>
-                                                option.value ===
-                                                data.pelanggan_id
-                                        )}
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="tgl_keluar">
-                                        Tanggal Keluar
-                                    </Label>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !data.tgl_keluar &&
-                                                        "text-muted-foreground"
-                                                )}
+                            <CardContent>
+                                <CardContent className="grid gap-4">
+                                    <div>
+                                        <Label>Pesanan</Label>
+                                        <Select
+                                            options={pesananOptions}
+                                            onChange={handlePesananChange}
+                                            placeholder="Pilih pesanan"
+                                        />
+                                    </div>
+                                    {/* Nomor tabung dinamis */}
+                                    <div>
+                                        <Label>Nomor Tabung</Label>
+                                        {nomorTabungList.map((value, index) => (
+                                            <div
+                                                key={index}
+                                                className="flex gap-2 mb-2"
                                             >
-                                                {data.tgl_keluar
-                                                    ? format(
-                                                          new Date(
-                                                              data.tgl_keluar
-                                                          ),
-                                                          "yyyy-MM-dd"
-                                                      )
-                                                    : "Pilih Tanggal"}
-                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={
-                                                    data.tgl_keluar
-                                                        ? new Date(
-                                                              data.tgl_keluar
-                                                          )
-                                                        : undefined
-                                                }
-                                                onSelect={(date) =>
-                                                    handleDateSelect(
-                                                        "tgl_keluar",
-                                                        date
-                                                    )
-                                                }
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="tgl_kembali">
-                                        Tanggal Kembali
-                                    </Label>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !data.tgl_kembali &&
-                                                        "text-muted-foreground"
-                                                )}
-                                            >
-                                                {data.tgl_kembali
-                                                    ? format(
-                                                          new Date(
-                                                              data.tgl_kembali
-                                                          ),
-                                                          "yyyy-MM-dd"
-                                                      )
-                                                    : "Pilih Tanggal"}
-                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={
-                                                    data.tgl_kembali
-                                                        ? new Date(
-                                                              data.tgl_kembali
-                                                          )
-                                                        : undefined
-                                                }
-                                                onSelect={(date) =>
-                                                    handleDateSelect(
-                                                        "tgl_kembali",
-                                                        date
-                                                    )
-                                                }
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="tgl_masuk_pabrik">
-                                        Tanggal Masuk Pabrik
-                                    </Label>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !data.tgl_masuk_pabrik &&
-                                                        "text-muted-foreground"
-                                                )}
-                                            >
-                                                {data.tgl_masuk_pabrik
-                                                    ? format(
-                                                          new Date(
-                                                              data.tgl_masuk_pabrik
-                                                          ),
-                                                          "yyyy-MM-dd"
-                                                      )
-                                                    : "Pilih Tanggal"}
-                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={
-                                                    data.tgl_masuk_pabrik
-                                                        ? new Date(
-                                                              data.tgl_masuk_pabrik
-                                                          )
-                                                        : undefined
-                                                }
-                                                onSelect={(date) =>
-                                                    handleDateSelect(
-                                                        "tgl_masuk_pabrik",
-                                                        date
-                                                    )
-                                                }
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="keterangan">
-                                        Keterangan
-                                    </Label>
-                                    <Input
-                                        id="keterangan"
-                                        type="text"
-                                        name="keterangan"
-                                        onChange={(e) =>
-                                            setData(
-                                                "keterangan",
-                                                e.target.value
-                                            )
-                                        }
-                                        value={data.keterangan}
-                                    />
-                                </div>
+                                                <Input
+                                                    value={value}
+                                                    onChange={(e) =>
+                                                        handleTabungChange(
+                                                            index,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder={`Tabung ke-${
+                                                        index + 1
+                                                    }`}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={() =>
+                                                        removeTabungField(index)
+                                                    }
+                                                >
+                                                    Hapus
+                                                </Button>
+                                            </div>
+                                        ))}
+                                        <Button
+                                            type="button"
+                                            onClick={addTabungField}
+                                        >
+                                            + Tambah Nomor Tabung
+                                        </Button>
+                                    </div>
+                                    {/* Tanggal keluar (otomatis dari pesanan) */}
+                                    <div>
+                                        <Label>Tanggal Keluar</Label>
+                                        <Input
+                                            type="date"
+                                            value={data.tgl_keluar}
+                                            disabled
+                                        />
+                                    </div>
+                                    {/* Tanggal kembali */}
+                                    <div>
+                                        <Label>Tanggal Kembali</Label>
+                                        <Input
+                                            type="date"
+                                            value={data.tgl_kembali}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "tgl_kembali",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                    {/* Status */}
+                                    <div>
+                                        <Label>Status</Label>
+                                        <Select
+                                            value={{
+                                                value: data.status,
+                                                label: data.status,
+                                            }}
+                                            onChange={(option) =>
+                                                setData(
+                                                    "status",
+                                                    option?.value || ""
+                                                )
+                                            }
+                                            options={[
+                                                {
+                                                    value: "keluar",
+                                                    label: "Keluar",
+                                                },
+                                                {
+                                                    value: "kembali",
+                                                    label: "Kembali",
+                                                },
+                                            ]}
+                                        />
+                                    </div>
+                                </CardContent>
                             </CardContent>
                             <CardFooter>
-                                <Button type="submit">Save Rekap</Button>
+                                <Button type="submit" disabled={processing}>
+                                    Save Rekap
+                                </Button>
                             </CardFooter>
                         </form>
                     </Card>

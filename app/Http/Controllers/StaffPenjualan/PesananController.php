@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use App\Models\PembayaranPesanan;
+use App\Models\Rekap;
 use App\Models\Stok;
 use App\Models\StokLog;
 use Illuminate\Support\Facades\Validator;
@@ -239,8 +240,8 @@ class PesananController extends Controller
     {
         $pesanan = Pesanan::with(['pelanggan', 'details.produk'])->findOrFail($id);
 
-        $pdf = Pdf::loadView('pdf.tanda-terima-kosong', ['pesanan' => $pesanan]);
-        return $pdf->stream("tanda-terima-kosong-{$pesanan->id}.pdf");
+        return Pdf::loadView('pdf.tanda_terima_kosong', compact('pesanan'))
+            ->stream('tanda-terima-botol-kosong.pdf');
     }
 
     public function konfirmasiPembayaran(Request $request, $id)
@@ -296,16 +297,28 @@ class PesananController extends Controller
         $pesanan = Pesanan::findOrFail($id);
         $pesanan->update(['status' => 'Dikirim']);
 
+        // Otomatis isi tanggal_keluar di tabel Rekap (jika sudah pernah dibuat manual sebelumnya)
+        Rekap::where('pesanan_id', $pesanan->id)
+            ->update(['tanggal_keluar' => now()]);
+
         return back()->with('success', 'Pesanan telah dikonfirmasi sebagai Dikirim.');
     }
+
 
     public function tandaiSelesai($id)
     {
         $pesanan = Pesanan::findOrFail($id);
+        $pesanan->status = 'dikirim';
+        $pesanan->save();
 
-        // if (!$pesanan->is_lunas) {
-        //     return back()->withErrors(['msg' => 'Pesanan belum lunas.']);
-        // }
+        foreach ($pesanan->detailPesanan as $detail) {
+            Rekap::create([
+                'pesanan_id' => $pesanan->id,
+                'tabung_id' => $detail->tabung_id,
+                'tanggal_keluar' => now(),
+                'kembali' => 'belum',
+            ]);
+        }
 
         $pesanan->update(['status' => 'Selesai']);
         return back()->with('success', 'Pesanan telah ditandai sebagai Selesai.');

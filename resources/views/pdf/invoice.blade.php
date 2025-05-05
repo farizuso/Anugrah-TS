@@ -6,162 +6,171 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 11px;
+            font-size: 10px;
             margin: 0;
             padding: 20px;
         }
+
         .header {
             text-align: center;
             margin-bottom: 10px;
         }
+
         .header img {
-            width: 100px;
-            margin-bottom: 5px;
+            width: 90px;
+            margin-bottom: 3px;
         }
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
+
+        h2 {
+            margin: 5px 0;
+            font-size: 14px;
         }
-        .info-box {
-            width: 48%;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 11px;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 5px;
-            text-align: left;
-        }
-        .no-border {
-            border: none;
-        }
-        .total-row {
-            font-weight: bold;
-        }
-        .highlight {
-            background-color: #fff9c4; /* kuning terang */
-            padding: 8px;
-            border: 1px solid #f0e68c;
-            margin-bottom: 10px;
-        }
-        .text-right {
-            text-align: right;
-        }
-        .note {
-            margin-top: 10px;
-            font-style: italic;
-            font-size: 10px;
-        }
+
+      
 
         .info-table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 11px;
+            margin-top: 5px;
+            font-size: 10px;
         }
 
         .info-table td {
-            border: 0px;
-            /* text-align: right; */
+            padding: 2px 4px;
+            vertical-align: top;
         }
 
-        /* .info-table td.right {
+        .highlight {
+            background-color: #f9f9c4;
+            border: 1px dashed #999;
+            padding: 6px;
+            margin: 10px 0;
+            font-size: 9px;
+        }
+
+        table.items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 10px;
+        }
+
+        table.items th,
+        table.items td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: left;
+        }
+
+        .text-right {
             text-align: right;
-        } */
+        }
+
+        .total-row {
+            font-weight: bold;
+        }
+
+        .note {
+            margin-top: 8px;
+            font-style: italic;
+            font-size: 9px;
+        }
+
+        .signature {
+            margin-top: 30px;
+            width: 100%;
+            font-size: 10px;
+        }
+
+        .signature td {
+            padding-top: 25px;
+            text-align: center;
+        }
+
+        .underline {
+            display: inline-block;
+            border-bottom: 1px solid #000;
+            width: 140px;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-    <img src="{{ public_path('assets/img/logo.png') }}" alt="Logo" width="100">
 
+<div class="header">
+    <img src="{{ public_path('assets/img/logo.png') }}" alt="Logo">
+    <p>Spesialis Gas Medis & Industri</p>
+    <p>Permata Green Menganti Regency Blok D2-02, Gresik | WA: 08978810015, 081333244901</p>
+    <hr>
+    <h2>INVOICE PESANAN</h2>
+</div>
 
+<table class="info-table">
+    <tr>
+        <td><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($pesanan->tgl_pesanan)->format('d M Y') }}</td>
+        <td><strong>No. Telp:</strong> {{ $pesanan->pelanggan->no_hp }}</td>
+        
+    </tr>
+    <tr>
+        <td><strong>Penerima:</strong> {{ $pesanan->pelanggan->nama_pelanggan }}</td>
+        <td><strong>Alamat:</strong> {{ $pesanan->pelanggan->alamat }}</td>
+    </tr>
+</table>
 
+@if($pesanan->jenis_pesanan === 'sewa')
+<div class="highlight">
+    🛢️ Pesanan ini adalah <strong>Sewa Tabung</strong><br>
+    Masa sewa 6 bulan. Jika tidak dikembalikan, jaminan sebesar <strong>Rp {{ number_format(1200000, 0, ',', '.') }}/tabung</strong> akan hangus.
+</div>
+@endif
 
-        <h2>Invoice Pesanan</h2>
-    </div>
-
-    {{-- <div class="info-section">
-        <div class="info-box">
-            <h4>Informasi Pemesanan</h4>
-            <p>Tanggal Pesanan: <strong>{{ \Carbon\Carbon::parse($pesanan->tgl_pesanan)->format('d M Y') }}</strong></p>
-            <p>Metode Pembayaran: <strong>{{ ucfirst($pesanan->metode_pembayaran) }}</strong></p>
-            <p>Status Pembayaran: <strong>{{ $pesanan->status_pembayaran }}</strong></p>
-            <p>Status Pengiriman: <strong>{{ $pesanan->status }}</strong></p>
-        </div>
-
-        <div class="info-box">
-            <h4>Informasi Pengiriman</h4>
-            <p>Penerima: <strong>{{ $pesanan->pelanggan->nama_pelanggan }}</strong></p>
-            <p>Alamat: {{ $pesanan->alamat_pengiriman }}</p>
-            <p>No. Telp: {{ $pesanan->no_telp_pengiriman }}</p>
-        </div>
-    </div> --}}
-
-    <table class="info-table">
+<table class="items">
+    <thead>
         <tr>
-            <td style="font-weight: bold">Informasi Pemesanan</td>
-            <td class="right" style="font-weight: bold">Informasi Pengiriman</td>
+            <th>Produk</th>
+            <th>Jumlah</th>
+            <th>Harga/Unit</th>
+            <th>Subtotal</th>
         </tr>
+    </thead>
+    <tbody>
+        @foreach($pesanan->details as $item)
         <tr>
-            <td>Tanggal Pesanan: {{ \Carbon\Carbon::parse($pesanan->tgl_pesanan)->format('d M Y') }}</td>
-            <td class="right">Penerima: {{ $pesanan->pelanggan->nama_pelanggan }}</td>
+            <td>{{ $item->produk->nama_produk }}</td>
+            <td>{{ $item->quantity }} tabung</td>
+            <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
+            <td>Rp {{ number_format($item->harga * $item->quantity, 0, ',', '.') }}</td>
         </tr>
-        <tr></tr>
-            <td>Metode Pembayaran: {{ ucfirst($pesanan->metode_pembayaran) }}</td>
-            <td class="right">Alamat: {{ $pesanan->alamat_pengiriman }}</td>
+        @endforeach
+        {{-- <tr class="total-row">
+            <td colspan="3" class="text-right">Biaya Pengiriman</td>
+            <td>Rp {{ number_format($pesanan->biaya_pengiriman, 0, ',', '.') }}</td>
+        </tr> --}}
+        <tr class="total-row">
+            <td colspan="3" class="text-right">Total</td>
+            <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
         </tr>
-        <tr>
-            <td>Status Pembayaran: {{ $pesanan->status_pembayaran }}</td>
-            <td class="right">No. Telp: {{ $pesanan->no_telp_pengiriman }}</td>
-        </tr>
-        <tr>
-            <td>Status Pengiriman: {{ $pesanan->status }}</td>
-            <td class="right"></td>
-        </tr>
-    </table>
+    </tbody>
+</table>
 
-    @if($pesanan->is_sewa)
-    <div class="highlight">
-        🛢️ Pesanan ini adalah <strong>Sewa Tabung</strong>.<br>
-        Masa sewa 6 bulan. Jika tidak dikembalikan, jaminan sebesar <strong>Rp{{ number_format(1200000, 0, ',', '.') }}/tabung</strong> akan hangus.
-    </div>
-    @endif
+<div class="note">
+    <p><strong>Syarat Pembeli/Penyewa:</strong></p>
+    <ol style="margin-left: 15px; padding-left: 10px;">
+        <li>Tabung kosong dikembalikan maksimal 14 hari. Lewat itu dikenakan denda Rp5.000/botol/hari.</li>
+        <li>Lebih dari 90 hari, tabung dianggap hilang dan diganti Rp2.400.000/tabung.</li>
+        <li>Keran rusak/hilang ganti Rp300.000, tutup botol hilang ganti Rp300.000.</li>
+        <li>Sewa tabung per bulan Rp100.000.</li>
+    </ol>
+</div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Produk</th>
-                <th>Jumlah</th>
-                <th>Harga/Unit</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($pesanan->details as $item)
-            <tr>
-                <td>{{ $item->produk->nama_produk }}</td>
-                <td>{{ $item->quantity }} tabung</td>
-                <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
-                <td>Rp {{ number_format($item->harga * $item->quantity, 0, ',', '.') }}</td>
-            </tr>
-            @endforeach
-            <tr class="total-row">
-                <td colspan="3" class="text-right">Biaya Pengiriman</td>
-                <td>Rp {{ number_format($pesanan->biaya_pengiriman, 0, ',', '.') }}</td>
-            </tr>
-            <tr class="total-row">
-                <td colspan="3" class="text-right">Total</td>
-                <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
-            </tr>
-        </tbody>
-    </table>
+<table class="signature">
+    <tr>
+        <td>Pembeli / Penyewa</td>
+        <td>Hormat Kami</td>
+    </tr>
+    <tr>
+        <td>( <span class="underline">&nbsp;</span> )</td>
+        <td>( <span class="underline">&nbsp;</span> )</td>
+    </tr>
+</table>
 
-    <p class="note">Terima kasih atas kepercayaan Anda!</p>
 </body>
 </html>

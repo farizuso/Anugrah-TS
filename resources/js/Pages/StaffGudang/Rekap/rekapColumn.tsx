@@ -6,7 +6,13 @@ import { ArrowUpDown } from "lucide-react";
 import React from "react";
 import Deleterkp from "./Delete";
 import Edit from "./Edit";
-import { rankItem } from "@tanstack/match-sorter-utils";
+
+// Helper untuk format tanggal
+function formatDate(value?: string | null) {
+    if (!value) return "-";
+    const date = new Date(value);
+    return !isNaN(date.getTime()) ? date.toISOString().split("T")[0] : "-";
+}
 
 export const rekapColumns: ColumnDef<Rekap>[] = [
     {
@@ -34,116 +40,64 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "nama_pelanggan",
-        header: "Nama Pelanggan",
-        cell: ({ row }) => (
-            <div className="capitalize">
-                {row.original.pelanggan.nama_pelanggan}
-            </div>
+        accessorKey: "pesanan_id",
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
+            >
+                ID Pesanan <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
         ),
-        accessorFn: (row) => row.pelanggan.nama_pelanggan,
+        cell: ({ row }) => row.original.pesanan_id,
     },
     {
-        accessorKey: "no_botol",
-        header: "No. Botol",
+        accessorKey: "pelanggan",
+        header: "Pelanggan",
+        cell: ({ row }) => row.original.pelanggan ?? "-",
+    },
+    {
+        accessorKey: "nomor_tabung",
+        header: "Nomor Tabung",
+        cell: ({ row }) => row.original.nomor_tabung ?? "-",
+    },
+    {
+        accessorKey: "tanggal_keluar",
+        header: "Tanggal Keluar",
+        cell: ({ row }) => formatDate(row.original.tanggal_keluar),
+    },
+    {
+        accessorKey: "tanggal_kembali",
+        header: "Tanggal Kembali",
+        cell: ({ row }) => formatDate(row.original.tanggal_kembali),
+    },
+    {
+        accessorKey: "status",
+        header: "Status",
         cell: ({ row }) => (
-            <div className="capitalize">{row.original.produk.no_botol}</div>
-        ),
-        accessorFn: (row) => row.produk.no_botol, // Akses nilai nested untuk fuzzy filtering
-    },
-    {
-        accessorKey: "alamat",
-        header: "Alamat",
-        cell: ({ row }) => (
-            <div className="capitalize">{row.original.pelanggan.alamat}</div>
-        ),
-    },
-    {
-        accessorKey: "tgl_keluar",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="grey"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Tgl. Keluar
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
-        cell: ({ row }) => {
-            const date = new Date(row.original.tgl_keluar);
-            return (
-                <div className="lowercase">
-                    {date.toISOString().split("T")[0]}
-                </div>
-            ); // Mengubah tanggal menjadi string
-        },
-    },
-    {
-        accessorKey: "tgl_kembali",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="grey"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Tgl. Kembali
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
-        cell: ({ row }) => {
-            const date = new Date(row.original.tgl_kembali);
-            return (
-                <div className="lowercase">
-                    {date.toISOString().split("T")[0]}
-                </div>
-            ); // Mengubah tanggal menjadi string
-        },
-    },
-    {
-        accessorKey: "tgl_pabrik",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="grey"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Tgl. Pabrik
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
-        cell: ({ row }) => (
-            <div className="lowercase">
-                {new Date(row.original.tgl_masuk_pabrik).toLocaleDateString()}
-            </div>
-        ),
-    },
-    {
-        accessorKey: "keterangan",
-        header: "Keterangan",
-        cell: ({ row }) => (
-            <div className="capitalize">{row.original.keterangan}</div>
+            <span
+                className={`px-2 py-1 rounded text-xs font-medium ${
+                    row.original.status === "kembali"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                }`}
+            >
+                {row.original.status}
+            </span>
         ),
     },
     {
         id: "actions",
+        header: "Aksi",
         enableHiding: false,
         cell: ({ row }) => {
             const rekap = row.original;
-
             return (
-                <div className="justify-center flex items-center gap-2">
-                    <Deleterkp rekapdelete={rekap} />
+                <div className="flex items-center gap-2">
                     <Edit rekapedit={rekap} />
+                    <Deleterkp rekapdelete={rekap} />
                 </div>
             );
         },

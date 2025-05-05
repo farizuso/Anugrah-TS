@@ -48,7 +48,7 @@ export interface Supplier {
     id: number;
     nama_supplier: string;
     alamat: string;
-    no_telp: number;
+    no_telp: string;
 }
 
 export interface Pembayaran {
@@ -70,6 +70,7 @@ export interface Pesanan {
     metode_pembayaran: string;
     status: string;
     jumlah_terbayar: number;
+    jenis_pesanan: string;
     details: {
         id: number;
         harga: number;
@@ -77,7 +78,6 @@ export interface Pesanan {
         produk: {
             id: number;
             nama_produk: string;
-            jenis_pesanan: "jual" | "sewa"; // ✅ tambahkan agar bisa digunakan di Detail.tsx
         };
     }[];
     riwayat_pembayaran: Pembayaran[];
@@ -107,12 +107,12 @@ export interface Pelanggan {
 
 export interface Rekap {
     id: number;
-    tgl_keluar: Date;
-    tgl_kembali: Date;
-    tgl_masuk_pabrik: Date;
-    keterangan: string;
-    produk: Produk;
-    pelanggan: Pelanggan;
+    pesanan_id: number;
+    pelanggan: string;
+    nomor_tabung: string;
+    tanggal_keluar: string | null;
+    tanggal_kembali: string | null;
+    status: "belum" | "kembali";
 }
 
 export interface DashboardData {

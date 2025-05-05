@@ -60,6 +60,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/admin/laporanpembelian/{id}', [LaporanPembelianController::class, 'destroy'])->name('admin.laporanpembelian.destroy');
     Route::post('/admin/laporanpembelian', [LaporanPembelianController::class, 'store'])->name('admin.laporanpembelian.store');
     Route::get('/admin/laporanpembelian/export', [LaporanPembelianController::class, 'export'])->name('admin.laporanpembelian.export');
+
+    Route::get('/admin/stok-log', [StokLogController::class, 'getStokLogAdmin'])->name('admin.stok-log.index');
 });
 
 
@@ -98,6 +100,7 @@ Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
 
 
     Route::get('/staffpenjualan/laporan-penjualan', [PesananController::class, 'laporanPenjualan'])->name('staffpenjualan.laporanPenjualan.penjualan');
+    Route::get('/staffpenjualan/stok-log', [StokLogController::class, 'getStokLogPenjualan'])->name('staffpenjualan.stok-log.index');
 });
 
 
