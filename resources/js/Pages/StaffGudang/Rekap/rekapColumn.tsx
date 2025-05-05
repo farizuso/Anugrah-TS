@@ -51,12 +51,12 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
                 ID Pesanan <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => row.original.pesanan_id,
+        cell: ({ row }) => row.original.pesanan.id,
     },
     {
         accessorKey: "pelanggan",
         header: "Pelanggan",
-        cell: ({ row }) => row.original.pelanggan ?? "-",
+        cell: ({ row }) => row.original.pesanan.pelanggan.nama_pelanggan ?? "-",
     },
     {
         accessorKey: "nomor_tabung",

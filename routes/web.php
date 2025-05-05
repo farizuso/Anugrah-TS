@@ -28,7 +28,7 @@ Route::get('/', function () {
 });
 
 // Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('admin.dashboard');
-Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
+// Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
 
 
 Route::middleware('auth',)->group(function () {

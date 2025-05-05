@@ -107,8 +107,8 @@ export interface Pelanggan {
 
 export interface Rekap {
     id: number;
-    pesanan_id: number;
-    pelanggan: string;
+    pesanan: Pesanan;
+    pelanggan: Pelanggan;
     nomor_tabung: string;
     tanggal_keluar: string | null;
     tanggal_kembali: string | null;
