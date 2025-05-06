@@ -18,9 +18,11 @@ class RekapController extends Controller
     public function index()
     {
         $rekaps = Rekap::with('pesanan.pelanggan')->get(); // penting: eager load relasi
+        $pesanans = Pesanan::with(['pelanggan', 'details.produk'])->get();
 
         return Inertia::render('StaffGudang/Rekap/Index', [
             'rekaps' => $rekaps,
+            'pesanans' => $pesanans
         ]);
     }
 

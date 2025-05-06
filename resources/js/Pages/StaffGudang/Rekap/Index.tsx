@@ -10,7 +10,7 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
-import { Rekap } from "@/types";
+import { Pesanan, Rekap } from "@/types";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useForm } from "@inertiajs/react";
 import * as React from "react";
@@ -18,34 +18,27 @@ import { DataTable } from "@/Components/DataTable";
 import { rekapColumns } from "./rekapColumn";
 import { CommandCombobox } from "@/Components/ui/CommandCombobox";
 
-interface PesananOption {
-    id: number;
-    pelanggan: {
-        nama: string;
-    };
-    details: {
-        jumlah: number;
-        produk_id: number;
-        produk: {
-            nama: string;
-        };
-    }[];
-}
+
 
 interface RekapProps {
-    posts: Rekap[];
-    pesanans: PesananOption[];
+    rekaps: Rekap[];
+    pesanans: Pesanan[];
 }
 
-const Index = ({ posts, pesanans }: RekapProps) => {
-    const { data, setData, post, processing, reset, errors } = useForm({
-        pesanan_id: null,
-        status: "keluar",
-        tabung_per_produk: [] as {
+const Index = ({ rekaps, pesanans }: RekapProps) => {
+    console.log(rekaps)
+    const { data, setData, post, processing, reset, errors } = useForm<{
+        pesanan_id: number | null; // Correct way to define pesanan_id as a number or null
+        status: string;
+        tabung_per_produk: {
             produk_id: number;
             produk_nama: string;
             tabung: string[];
-        }[],
+        }[];
+    }>({
+        pesanan_id: null, // Initialize with null
+        status: "keluar",
+        tabung_per_produk: [],
     });
 
     const handlePesananChange = (val: string) => {
@@ -55,12 +48,14 @@ const Index = ({ posts, pesanans }: RekapProps) => {
         const selected = pesanans.find((p) => p.id === id);
         if (!selected) return;
 
-        setData("pesanan_id", selected.id);
+        setData("pesanan_id", selected.id as any);
+
+        console.log(selected);
 
         const produkList = selected.details.map((d) => ({
-            produk_id: d.produk_id,
-            produk_nama: d.produk.nama,
-            tabung: Array(d.jumlah).fill(""),
+            produk_id: d.id,
+            produk_nama: d.produk.nama_produk,
+            tabung: Array(d.quantity).fill(""),
         }));
 
         setData("tabung_per_produk", produkList);
@@ -98,7 +93,7 @@ const Index = ({ posts, pesanans }: RekapProps) => {
                 </TabsList>
 
                 <TabsContent value="account">
-                    <DataTable data={posts} columns={rekapColumns} />
+                    <DataTable data={rekaps} columns={rekapColumns} />
                 </TabsContent>
 
                 <TabsContent value="form">
@@ -116,7 +111,7 @@ const Index = ({ posts, pesanans }: RekapProps) => {
                                     <Label>Pesanan</Label>
                                     <CommandCombobox
                                         options={pesanans.map((p) => ({
-                                            label: `#${p.id} - ${p.pelanggan.nama}`,
+                                            label: `#${p.id} - ${p.pelanggan.nama_pelanggan}`,
                                             value: p.id.toString(),
                                         }))}
                                         value={
@@ -135,7 +130,7 @@ const Index = ({ posts, pesanans }: RekapProps) => {
                                                 <Input
                                                     value={
                                                         selectedPesanan
-                                                            ?.pelanggan.nama ??
+                                                            ?.pelanggan.nama_pelanggan ??
                                                         ""
                                                     }
                                                     readOnly
@@ -149,13 +144,13 @@ const Index = ({ posts, pesanans }: RekapProps) => {
                                                             selectedPesanan?.details
                                                         )
                                                             ? selectedPesanan.details
-                                                                  .map(
-                                                                      (d) =>
-                                                                          d
-                                                                              .produk
-                                                                              .nama
-                                                                  )
-                                                                  .join(", ")
+                                                                .map(
+                                                                    (d) =>
+                                                                        d
+                                                                            .produk
+                                                                            .nama_produk
+                                                                )
+                                                                .join(", ")
                                                             : ""
                                                     }
                                                     readOnly
