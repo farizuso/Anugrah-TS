@@ -56,8 +56,10 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
     {
         accessorKey: "pelanggan",
         header: "Pelanggan",
-        cell: ({ row }) => row.original.pesanan.pelanggan.nama_pelanggan ?? "-",
+        cell: ({ row }) =>
+            row.original.pesanan?.pelanggan?.nama_pelanggan ?? "-",
     },
+
     {
         accessorKey: "nomor_tabung",
         header: "Nomor Tabung",

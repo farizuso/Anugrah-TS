@@ -9,20 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('rekaps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pesanan_id')->constrained()->onDelete('cascade');
-            $table->foreignId('pelanggan_id')->constrained()->onDelete('cascade');
-            $table->foreignId('produk_id')->constrained()->onDelete('cascade');
-            $table->string('nomor_tabung')->unique(); // misal: TBG001
+            $table->foreignId('pelanggan_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('produk_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('nomor_tabung');
+            $table->enum('status', ['keluar', 'kembali']);
             $table->dateTime('tanggal_keluar')->nullable();
             $table->dateTime('tanggal_kembali')->nullable();
-            $table->enum('status', ['keluar', 'kembali'])->default('keluar');
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

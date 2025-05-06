@@ -2,30 +2,29 @@
 
 namespace Database\Seeders;
 
-use App\Models\Pesanan;
 use App\Models\Rekap;
-use Carbon\Carbon;
+use App\Models\Pesanan;
+use App\Models\Pelanggan;
+use App\Models\Produk;
 use Illuminate\Database\Seeder;
 
 class RekapSeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
-        $pesanans = Pesanan::with(['pelanggan', 'details'])->get();
-        $counter = 1;
+        $pesanans = Pesanan::with('pelanggan', 'details.produk')->get();
 
         foreach ($pesanans as $pesanan) {
             foreach ($pesanan->details as $detail) {
-                // Simulasi tiap detail punya 1-2 tabung keluar
-                foreach (range(1, rand(1, 2)) as $_) {
+                for ($i = 0; $i < $detail->quantity; $i++) {
                     Rekap::create([
                         'pesanan_id' => $pesanan->id,
-                        'pelanggan_id' => $pesanan->pelanggan_id, // ⬅️ ambil dari pesanan
-                        'produk_id' => $detail->produk_id,
-                        'nomor_tabung' => 'TBG-' . str_pad($counter++, 3, '0', STR_PAD_LEFT),
-                        'tanggal_keluar' => $pesanan->tgl_pesanan,
-                        'tanggal_kembali' => null, // bisa dibuat random juga kalau mau
+                        'pelanggan_id' => $pesanan->pelanggan->id ?? null,
+                        'produk_id' => $detail->produk->id ?? null,
+                        'nomor_tabung' => 'TAB-' . strtoupper(uniqid()),
                         'status' => 'keluar',
+                        'tanggal_keluar' => now()->subDays(rand(1, 10)),
+                        'tanggal_kembali' => null,
                     ]);
                 }
             }
