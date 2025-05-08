@@ -75,6 +75,12 @@ Route::middleware('auth', 'role:staff_gudang')->group(function () {
 
 
     Route::resource('/staffgudang/rekap', RekapController::class)->names('staffgudang.rekap');
+    Route::put('/staffgudang/rekap/{id}/konfirmasi-kembali', [RekapController::class, 'konfirmasiKembali'])->name('staffgudang.rekap.konfirmasi-kembali');
+
+
+
+
+
 
     Route::get('/staffgudang/stok-log', [StokLogController::class, 'index'])->name('staffgudang.stok-log.index');
 });

@@ -35,25 +35,30 @@ const Dashboard = () => {
 
     const cardData = [
         {
-            label: "Total Revenue",
-            amount: `Rp ${(totalRevenue ?? 0).toLocaleString("id-ID")}`,
+            label: "Total Pendapatan",
+            amount: new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0,
+            }).format(totalRevenue ?? 0),
             description: "Total dari semua penjualan",
             icon: DollarSign,
         },
+
         {
-            label: "Purchases",
+            label: "Pembelian",
             amount: `${totalPurchases ?? 0}`,
             description: "Jumlah pembelian dari supplier",
             icon: CreditCard,
         },
         {
-            label: "Sales",
+            label: "Penjualan",
             amount: `${totalSales ?? 0}`,
             description: "Jumlah penjualan ke pelanggan",
             icon: CreditCard,
         },
         {
-            label: "Total Stock",
+            label: "Total Stok",
             amount: `${totalStock ?? 0}`,
             description: "Jumlah stok saat ini",
             icon: Activity,

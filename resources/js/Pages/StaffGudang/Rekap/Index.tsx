@@ -18,15 +18,13 @@ import { DataTable } from "@/Components/DataTable";
 import { rekapColumns } from "./rekapColumn";
 import { CommandCombobox } from "@/Components/ui/CommandCombobox";
 
-
-
 interface RekapProps {
     rekaps: Rekap[];
     pesanans: Pesanan[];
 }
 
 const Index = ({ rekaps, pesanans }: RekapProps) => {
-    console.log(rekaps)
+    console.log(rekaps);
     const { data, setData, post, processing, reset, errors } = useForm<{
         pesanan_id: number | null; // Correct way to define pesanan_id as a number or null
         status: string;
@@ -53,7 +51,7 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
         console.log(selected);
 
         const produkList = selected.details.map((d) => ({
-            produk_id: d.id,
+            produk_id: d.produk.id, // yang benar
             produk_nama: d.produk.nama_produk,
             tabung: Array(d.quantity).fill(""),
         }));
@@ -73,6 +71,7 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+        console.log("Submitting data:", data);
         post(route("staffgudang.rekap.store"), {
             data,
             onSuccess: () => {
@@ -130,7 +129,8 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
                                                 <Input
                                                     value={
                                                         selectedPesanan
-                                                            ?.pelanggan.nama_pelanggan ??
+                                                            ?.pelanggan
+                                                            .nama_pelanggan ??
                                                         ""
                                                     }
                                                     readOnly
@@ -144,13 +144,13 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
                                                             selectedPesanan?.details
                                                         )
                                                             ? selectedPesanan.details
-                                                                .map(
-                                                                    (d) =>
-                                                                        d
-                                                                            .produk
-                                                                            .nama_produk
-                                                                )
-                                                                .join(", ")
+                                                                  .map(
+                                                                      (d) =>
+                                                                          d
+                                                                              .produk
+                                                                              .nama_produk
+                                                                  )
+                                                                  .join(", ")
                                                             : ""
                                                     }
                                                     readOnly

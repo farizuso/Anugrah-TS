@@ -121,14 +121,6 @@ export const KonfirmasiColumns: ColumnDef<LaporanPembelian>[] = [
 
             return (
                 <div className="flex justify-center items-center gap-2">
-                    {/* <Link
-                        href={route(
-                            "staffgudang.laporanpembelian.konfirmasi",
-                            laporan.id
-                        )}
-                    >
-                        <Button variant="default">Konfirmasi</Button>
-                    </Link> */}
                     {laporan.status !== "Dikonfirmasi" && (
                         <ConfirmButton
                             routeName="staffgudang.laporanpembelian.konfirmasi"

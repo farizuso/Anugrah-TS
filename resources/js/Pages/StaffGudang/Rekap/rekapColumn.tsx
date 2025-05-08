@@ -6,6 +6,10 @@ import { ArrowUpDown } from "lucide-react";
 import React from "react";
 import Deleterkp from "./Delete";
 import Edit from "./Edit";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import { router } from "@inertiajs/react";
+import ConfirmReturn from "@/Components/ConfirmReturn";
 
 // Helper untuk format tanggal
 function formatDate(value?: string | null) {
@@ -39,20 +43,20 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
         enableSorting: false,
         enableHiding: false,
     },
-    {
-        accessorKey: "pesanan_id",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                }
-            >
-                ID Pesanan <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => row.original.pesanan.id,
-    },
+    // {
+    //     accessorKey: "pesanan_id",
+    //     header: ({ column }) => (
+    //         <Button
+    //             variant="ghost"
+    //             onClick={() =>
+    //                 column.toggleSorting(column.getIsSorted() === "asc")
+    //             }
+    //         >
+    //             ID Pesanan <ArrowUpDown className="ml-2 h-4 w-4" />
+    //         </Button>
+    //     ),
+    //     cell: ({ row }) => row.original.pesanan.id,
+    // },
     {
         accessorKey: "pelanggan",
         header: "Pelanggan",
@@ -65,30 +69,72 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
         header: "Nomor Tabung",
         cell: ({ row }) => row.original.nomor_tabung ?? "-",
     },
+
     {
         accessorKey: "tanggal_keluar",
-        header: "Tanggal Keluar",
-        cell: ({ row }) => formatDate(row.original.tanggal_keluar),
+        header: ({ column }) => (
+            <Button
+                variant="default"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
+            >
+                Tgl. Keluar <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const tanggal = row.original.pesanan?.tgl_pesanan; // akses dari relasi pesanan
+            const formattedDate =
+                tanggal && typeof tanggal === "string"
+                    ? format(new Date(tanggal), "dd MMMM yyyy", { locale: id })
+                    : "-";
+            return <div>{formattedDate}</div>;
+        },
     },
+
     {
         accessorKey: "tanggal_kembali",
-        header: "Tanggal Kembali",
-        cell: ({ row }) => formatDate(row.original.tanggal_kembali),
+        header: ({ column }) => (
+            <Button
+                variant="default"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
+            >
+                Tgl. Kembali <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const tanggal = row.original.tanggal_kembali; // akses dari relasi pesanan
+            const formattedDate =
+                tanggal && typeof tanggal === "string"
+                    ? format(new Date(tanggal), "dd MMMM yyyy", { locale: id })
+                    : "-";
+            return <div>{formattedDate}</div>;
+        },
     },
     {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => (
-            <span
-                className={`px-2 py-1 rounded text-xs font-medium ${
-                    row.original.status === "kembali"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                }`}
-            >
-                {row.original.status}
-            </span>
-        ),
+        cell: ({ row }) => {
+            const status = row.original.status as string;
+
+            const badgeClass =
+                {
+                    kembali: "bg-green-500 text-white font-bold",
+                    dipinjam: "bg-yellow-100 text-yellow-700",
+                    "Belum Dikonfirmasi": "bg-yellow-500 text-black",
+                    Dikonfirmasi: "bg-green-500 text-white font-bold",
+                }[status] || "bg-yellow-500 text-black font-bold";
+
+            return (
+                <span
+                    className={`capitalize inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${badgeClass}`}
+                >
+                    {status}
+                </span>
+            );
+        },
     },
     {
         id: "actions",
@@ -100,6 +146,7 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
                 <div className="flex items-center gap-2">
                     <Edit rekapedit={rekap} />
                     <Deleterkp rekapdelete={rekap} />
+                    <ConfirmReturn rekap={rekap} />
                 </div>
             );
         },

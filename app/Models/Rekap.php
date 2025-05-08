@@ -11,10 +11,10 @@ class Rekap extends Model
         'pesanan_id',
         'pelanggan_id',
         'produk_id',
-        'nomor_tabung',
-        'status',
         'tanggal_keluar',
         'tanggal_kembali',
+        'nomor_tabung',
+        'status',
     ];
 
     public function pesanan()
