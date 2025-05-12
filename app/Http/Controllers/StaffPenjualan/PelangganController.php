@@ -5,6 +5,7 @@ namespace App\Http\Controllers\StaffPenjualan;
 use App\Http\Controllers\Controller;
 use App\Models\Pelanggan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class PelangganController extends Controller
@@ -30,14 +31,20 @@ class PelangganController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $data = $request->validate([
-            'nama_pelanggan' => 'required',
-            'alamat' => 'required',
-            'no_hp' => 'required',
-        ]);
-        Pelanggan::create($data);
-        return redirect()->route('staffpenjualan.pelanggan.index')->with('success', 'Data Pelanggan berhasil ditambahkan');
+        try {
+            $data = $request->validate([
+                'nama_pelanggan' => 'required',
+                'alamat' => 'required',
+                'no_hp' => 'required',
+            ]);
+            Pelanggan::create($data);
+
+            return redirect()->route('staffpenjualan.pelanggan.index')->with('success', 'Data Pelanggan berhasil ditambahkan');
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menambahkan data: ' . $e->getMessage());
+        }
     }
 
     /**

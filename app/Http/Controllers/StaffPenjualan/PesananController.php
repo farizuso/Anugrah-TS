@@ -62,15 +62,13 @@ class PesananController extends Controller
         $jenisPesanan = $request->jenis_pesanan;
         $jaminanSewa = 1200000;
 
-        // Validasi stok hanya untuk pesanan jenis "jual"
-        if ($jenisPesanan === 'jual') {
-            foreach ($produkList as $item) {
-                $stok = Stok::where('produk_id', $item['produk_id'])->first();
-                if ($stok && $stok->jumlah_stok < $item['quantity']) {
-                    return redirect()->back()
-                        ->with('error', "Stok untuk produk ID {$item['produk_id']} tidak mencukupi.")
-                        ->withInput();
-                }
+        // Validasi stok hanya untuk "jual" dan "sewa" (agar tidak minus)
+        foreach ($produkList as $item) {
+            $stok = Stok::where('produk_id', $item['produk_id'])->first();
+            if ($stok && $stok->jumlah_stok < $item['quantity']) {
+                return redirect()->back()
+                    ->with('error', "Stok untuk produk ID {$item['produk_id']} tidak mencukupi.")
+                    ->withInput();
             }
         }
 
@@ -89,7 +87,6 @@ class PesananController extends Controller
             }
 
             $pesanan = Pesanan::create([
-
                 'tgl_pesanan' => $request->tgl_pesanan,
                 'pelanggan_id' => $request->pelanggan_id,
                 'total' => $total,
@@ -98,10 +95,9 @@ class PesananController extends Controller
                 'jumlah_terbayar' => 0,
                 'is_lunas' => false,
                 'keterangan' => 'Belum Lunas',
-
             ]);
-            $pelanggan = Pelanggan::find($request->pelanggan_id);
 
+            $pelanggan = Pelanggan::find($request->pelanggan_id);
 
             foreach ($produkList as $item) {
                 $harga = $jenisPesanan === 'sewa' ? $jaminanSewa : $item['harga'];
@@ -113,25 +109,22 @@ class PesananController extends Controller
                     'quantity' => $item['quantity'],
                 ]);
 
-                if ($jenisPesanan === 'jual') {
-                    $stok = Stok::where('produk_id', $item['produk_id'])->first();
-                    if ($stok) {
-                        $stok->jumlah_stok -= $item['quantity'];
-                        $stok->save();
+                $stok = Stok::where('produk_id', $item['produk_id'])->first();
+                if ($stok) {
+                    $stok->jumlah_stok -= $item['quantity'];
+                    $stok->save();
 
-                        // Membuat log pengurangan stok
-                        try {
-                            StokLog::create([
-                                'produk_id' => $item['produk_id'],
-                                'tipe' => 'keluar',
-                                'jumlah' => $item['quantity'],
-                                'sisa_stok' => $stok->jumlah_stok, // <- tambahkan ini
-                                'keterangan' => 'Stok keluar karena pesanan dari ' . $pelanggan->nama_pelanggan,
-                                'tanggal' => now(),
-                            ]);
-                        } catch (\Exception $e) {
-                            Log::error('Gagal membuat stok log: ' . $e->getMessage());
-                        }
+                    try {
+                        StokLog::create([
+                            'produk_id' => $item['produk_id'],
+                            'tipe' => 'keluar',
+                            'jumlah' => $item['quantity'],
+                            'sisa_stok' => $stok->jumlah_stok,
+                            'keterangan' => 'Stok keluar karena pesanan ' . $jenisPesanan . ' dari ' . $pelanggan->nama_pelanggan,
+                            'tanggal' => now(),
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::error('Gagal membuat stok log: ' . $e->getMessage());
                     }
                 }
             }
@@ -156,7 +149,23 @@ class PesananController extends Controller
 
 
 
+
     public function detail_pesanan($id)
+    {
+        $pesanan = Pesanan::with(['pelanggan', 'details.produk', 'riwayat_pembayaran'])->findOrFail($id);
+
+        // 👇 debug cek apakah `jenis` masuk
+        foreach ($pesanan->details as $detail) {
+            Log::info("Produk: {$detail->produk->nama_produk}, Jenis: {$detail->produk->jenis}");
+        }
+
+        return Inertia::render('StaffPenjualan/Pesanan/Detail', [
+            'pesanan' => $pesanan,
+        ]);
+    }
+
+
+    public function getdetail_pesananAdmin($id)
     {
         $pesanan = Pesanan::with(['pelanggan', 'details.produk', 'riwayat_pembayaran'])->findOrFail($id);
 
@@ -336,6 +345,21 @@ class PesananController extends Controller
         $penjualan = $query->orderBy('tgl_pesanan', 'desc')->get();
 
         return Inertia::render('StaffPenjualan/LaporanPenjualan/Index', [
+            'penjualan' => $penjualan,
+        ]);
+    }
+
+    public function getLaporanPenjualanAdmin(Request $request)
+    {
+        $query = Pesanan::with('pelanggan');
+
+        if ($request->start_date && $request->end_date) {
+            $query->whereBetween('tgl_pesanan', [$request->start_date, $request->end_date]);
+        }
+
+        $penjualan = $query->orderBy('tgl_pesanan', 'desc')->get();
+
+        return Inertia::render('Admin/LaporanPenjualan/Index', [
             'penjualan' => $penjualan,
         ]);
     }

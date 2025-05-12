@@ -27,6 +27,8 @@ Route::get('/', function () {
     ]);
 });
 
+
+
 // Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('admin.dashboard');
 // Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
 
@@ -61,11 +63,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/laporanpembelian', [LaporanPembelianController::class, 'store'])->name('admin.laporanpembelian.store');
     Route::get('/admin/laporanpembelian/export', [LaporanPembelianController::class, 'export'])->name('admin.laporanpembelian.export');
 
+    Route::get('/admin/rekap', [RekapController::class, 'getRekapAdmin'])->name('admin.rekap.index');
+
+    Route::get('/admin/laporan-penjualan', [PesananController::class, 'getLaporanPenjualanAdmin'])->name('admin.laporanPenjualan.index');
+    Route::get('/admin/laporan-penjualan/{id}/detail', [PesananController::class, 'getdetail_pesananAdmin'])->name('admin.laporanPenjualan.detail');
+
     Route::get('/admin/stok-log', [StokLogController::class, 'getStokLogAdmin'])->name('admin.stok-log.index');
 });
 
 
-Route::middleware('auth', 'role:staff_gudang')->group(function () {
+Route::middleware(['auth', 'role:staff_gudang'])->group(function () {
 
     Route::get('/staffgudang/laporanpembelian', [LaporanPembelianController::class, 'getLaporanPembelianGudang'])->name('staffgudang.laporanpembelian.index');
     Route::put('/staffgudang/laporan-pembelian/{id}/konfirmasi', [LaporanPembelianController::class, 'konfirmasi'])->name('staffgudang.laporanpembelian.konfirmasi');
@@ -107,6 +114,8 @@ Route::middleware(['auth', 'role:staff_penjualan'])->group(function () {
 
     Route::get('/staffpenjualan/laporan-penjualan', [PesananController::class, 'laporanPenjualan'])->name('staffpenjualan.laporanPenjualan.penjualan');
     Route::get('/staffpenjualan/stok-log', [StokLogController::class, 'getStokLogPenjualan'])->name('staffpenjualan.stok-log.index');
+
+    Route::get('/staffpenjualan/produk', [ProductController::class, 'getProdukPenjualan'])->name('staffpenjualan.produk.index');
 });
 
 

@@ -94,7 +94,7 @@
 
 <hr>
 
-<div class="title">TANDA TERIMA TABUNG KOSONG</div>
+<div class="title">TANDA TERIMA TABUNG </div>
 
 <table class="info">
     <tr>
@@ -117,16 +117,18 @@
 <table class="detail">
     <thead>
         <tr>
-            <th>No</th>
+            <th style="width: 7%;">No</th>
             <th>Nomor Tabung Kosong</th>
             <th></th>
+            <th>Nomor Tabung Isi
             <th></th>
         </tr>
     </thead>
     <tbody>
         @for ($i = 0; $i < 10; $i++)
             <tr>
-                <td>{{ $i + 1 }}</td>
+               <td style="width: 7% ;">{{ $i + 1 }}</td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>

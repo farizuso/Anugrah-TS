@@ -9,7 +9,10 @@ import {
     IconMacbookAirFill,
     IconNotes,
     IconPerson,
+    IconSendFill,
+    IconServer,
     IconSettings,
+    IconStore2Fill,
     IconStoreFill,
     IconToolbox,
 } from "@irsyadadl/paranoid";
@@ -34,17 +37,33 @@ export function Aside() {
                         active={route().current("admin.laporanpembelian.index")}
                         href={route("admin.laporanpembelian.index")}
                     >
-                        <IconBrandProducthunt />
+                        <IconServer />
                         <span>Laporan Pembelian</span>
                     </AsideLink>
 
-                    {/* <AsideLink
-                        active={route().current("admin.laporanpenjualan.index")}
-                        href={route("admin.laporanpenjualan.index")}
+                    <AsideLink
+                        active={route().current("admin.laporanPenjualan.index")}
+                        href={route("admin.laporanPenjualan.index")}
                     >
-                        <IconStoreFill />
+                        <IconMacbookAirFill />
                         <span>Laporan Penjualan</span>
-                    </AsideLink> */}
+                    </AsideLink>
+
+                    <AsideLink
+                        active={route().current("admin.stok-log.index")}
+                        href={route("admin.stok-log.index")}
+                    >
+                        <IconStore2Fill />
+                        <span>Stok Logs</span>
+                    </AsideLink>
+
+                    <AsideLink
+                        active={route().current("admin.rekap.index")}
+                        href={route("admin.rekap.index")}
+                    >
+                        <IconPerson />
+                        <span>Rekap</span>
+                    </AsideLink>
 
                     <AsideLink
                         active={route().current("admin.produk.index")}
@@ -61,19 +80,29 @@ export function Aside() {
                         <IconToolbox />
                         <span>Supplier</span>
                     </AsideLink>
-
-                    <AsideLink
-                        active={route().current("admin.stok-log.index")}
-                        href={route("admin.stok-log.index")}
-                    >
-                        <IconPerson />
-                        <span>Stok Logs</span>
-                    </AsideLink>
                 </>
             )}
 
             {role === "staff_gudang" && (
                 <>
+                    <AsideLink
+                        active={route().current(
+                            "staffgudang.laporanpembelian.index"
+                        )}
+                        href={route("staffgudang.laporanpembelian.index")}
+                    >
+                        <IconServer />
+                        <span>Laporan Pembelian</span>
+                    </AsideLink>
+
+                    <AsideLink
+                        active={route().current("staffgudang.stok-log.index")}
+                        href={route("staffgudang.stok-log.index")}
+                    >
+                        <IconStore2Fill />
+                        <span>Stok Logs</span>
+                    </AsideLink>
+
                     <AsideLink
                         active={route().current("staffgudang.rekap.index")}
                         href={route("staffgudang.rekap.index")}
@@ -82,23 +111,6 @@ export function Aside() {
                         <span>Rekap</span>
                     </AsideLink>
 
-                    <AsideLink
-                        active={route().current("staffgudang.stok-log.index")}
-                        href={route("staffgudang.stok-log.index")}
-                    >
-                        <IconPerson />
-                        <span>Stok Logs</span>
-                    </AsideLink>
-
-                    <AsideLink
-                        active={route().current(
-                            "staffgudang.laporanpembelian.index"
-                        )}
-                        href={route("staffgudang.laporanpembelian.index")}
-                    >
-                        <IconBrandProducthunt />
-                        <span>Laporan Pembelian</span>
-                    </AsideLink>
                     <AsideLink
                         active={route().current("staffgudang.produk.index")}
                         href={route("staffgudang.produk.index")}
@@ -111,6 +123,18 @@ export function Aside() {
 
             {role === "staff_penjualan" && (
                 <>
+                    <AsideLink
+                        active={route().current(
+                            "staffpenjualan.laporanPenjualan.penjualan"
+                        )}
+                        href={route(
+                            "staffpenjualan.laporanPenjualan.penjualan"
+                        )}
+                    >
+                        <IconMacbookAirFill />
+                        <span>Laporan Penjualan</span>
+                    </AsideLink>
+
                     <AsideLink
                         active={route().current(
                             "staffpenjualan.pelanggan.index"
@@ -131,24 +155,20 @@ export function Aside() {
 
                     <AsideLink
                         active={route().current(
-                            "staffpenjualan.laporanPenjualan.penjualan"
-                        )}
-                        href={route(
-                            "staffpenjualan.laporanPenjualan.penjualan"
-                        )}
-                    >
-                        <IconMacbookAirFill />
-                        <span>Laporan Penjualan</span>
-                    </AsideLink>
-
-                    <AsideLink
-                        active={route().current(
                             "staffpenjualan.stok-log.index"
                         )}
                         href={route("staffpenjualan.stok-log.index")}
                     >
-                        <IconPerson />
+                        <IconStore2Fill />
                         <span>Stok Logs</span>
+                    </AsideLink>
+
+                    <AsideLink
+                        active={route().current("staffpenjualan.produk.index")}
+                        href={route("staffpenjualan.produk.index")}
+                    >
+                        <IconBrandProducthunt />
+                        <span>Produk</span>
                     </AsideLink>
                 </>
             )}

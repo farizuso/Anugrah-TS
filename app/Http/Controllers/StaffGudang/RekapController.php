@@ -34,6 +34,23 @@ class RekapController extends Controller
         ]);
     }
 
+    public function getRekapAdmin()
+    {
+        $rekaps = Rekap::with(['pesanan', 'pesanan.pelanggan', 'pesanan.details.produk'])->get();
+
+        // Ambil hanya pesanan yang belum direkap
+        $pesanans = Pesanan::with(['pelanggan', 'details.produk'])
+            ->whereNotIn('id', function ($query) {
+                $query->select('pesanan_id')->from('rekaps');
+            })
+            ->get();
+
+        return Inertia::render('Admin/Rekap/Index', [
+            'rekaps' => $rekaps,
+            'pesanans' => $pesanans,
+        ]);
+    }
+
 
 
 

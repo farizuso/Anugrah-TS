@@ -53,6 +53,16 @@ class ProductController extends Controller
         ]);
     }
 
+    public function getProdukPenjualan()
+    {
+        // Ambil semua data produk beserta relasi stok jika ada
+        $posts = Produk::with('stok')->get();
+
+        return Inertia::render('StaffPenjualan/Produk/Index', [
+            'posts' => $posts,
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
