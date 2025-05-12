@@ -158,7 +158,7 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
                     {/* <Detail pesanandetail={pesanan} /> */}
                     <Link
                         href={route(
-                            "staffpenjualan.pesanan.detail",
+                            "admin.laporanPenjualan.detail",
                             pesanan.id
                         )}
                     >
