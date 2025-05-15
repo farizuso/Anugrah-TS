@@ -43,16 +43,6 @@ const Index = ({ posts }: SupplierProps) => {
 
     console.log(data);
 
-    const { produks = [] } = usePage<PageProps>().props;
-
-    // State to store produk options
-    const [produkOptions, setProdukOptions] = React.useState(
-        produks?.map((produk) => ({
-            value: String(produk.id),
-            label: produk.nama_produk,
-        })) || []
-    );
-
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route("admin.supplier.store"), {
@@ -60,22 +50,9 @@ const Index = ({ posts }: SupplierProps) => {
         });
     };
 
-    const handleDateSelect = (field: any, date: any) => {
-        if (date) {
-            const adjustedDate = new Date(date);
-            adjustedDate.setHours(12, 0, 0, 0);
-            setData({
-                ...data,
-                [field]: adjustedDate.toISOString().split("T")[0],
-            });
-        } else {
-            setData({ ...data, [field]: "" });
-        }
-    };
-
     return (
         <AdminLayout>
-            <Tabs defaultValue="account" className="w-full">
+            <Tabs defaultValue="password" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="account">Data Table</TabsTrigger>
                     <TabsTrigger value="password">

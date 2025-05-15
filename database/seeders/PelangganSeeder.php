@@ -16,19 +16,19 @@ class PelangganSeeder extends Seeder
         $pelanggans = [
             [
                 'id' => 1,
-                'nama_pelanggan' => "undertaker",
+                'nama_pelanggan' => "UD. Kembang Api",
                 'alamat' => "malang",
                 'no_hp' => "08123456789",
             ],
             [
                 'id' => 2,
-                'nama_pelanggan' => "rey misterio",
+                'nama_pelanggan' => "Agus Bengkel",
                 'alamat' => "surabaya",
                 'no_hp' => "08123456789",
             ]
-            ];
-            foreach ($pelanggans as $pelanggan){
-                \App\Models\Pelanggan::create($pelanggan);
-            }
+        ];
+        foreach ($pelanggans as $pelanggan) {
+            \App\Models\Pelanggan::create($pelanggan);
+        }
     }
 }

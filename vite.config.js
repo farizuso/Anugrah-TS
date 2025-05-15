@@ -1,13 +1,25 @@
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
-import react from '@vitejs/plugin-react';
+// vite.config.ts
+import { defineConfig } from "vite";
+import laravel from "laravel-vite-plugin";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: 'resources/js/app.tsx',
+            input: "resources/js/app.tsx",
             refresh: true,
         }),
         react(),
     ],
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "resources/js"),
+        },
+    },
+    test: {
+        // globals: true,
+        // environment: "jsdom",
+        // setupFiles: "./setup.ts", // opsional jika kamu butuh mocking global, dsb.
+    },
 });

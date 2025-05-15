@@ -1,14 +1,14 @@
 import { FormEventHandler } from "react";
-import Checkbox from "@/Components/Checkbox";
 import GuestLayout from "@/Layouts/GuestLayout";
-import UserLayout from "@/Layouts/UserLayout";
-import { Head, useForm, Link } from "@inertiajs/react";
+import { useForm, Link } from "@inertiajs/react";
 import { Label } from "@/Components/ui/label";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import InputError from "@/Components/InputError";
 import useLocalStorage from "use-local-storage";
 import logo from "../../../assets/img/logo.png";
+import Checkbox from "@/Components/Checkbox";
+
 // import {Link} from "react-router-dom";
 
 export default function Login() {

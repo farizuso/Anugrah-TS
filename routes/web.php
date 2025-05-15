@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\TodoController;
 use App\Http\Controllers\Admin\ProductController;
@@ -29,10 +30,6 @@ Route::get('/', function () {
 
 
 
-// Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('admin.dashboard');
-// Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
-
-
 Route::middleware('auth',)->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -40,10 +37,6 @@ Route::middleware('auth',)->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('/todos', TodoController::class)->names('admin.todo');
     Route::resource('/admin/dashboard', DashboardController::class)->names('admin.dashboard');
-
-
-    // Route::resource('/admin/produk', ProductController::class)->names('admin.produk');
-
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

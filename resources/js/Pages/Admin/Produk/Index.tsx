@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 
 interface ProdukProps {
     posts: Produk[];
+    defaultTab?: string;
 }
 
 const TabsDemo = ({ posts }: ProdukProps) => {
@@ -70,7 +71,8 @@ const TabsDemo = ({ posts }: ProdukProps) => {
 
     return (
         <AdminLayout>
-            <Tabs defaultValue="account" className="w-full">
+            {/* ubah kembali deafultvalue ke account */}
+            <Tabs defaultValue="password" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="account">Data Table</TabsTrigger>
                     <TabsTrigger value="password">Tambah Data</TabsTrigger>

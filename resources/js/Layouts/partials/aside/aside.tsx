@@ -92,7 +92,7 @@ export function Aside() {
                         href={route("staffgudang.laporanpembelian.index")}
                     >
                         <IconServer />
-                        <span>Laporan Pembelian</span>
+                        <span>Penambahan Stok</span>
                     </AsideLink>
 
                     <AsideLink

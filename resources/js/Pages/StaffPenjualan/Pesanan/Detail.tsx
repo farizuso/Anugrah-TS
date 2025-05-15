@@ -223,11 +223,10 @@ const Detail = ({ pesanan }: DetailProps) => {
                             )
                         }
                     >
-                        Cetak Tanda Terima
+                        Cetak Invoice
                     </Button>
 
                     <Button
-                        variant="outline"
                         onClick={() =>
                             window.open(
                                 route(
@@ -238,7 +237,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                             )
                         }
                     >
-                        Cetak Botol Kosong
+                        Cetak Tanda Terima Tabung
                     </Button>
 
                     {pesanan.status === "Dikirim" && (

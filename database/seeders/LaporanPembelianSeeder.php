@@ -24,12 +24,12 @@ class LaporanPembelianSeeder extends Seeder
 
         // Daftar harga tetap berdasarkan nama_produk dari ProdukSeeder
         $hargaTetap = [
-            'oxygen' => 100000,
-            'karbon dioksida' => 200000,
-            'asitilen' => 500000,
-            'argon' => 350000,
-            'nitrogen' => 170000,
-            'LPG' => 850000,
+            'oxygen' => 35000,
+            'karbon dioksida' => 150000,
+            'asitilen' => 390000,
+            'argon' => 220000,
+            'nitrogen' => 95000,
+            'LPG' => 500000,
             'regulator' => 150000,
             'non-breathing mask' => 25000,
         ];

@@ -72,9 +72,7 @@ class PesananSeeder extends Seeder
                 'total' => $total,
                 'jumlah_terbayar' => $dibayar,
                 'is_lunas' => $dibayar >= $total,
-                'keterangan' => $dibayar >= $total
-                    ? 'Lunas'
-                    : ($dibayar > 0 ? 'Cicilan' : 'Belum Lunas'),
+                'keterangan' => $dibayar >= $total ? 'Lunas' : 'Belum Lunas',
             ]);
         }
     }

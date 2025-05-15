@@ -160,7 +160,7 @@ const AdminLayout = ({
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
-                                    <Link href="/siswa/profile">
+                                    <Link href="/profile">
                                         <DropdownMenuItem className="cursor-pointer">
                                             <User className="mr-2 h-4 w-4" />
                                             <span>Profile</span>

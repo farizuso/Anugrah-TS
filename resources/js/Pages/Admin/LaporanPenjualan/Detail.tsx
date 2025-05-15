@@ -1,27 +1,10 @@
 import React, { useState } from "react";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/Components/ui/dialog";
-import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-} from "@/Components/ui/select";
-import { Button } from "@/Components/ui/button";
-import { FaEye } from "react-icons/fa";
+
 import { Pembayaran, Pesanan, Produk } from "@/types";
-import ConfirmPembayaran from "@/Components/ConfirmPembayaran";
+
 import { format } from "date-fns";
-import { Label } from "@/Components/ui/label";
-import { router, useForm, usePage } from "@inertiajs/react";
+
 import AdminLayout from "@/Layouts/AdminLayout";
-import { Input } from "@/Components/ui/input";
 
 interface DetailProps {
     pesanan: Pesanan;
@@ -34,20 +17,6 @@ const Detail = ({ pesanan }: DetailProps) => {
 
     const formatRupiah = (angka: number) =>
         `Rp ${angka.toLocaleString("id-ID")}`;
-
-    const handleUpdatePembayaran = (metode: string) => {
-        if (pesanan.metode_pembayaran) return;
-        router.post(
-            route("staffpenjualan.pesanan.update_pembayaran", pesanan.id),
-            { metode_pembayaran: metode },
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    console.log("Metode pembayaran diperbarui");
-                },
-            }
-        );
-    };
 
     return (
         <AdminLayout>
@@ -193,98 +162,6 @@ const Detail = ({ pesanan }: DetailProps) => {
                         </tbody>
                     </table>
                 </div>
-
-                <div>
-                    <Label className="mb-1 block">
-                        Pilih Metode Pembayaran
-                    </Label>
-                    <Select
-                        defaultValue={pesanan.metode_pembayaran || ""}
-                        onValueChange={handleUpdatePembayaran}
-                        disabled={!!pesanan.metode_pembayaran}
-                    >
-                        <SelectTrigger className="w-[200px]">
-                            <SelectValue placeholder="Pilih metode" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="tunai">Tunai</SelectItem>
-                            <SelectItem value="transfer">Transfer</SelectItem>
-                            <SelectItem value="cicilan">Cicilan</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="flex gap-3 flex-row mt-4">
-                    <Button
-                        onClick={() =>
-                            window.open(
-                                route("staffpenjualan.invoice.pdf", pesanan.id),
-                                "_blank"
-                            )
-                        }
-                    >
-                        Cetak Tanda Terima
-                    </Button>
-
-                    <Button
-                        variant="outline"
-                        onClick={() =>
-                            window.open(
-                                route(
-                                    "staffpenjualan.tandaTerima.kosong",
-                                    pesanan.id
-                                ),
-                                "_blank"
-                            )
-                        }
-                    >
-                        Cetak Botol Kosong
-                    </Button>
-
-                    {pesanan.status === "Dikirim" && (
-                        <Button
-                            variant="success"
-                            onClick={() =>
-                                router.post(
-                                    route(
-                                        "staffpenjualan.pesanan.selesai",
-                                        pesanan.id
-                                    )
-                                )
-                            }
-                        >
-                            Tandai Selesai
-                        </Button>
-                    )}
-
-                    {pesanan.status === "Pending" && (
-                        <Button
-                            variant="default"
-                            onClick={() =>
-                                router.post(
-                                    route(
-                                        "staffpenjualan.pesanan.kirim",
-                                        pesanan.id
-                                    )
-                                )
-                            }
-                        >
-                            Konfirmasi Pengiriman
-                        </Button>
-                    )}
-                </div>
-
-                {pesanan.keterangan !== "Lunas" && (
-                    <div className="pt-4 border-t">
-                        <p className="text-red-600 mb-2">Status: Belum Lunas</p>
-                        <ConfirmPembayaran
-                            pesananId={pesanan.id}
-                            sisaTagihan={
-                                pesanan.total - pesanan.jumlah_terbayar
-                            }
-                        />
-                    </div>
-                )}
 
                 {pesanan.riwayat_pembayaran?.length > 0 && (
                     <div className="mt-6 pt-4 border-t">

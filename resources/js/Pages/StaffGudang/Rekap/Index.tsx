@@ -85,7 +85,8 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
 
     return (
         <AdminLayout>
-            <Tabs defaultValue="account" className="w-full">
+            {/* ubah defultValue menjadi account */}
+            <Tabs defaultValue="form" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="account">Data Table</TabsTrigger>
                     <TabsTrigger value="form">Tambah Data</TabsTrigger>

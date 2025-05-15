@@ -30,12 +30,13 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
             <div className="flex flex-col gap-2 w-full justify-center items-center px-5 max-w-md">
-            <img className="w-50" src={logo} />
+                <img className="w-50" src={logo} />
                 <p className="text-xl font-bold">Register</p>
                 <form
+                    role="form"
                     onSubmit={submit}
                     className="flex flex-col gap-1 lg:mt-1 shadow-sm mt-5 p-5
-                bg-white border border-gray-300 rounded-lg w-full"
+                    bg-white border border-gray-300 rounded-lg w-full"
                 >
                     <div>
                         <InputLabel htmlFor="name" value="Name" />
@@ -81,11 +82,16 @@ export default function Register() {
                             value={data.password}
                             className="mt-1 block w-full"
                             autoComplete="new-password"
-                            onChange={(e) => setData("password", e.target.value)}
+                            onChange={(e) =>
+                                setData("password", e.target.value)
+                            }
                             required
                         />
 
-                        <InputError message={errors.password} className="mt-2" />
+                        <InputError
+                            message={errors.password}
+                            className="mt-2"
+                        />
                     </div>
 
                     <div className="mt-4">

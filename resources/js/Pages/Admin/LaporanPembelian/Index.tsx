@@ -119,14 +119,6 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
         setData("produk", newProduk);
     };
 
-    const handleSupplierChange = (option: any) => {
-        setData("supplier_id", option?.value || "");
-    };
-
-    const handleCreate = (inputValue: string) => {
-        alert(`Tambah supplier baru: ${inputValue}`);
-    };
-
     const produkOptions = produks.map((produk) => ({
         value: String(produk.id),
         label: produk.nama_produk,
@@ -174,7 +166,8 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
 
     return (
         <AdminLayout>
-            <Tabs defaultValue="datatable" className="w-full">
+            {/* ubah lagi defaultvalue menjadi datatable */}
+            <Tabs defaultValue="form" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="datatable">Data Table</TabsTrigger>
                     <TabsTrigger value="form">Tambah Data</TabsTrigger>

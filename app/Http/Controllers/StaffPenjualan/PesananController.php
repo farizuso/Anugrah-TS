@@ -174,7 +174,7 @@ class PesananController extends Controller
             Log::info("Produk: {$detail->produk->nama_produk}, Jenis: {$detail->produk->jenis}");
         }
 
-        return Inertia::render('StaffPenjualan/Pesanan/Detail', [
+        return Inertia::render('Admin/LaporanPenjualan/Detail', [
             'pesanan' => $pesanan,
         ]);
     }

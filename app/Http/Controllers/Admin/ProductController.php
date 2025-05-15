@@ -43,6 +43,10 @@ class ProductController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menambahkan data: ' . $e->getMessage());
         }
     }
+
+
+
+
     public function getProdukGudang()
     {
         // Ambil semua data produk beserta relasi stok jika ada

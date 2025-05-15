@@ -54,10 +54,9 @@ const Edit = ({ pelangganedit }: EditPelanggan) => {
             <DialogContent className="sm:max-w-[425px]">
                 <form onSubmit={submit}>
                     <DialogHeader>
-                        <DialogTitle>Edit profile</DialogTitle>
+                        <DialogTitle>Edit Data Pelanggan</DialogTitle>
                         <DialogDescription>
-                            Make changes to your profile here. Click save when
-                            you're done.
+                            Perbarui informasi data pelanggan dibawah ini.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -126,7 +125,7 @@ const Edit = ({ pelangganedit }: EditPelanggan) => {
 
                     <DialogFooter>
                         <Button type="submit" disabled={processing}>
-                            Save changes
+                            Simpan Perubahan
                         </Button>
                     </DialogFooter>
                 </form>
