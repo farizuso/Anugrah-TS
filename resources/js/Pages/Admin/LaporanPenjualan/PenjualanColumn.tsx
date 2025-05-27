@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { router } from "@inertiajs/react";
 import { Link } from "@inertiajs/react";
+import { formatTanggalIndonesia } from "@/lib/utils";
 
 // Gunakan parameter opsional + default fallback
 export const PenjualanColumns: ColumnDef<Pesanan>[] = [
@@ -35,7 +36,8 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "tgl_pesanan",
+        id: "tgl_pesanan",
+        accessorFn: (row) => formatTanggalIndonesia(row.tgl_pesanan.toString()), // hasil string misalnya "18 Mei 2025"
         header: ({ column }) => (
             <Button
                 variant="default"
@@ -43,20 +45,17 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
                     column.toggleSorting(column.getIsSorted() === "asc")
                 }
             >
-                Tgl.Pesanan
+                Tgl. Pesanan
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => {
-            const tanggal = row.getValue("tgl_pesanan");
-            const formattedDate =
-                tanggal && typeof tanggal === "string"
-                    ? format(new Date(tanggal), "dd MMMM yyyy", {
-                          locale: id,
-                      })
-                    : "-";
-            return <div>{formattedDate}</div>;
-        },
+        cell: ({ row }) => (
+            <div className="capitalize">
+                {row.getValue("tgl_pesanan")}
+            </div>
+        ),
+        enableGlobalFilter: true,
+        filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching
     },
     {
         id: "nomor_invoice",
@@ -104,7 +103,7 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
                     return (
                         sum +
                         (keterangan === "cicilan" ||
-                        keterangan === "belum lunas"
+                            keterangan === "belum lunas"
                             ? sisaTagihan
                             : total)
                     );
@@ -165,8 +164,8 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
                 status === "lunas"
                     ? "text-green-600 font-semibold"
                     : status === "belum lunas"
-                    ? "text-red-600 font-semibold"
-                    : "text-gray-700";
+                        ? "text-red-600 font-semibold"
+                        : "text-gray-700";
             return (
                 <div className={`capitalize ${className}`}>
                     {row.original.keterangan}
