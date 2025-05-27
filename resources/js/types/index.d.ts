@@ -75,6 +75,9 @@ export interface Pesanan {
         id: number;
         harga: number;
         quantity: number;
+        tipe_item: string;
+        durasi: number;
+        nomor_invoice: string;
         produk: {
             id: number;
             nama_produk: string;
@@ -136,6 +139,13 @@ export interface MonthlySales {
 export interface LowStock {
     nama: string;
     stok: number;
+}
+
+interface MonthlyFinanceItem {
+    bulan: string;
+    pendapatan: number;
+    pengeluaran: number;
+    laba: number;
 }
 
 export type PageProps<

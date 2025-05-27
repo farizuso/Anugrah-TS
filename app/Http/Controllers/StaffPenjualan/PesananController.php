@@ -44,11 +44,12 @@ class PesananController extends Controller
         $validator = Validator::make($request->all(), [
             'tgl_pesanan' => 'required|date',
             'pelanggan_id' => 'required|exists:pelanggans,id',
-            'jenis_pesanan' => 'required|in:jual,sewa',
             'produk' => 'required|array|min:1',
             'produk.*.produk_id' => 'required|exists:produks,id',
             'produk.*.harga' => 'required|numeric|min:0',
             'produk.*.quantity' => 'required|integer|min:1',
+            'produk.*.tipe_item' => 'required|in:jual,sewa',
+            'produk.*.durasi' => 'nullable|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -59,30 +60,34 @@ class PesananController extends Controller
         }
 
         $produkList = $request->produk;
-        $jenisPesanan = $request->jenis_pesanan;
-        $jaminanSewa = 1200000;
 
-        // Validasi stok hanya untuk "jual" dan "sewa" (agar tidak minus)
         foreach ($produkList as $item) {
             $stok = Stok::where('produk_id', $item['produk_id'])->first();
-            if ($stok && $stok->jumlah_stok < $item['quantity']) {
+
+            // Tambahan validasi jika stok tidak ada
+            if (!$stok) {
+                return redirect()->back()
+                    ->with('error', "Stok untuk produk ID {$item['produk_id']} belum tersedia.")
+                    ->withInput();
+            }
+
+            if ($stok->jumlah_stok < $item['quantity']) {
                 return redirect()->back()
                     ->with('error', "Stok untuk produk ID {$item['produk_id']} tidak mencukupi.")
                     ->withInput();
             }
         }
 
+
         DB::beginTransaction();
 
         try {
             $total = 0;
+
             foreach ($produkList as $item) {
                 $jumlah = (int) $item['quantity'];
-
-                $subtotal = $jenisPesanan === 'sewa'
-                    ? $jumlah * $jaminanSewa
-                    : $jumlah * (int)$item['harga'];
-
+                $harga = (int) $item['harga'];
+                $subtotal = $jumlah * $harga;
                 $total += $subtotal;
             }
 
@@ -90,7 +95,7 @@ class PesananController extends Controller
                 'tgl_pesanan' => $request->tgl_pesanan,
                 'pelanggan_id' => $request->pelanggan_id,
                 'total' => $total,
-                'jenis_pesanan' => $jenisPesanan,
+                'jenis_pesanan' => 'campuran',
                 'status' => 'Pending',
                 'jumlah_terbayar' => 0,
                 'is_lunas' => false,
@@ -98,15 +103,18 @@ class PesananController extends Controller
             ]);
 
             $pelanggan = Pelanggan::find($request->pelanggan_id);
+            $lastId = \App\Models\PesananDetail::max('id') + 1;
+            $nomorInvoice = 'INV-' . now()->format('Ymd') . '-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
 
             foreach ($produkList as $item) {
-                $harga = $jenisPesanan === 'sewa' ? $jaminanSewa : $item['harga'];
-
                 PesananDetail::create([
                     'pesanan_id' => $pesanan->id,
+                    'nomor_invoice' => $nomorInvoice,
                     'produk_id' => $item['produk_id'],
-                    'harga' => $harga,
+                    'harga' => $item['harga'],
                     'quantity' => $item['quantity'],
+                    'tipe_item' => $item['tipe_item'],
+                    'durasi' => $item['tipe_item'] === 'sewa' ? $item['durasi'] : 0,
                 ]);
 
                 $stok = Stok::where('produk_id', $item['produk_id'])->first();
@@ -120,7 +128,7 @@ class PesananController extends Controller
                             'tipe' => 'keluar',
                             'jumlah' => $item['quantity'],
                             'sisa_stok' => $stok->jumlah_stok,
-                            'keterangan' => 'Stok keluar karena pesanan ' . $jenisPesanan . ' dari ' . $pelanggan->nama_pelanggan,
+                            'keterangan' => 'Stok keluar  pesanan ' . $item['tipe_item'] . ' dari ' . $pelanggan->nama_pelanggan,
                             'tanggal' => now(),
                         ]);
                     } catch (\Exception $e) {
@@ -141,11 +149,6 @@ class PesananController extends Controller
                 ->withInput();
         }
     }
-
-
-
-
-
 
 
 
@@ -189,6 +192,8 @@ class PesananController extends Controller
             'produk.*.produk_id' => 'required|exists:produks,id',
             'produk.*.quantity' => 'required|numeric|min:1',
             'produk.*.harga' => 'required|numeric|min:0',
+            'produk.*.tipe_item' => 'required|in:jual,sewa',
+            'produk.*.durasi' => 'nullable|numeric|min:0',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -202,12 +207,17 @@ class PesananController extends Controller
             // Temukan pesanan
             $pesanan = Pesanan::findOrFail($id);
 
+            // Hitung total dari semua item
+            $total = collect($validated['produk'])->sum(function ($item) {
+                return $item['harga'] * $item['quantity'];
+            });
+
             // Update data utama pesanan
             $pesanan->update([
                 'tgl_pesanan' => $tglFix,
                 'pelanggan_id' => $validated['pelanggan_id'],
                 'keterangan' => $validated['keterangan'] ?? null,
-                'total' => collect($validated['produk'])->sum(fn($item) => $item['harga'] * $item['quantity']),
+                'total' => $total,
             ]);
 
             // Hapus semua detail sebelumnya
@@ -220,6 +230,8 @@ class PesananController extends Controller
                     'produk_id' => $item['produk_id'],
                     'harga' => $item['harga'],
                     'quantity' => $item['quantity'],
+                    'tipe_item' => $item['tipe_item'],
+                    'durasi' => $item['tipe_item'] === 'sewa' ? $item['durasi'] : 0,
                 ]);
             }
         });
@@ -227,6 +239,7 @@ class PesananController extends Controller
         return redirect()->route('staffpenjualan.pesanan.index')
             ->with('success', 'Data Pesanan berhasil diperbarui');
     }
+
 
     public function invoice($id)
     {
@@ -317,26 +330,18 @@ class PesananController extends Controller
     public function tandaiSelesai($id)
     {
         $pesanan = Pesanan::findOrFail($id);
-        $pesanan->status = 'dikirim';
-        $pesanan->save();
 
-        foreach ($pesanan->detailPesanan as $detail) {
-            Rekap::create([
-                'pesanan_id' => $pesanan->id,
-                'tabung_id' => $detail->tabung_id,
-                'tanggal_keluar' => now(),
-                'kembali' => 'belum',
-            ]);
-        }
-
+        // Ubah status saja
         $pesanan->update(['status' => 'Selesai']);
+
         return back()->with('success', 'Pesanan telah ditandai sebagai Selesai.');
     }
 
 
+
     public function LaporanPenjualan(Request $request)
     {
-        $query = Pesanan::with('pelanggan');
+        $query = Pesanan::with(['pelanggan', 'details']);
 
         if ($request->start_date && $request->end_date) {
             $query->whereBetween('tgl_pesanan', [$request->start_date, $request->end_date]);
@@ -351,7 +356,7 @@ class PesananController extends Controller
 
     public function getLaporanPenjualanAdmin(Request $request)
     {
-        $query = Pesanan::with('pelanggan');
+        $query = Pesanan::with(['pelanggan', 'details']);
 
         if ($request->start_date && $request->end_date) {
             $query->whereBetween('tgl_pesanan', [$request->start_date, $request->end_date]);

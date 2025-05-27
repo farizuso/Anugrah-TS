@@ -79,7 +79,7 @@ const Edit = ({ produkedit }: EditProduk) => {
                 <DialogHeader>
                     <DialogTitle>Edit Produk</DialogTitle>
                     <DialogDescription>
-                        Perbarui informasi produk di bawah ini.
+                        Ubah data produk di bawah ini.
                     </DialogDescription>
                 </DialogHeader>
 

@@ -183,9 +183,17 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
             const pesanan = row.original;
             return (
                 <div className="justify-center flex items-center gap-2">
-                    <Delete pesanandelete={pesanan} />
-                    <Edit pesananedit={pesanan} />
-                    {/* <Detail pesanandetail={pesanan} /> */}
+                    {/* Delete hanya tampil jika status bukan Dikirim atau Selesai */}
+                    {pesanan.status !== "Dikirim" &&
+                        pesanan.status !== "Selesai" && (
+                            <Delete pesanandelete={pesanan} />
+                        )}
+
+                    {/* Edit hanya tampil jika status bukan Selesai */}
+                    {pesanan.status !== "Selesai" && (
+                        <Edit pesananedit={pesanan} />
+                    )}
+
                     <Link
                         href={route(
                             "staffpenjualan.pesanan.detail",

@@ -13,17 +13,12 @@ class PesananSeeder extends Seeder
 {
     public function run(): void
     {
-        // Pastikan ada produk dan pelanggan
+        // Pastikan produk tersedia
         if (Produk::count() === 0) {
-            Produk::insert([
-                ['nama_produk' => 'Oksigen'],
-                ['nama_produk' => 'Nitrogen'],
-                ['nama_produk' => 'Argon'],
-                ['nama_produk' => 'Asetilena'],
-                ['nama_produk' => 'Karbon Dioksida'],
-            ]);
+            $this->call(ProdukSeeder::class);
         }
 
+        // Pastikan pelanggan tersedia
         if (Pelanggan::count() === 0) {
             $this->call(PelangganSeeder::class);
         }
@@ -33,11 +28,8 @@ class PesananSeeder extends Seeder
 
         foreach (range(1, 5) as $i) {
             $tgl = Carbon::now()->subMonths(rand(0, 5))->subDays(rand(0, 28));
-
-
             $pelanggan = $pelanggans->random();
 
-            // Buat pesanan tanpa metode pembayaran
             $pesanan = Pesanan::create([
                 'tgl_pesanan' => $tgl,
                 'pelanggan_id' => $pelanggan->id,
@@ -46,27 +38,48 @@ class PesananSeeder extends Seeder
                 'jumlah_terbayar' => 0,
                 'keterangan' => 'Belum Lunas',
                 'total' => 0,
+                'jenis_pesanan' => 'campuran',
             ]);
 
             $total = 0;
 
-            // Tambahkan detail produk
             foreach ($produks->random(rand(2, 4)) as $produk) {
-                $harga = rand(10000, 50000);
                 $qty = rand(1, 5);
+                $tipe = rand(0, 1) ? 'sewa' : 'jual';
 
-                PesananDetail::create([
+                $durasi = 0;
+                $hargaJual = $produk->harga_jual ?? 0;
+
+                if ($tipe === 'sewa' && $produk->kategori === 'gas') {
+                    $durasi = rand(1, 6);
+                    $harga = $hargaJual + (100000 * $durasi);
+                } else {
+                    $tipe = 'jual';
+                    $harga = $hargaJual;
+                }
+
+                // Simpan detail terlebih dahulu
+                $detail = PesananDetail::create([
                     'pesanan_id' => $pesanan->id,
                     'produk_id' => $produk->id,
                     'harga' => $harga,
                     'quantity' => $qty,
+                    'tipe_item' => $tipe,
+                    'durasi' => $tipe === 'sewa' ? $durasi : 0,
+                    'nomor_invoice' => 'INV-' . strtoupper(uniqid()), // contoh format invoice
+                ]);
+
+                // Generate dan update nomor_invoice
+                $nomorInvoice = 'INV-' . $tgl->format('Ymd') . '-' . str_pad($detail->id, 5, '0', STR_PAD_LEFT);
+                $detail->update([
+                    'nomor_invoice' => $nomorInvoice,
                 ]);
 
                 $total += $harga * $qty;
             }
 
-            // Simulasikan sebagian ada yang sudah dibayar
-            $dibayar = rand(0, $total); // bisa 0, cicilan, atau full
+            // Pembayaran simulasi
+            $dibayar = rand(0, $total);
 
             $pesanan->update([
                 'total' => $total,

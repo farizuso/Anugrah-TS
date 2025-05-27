@@ -59,9 +59,15 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
         },
     },
     {
-        accessorKey: "id",
-        header: "No Pesanan",
-        cell: ({ row }) => `#${row.original.id}`,
+        id: "nomor_invoice",
+        header: "Nomor Invoice",
+        accessorFn: (row) =>
+            row.details && row.details.length > 0
+                ? row.details[0].nomor_invoice
+                : `#${row.id}`,
+        enableGlobalFilter: true,
+        filterFn: "fuzzy",
+        cell: ({ row }) => row.getValue("nomor_invoice"),
     },
     {
         accessorKey: "pelanggan.nama_pelanggan",
@@ -72,16 +78,37 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
         header: "Total Tagihan",
         cell: ({ row }) => {
             const total = row.original.total;
+            const dibayar = row.original.jumlah_terbayar || 0;
+            const keterangan = row.original.keterangan?.toLowerCase();
+            const sisaTagihan = total - dibayar;
+
             const formatted = new Intl.NumberFormat("id-ID", {
                 style: "currency",
                 currency: "IDR",
-            }).format(total);
+            }).format(
+                keterangan === "cicilan" || keterangan === "belum lunas"
+                    ? sisaTagihan
+                    : total
+            );
+
             return <div className="font-bold text-red-600">{formatted}</div>;
         },
         footer: ({ table }) => {
             const totalSeluruh = table
                 .getFilteredRowModel()
-                .rows.reduce((sum, row) => sum + row.original.total, 0);
+                .rows.reduce((sum, row) => {
+                    const total = row.original.total;
+                    const dibayar = row.original.jumlah_terbayar || 0;
+                    const keterangan = row.original.keterangan?.toLowerCase();
+                    const sisaTagihan = total - dibayar;
+                    return (
+                        sum +
+                        (keterangan === "cicilan" ||
+                        keterangan === "belum lunas"
+                            ? sisaTagihan
+                            : total)
+                    );
+                }, 0);
             const formatted = new Intl.NumberFormat("id-ID", {
                 style: "currency",
                 currency: "IDR",

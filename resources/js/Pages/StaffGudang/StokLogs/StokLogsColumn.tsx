@@ -22,7 +22,7 @@ export const StokLogsColumns: ColumnDef<StokLog>[] = [
         cell: ({ row }) => {
             const tanggal = row.original.tanggal;
             const formattedDate = tanggal
-                ? format(new Date(tanggal), "dd MMMM yyyy HH:mm", {
+                ? format(new Date(tanggal), "dd MMMM yyyy", {
                       locale: id,
                   })
                 : "-";

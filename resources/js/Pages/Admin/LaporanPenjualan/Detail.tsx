@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { Pembayaran, Pesanan, Produk } from "@/types";
 
-import { format } from "date-fns";
+import { addMonths, format } from "date-fns";
 
 import AdminLayout from "@/Layouts/AdminLayout";
 
@@ -18,11 +18,40 @@ const Detail = ({ pesanan }: DetailProps) => {
     const formatRupiah = (angka: number) =>
         `Rp ${angka.toLocaleString("id-ID")}`;
 
+    const getHargaRinci = (item: any) => {
+        const hargaSewa = item.tipe_item === "sewa" ? 100000 * item.durasi : 0;
+        const hargaGas = item.harga - hargaSewa;
+        return { hargaGas, hargaSewa };
+    };
+
+    const hasSewa = (pesanan: Pesanan) => {
+        return pesanan.details.some((item) => item.tipe_item === "sewa");
+    };
+
+    const getDurasiSewa = (pesanan: Pesanan) => {
+        const durasi = pesanan.details
+            .filter((item) => item.tipe_item === "sewa")
+            .reduce((acc, item) => acc + item.durasi, 0);
+
+        const startDate = new Date(pesanan.tgl_pesanan);
+        const endDate = addMonths(startDate, durasi);
+
+        return `${format(startDate, "dd MMM yyyy")} - ${format(
+            endDate,
+            "dd MMM yyyy"
+        )}`;
+    };
+
     return (
         <AdminLayout>
             <div className="bg-blue-700 text-white px-6 py-4 rounded-t-md">
                 <h2 className="text-2xl font-semibold">Detail Transaksi</h2>
-                <p className="text-sm mt-1">Detail transaksi # {pesanan.id}</p>
+                <p className="text-sm mt-1">
+                    Nomor Invoice:{" "}
+                    <strong>
+                        {pesanan.details[0]?.nomor_invoice || `#${pesanan.id}`}
+                    </strong>
+                </p>
             </div>
 
             <div className="p-6 space-y-6">
@@ -31,9 +60,8 @@ const Detail = ({ pesanan }: DetailProps) => {
                         <p className="font-semibold mb-1">
                             Informasi Pemesanan
                         </p>
-
                         <p>
-                            tanggal pesanan:{" "}
+                            Tanggal pesanan:{" "}
                             <strong>
                                 {format(
                                     new Date(pesanan.tgl_pesanan),
@@ -42,36 +70,38 @@ const Detail = ({ pesanan }: DetailProps) => {
                             </strong>
                         </p>
                         <p>
-                            metode pembayaran:{" "}
+                            Metode pembayaran:{" "}
                             <strong>{pesanan.metode_pembayaran || "-"}</strong>
                         </p>
                         <p>
-                            status pembayaran:{" "}
+                            Status pembayaran:{" "}
                             <strong className="capitalize">
                                 {pesanan.keterangan}
                             </strong>
                         </p>
                         <p>
-                            status pengiriman:{" "}
+                            Status pengiriman:{" "}
                             <strong className="capitalize">
                                 {pesanan.status || "-"}
                             </strong>
                         </p>
 
-                        {isSewaTabung && (
+                        {hasSewa(pesanan) && (
                             <div className="mt-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-3 rounded">
                                 <p className="font-semibold">
-                                    🛢️ Pesanan ini adalah{" "}
+                                    🛢️ Pesanan ini mengandung{" "}
                                     <span className="underline">
                                         Sewa Tabung
                                     </span>
                                     .
                                 </p>
                                 <p>
-                                    Masa sewa 6 bulan. Jika tidak dikembalikan,
-                                    jaminan sebesar{" "}
-                                    <strong>Rp1.200.000/tabung</strong> akan
-                                    hangus.
+                                    Masa sewa:{" "}
+                                    <strong>{getDurasiSewa(pesanan)}</strong>
+                                </p>
+                                <p>
+                                    Biaya sewa: <strong>Rp100.000/bulan</strong>{" "}
+                                    (belum termasuk isi gas)
                                 </p>
                             </div>
                         )}
@@ -87,22 +117,23 @@ const Detail = ({ pesanan }: DetailProps) => {
                             </p>
                         )}
                     </div>
+
                     <div>
                         <p className="font-semibold mb-1">
                             Informasi Pengiriman
                         </p>
                         <p>
-                            penerima:{" "}
+                            Penerima:{" "}
                             <strong>
                                 {pesanan.pelanggan?.nama_pelanggan || "-"}
                             </strong>
                         </p>
                         <p>
-                            alamat:{" "}
+                            Alamat:{" "}
                             <strong>{pesanan.pelanggan?.alamat || "-"}</strong>
                         </p>
                         <p>
-                            no. telp:{" "}
+                            No. Telp:{" "}
                             <strong>{pesanan.pelanggan?.no_hp || "-"}</strong>
                         </p>
                     </div>
@@ -113,6 +144,10 @@ const Detail = ({ pesanan }: DetailProps) => {
                         <thead className="bg-gray-200">
                             <tr>
                                 <th className="text-left px-4 py-2">Produk</th>
+                                <th className="text-left px-4 py-2">Tipe</th>
+                                <th className="text-left px-4 py-2">
+                                    Masa Sewa
+                                </th>
                                 <th className="text-left px-4 py-2">Jumlah</th>
                                 <th className="text-left px-4 py-2">
                                     Harga/unit
@@ -123,36 +158,52 @@ const Detail = ({ pesanan }: DetailProps) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {pesanan.details.map((item, idx) => (
-                                <tr key={idx} className="border-t">
-                                    <td className="px-4 py-2">
-                                        {item.produk?.nama_produk}
-                                    </td>
-                                    <td className="px-4 py-2">
-                                        {item.quantity} tabung
-                                    </td>
-                                    <td className="px-4 py-2">
-                                        {formatRupiah(item.harga)}
-                                    </td>
-                                    <td className="px-4 py-2">
-                                        {formatRupiah(
-                                            item.harga * item.quantity
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                            {/* <tr className="border-t">
-                                <td className="px-4 py-2" colSpan={3}>
-                                    Biaya Pengiriman
-                                </td>
-                                <td className="px-4 py-2">
-                                    {formatRupiah(
-                                        pesanan.biaya_pengiriman || 0
-                                    )}
-                                </td>
-                            </tr> */}
+                            {pesanan.details.map((item, idx) => {
+                                const { hargaGas, hargaSewa } =
+                                    getHargaRinci(item);
+                                return (
+                                    <tr key={idx} className="border-t">
+                                        <td className="px-4 py-2">
+                                            {item.produk?.nama_produk}
+                                        </td>
+                                        <td className="px-4 py-2 capitalize">
+                                            {item.tipe_item}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            {item.tipe_item === "sewa"
+                                                ? `${item.durasi} bln`
+                                                : "-"}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            {item.quantity} tabung
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            {item.tipe_item === "sewa" ? (
+                                                <div className="space-y-1">
+                                                    <div>
+                                                        Sewa:{" "}
+                                                        {formatRupiah(100000)} x{" "}
+                                                        {item.durasi}
+                                                    </div>
+                                                    <div>
+                                                        Gas:{" "}
+                                                        {formatRupiah(hargaGas)}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                formatRupiah(item.harga)
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            {formatRupiah(
+                                                item.harga * item.quantity
+                                            )}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                             <tr className="font-bold border-t bg-gray-100">
-                                <td className="px-4 py-2" colSpan={3}>
+                                <td className="px-4 py-2" colSpan={5}>
                                     Total
                                 </td>
                                 <td className="px-4 py-2 text-blue-700">

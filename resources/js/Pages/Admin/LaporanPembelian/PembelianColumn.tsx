@@ -178,8 +178,12 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
             const laporanpembelian = row.original;
             return (
                 <div className="justify-center flex items-center gap-2">
-                    <Delete pembeliandelete={laporanpembelian} />
-                    <Edit pembelianedit={laporanpembelian} />
+                    {laporanpembelian.status !== "Dikonfirmasi" && (
+                        <>
+                            <Delete pembeliandelete={laporanpembelian} />
+                            <Edit pembelianedit={laporanpembelian} />
+                        </>
+                    )}
                 </div>
             );
         },

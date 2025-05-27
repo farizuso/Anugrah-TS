@@ -52,7 +52,7 @@ const Index = ({ posts }: SupplierProps) => {
 
     return (
         <AdminLayout>
-            <Tabs defaultValue="password" className="w-full">
+            <Tabs defaultValue="account" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="account">Data Table</TabsTrigger>
                     <TabsTrigger value="password">

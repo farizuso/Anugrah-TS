@@ -72,7 +72,7 @@ const TabsDemo = ({ posts }: ProdukProps) => {
     return (
         <AdminLayout>
             {/* ubah kembali deafultvalue ke account */}
-            <Tabs defaultValue="password" className="w-full">
+            <Tabs defaultValue="account" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="account">Data Table</TabsTrigger>
                     <TabsTrigger value="password">Tambah Data</TabsTrigger>
@@ -157,7 +157,7 @@ const TabsDemo = ({ posts }: ProdukProps) => {
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button>Save Produk</Button>
+                                <Button>Simpan Data Produk</Button>
                             </CardFooter>
                         </form>
                     </Card>

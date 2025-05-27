@@ -18,6 +18,7 @@ import { FormEventHandler, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { PenjualanColumns } from "./PenjualanColumn";
 import { Pesanan } from "@/types";
+import { PenjualanDataTable } from "@/Components/PenjualanDataTable";
 
 interface PesananProps {
     penjualan: Pesanan[];
@@ -25,7 +26,7 @@ interface PesananProps {
 const TabsDemo = ({ penjualan }: PesananProps) => {
     return (
         <AdminLayout>
-            <DataTable data={penjualan} columns={PenjualanColumns} />
+            <PenjualanDataTable data={penjualan} columns={PenjualanColumns} />
         </AdminLayout>
     );
 };

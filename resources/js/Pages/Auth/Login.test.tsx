@@ -24,7 +24,7 @@ vi.mock("@inertiajs/react", async () => {
 
 vi.mock("use-local-storage", () => {
     return {
-        default: () => ["", vi.fn()], // <== KUNCI DI SINI
+        default: () => ["", vi.fn()],
     };
 });
 
@@ -45,6 +45,6 @@ describe("Login Page", () => {
         const submitButton = getByRole("button", { name: /sign in/i });
         fireEvent.click(submitButton);
 
-        expect(true).toBe(true); // ganti ini jika ingin test interaksi lebih lanjut
+        expect(true).toBe(true);
     });
 });

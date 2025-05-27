@@ -23,7 +23,7 @@ class DashboardController extends Controller
         $totalSales = Pesanan::count();
 
         // Total stok
-        $totalStock = Stok::sum('jumlah_stok'); // Ganti sesuai nama kolom yang benar
+        $totalStock = Stok::sum('jumlah_stok');
 
         // Top 5 pelanggan dengan pembelian terbanyak
         $topCustomers = DB::table('pesanans')
@@ -45,7 +45,7 @@ class DashboardController extends Controller
                 ];
             });
 
-        // Penjualan per bulan untuk grafik
+        // Grafik penjualan bulanan
         $monthlySales = Pesanan::whereNotNull('tgl_pesanan')
             ->selectRaw('MONTH(tgl_pesanan) as month, SUM(total) as total')
             ->groupByRaw('MONTH(tgl_pesanan)')
@@ -58,6 +58,7 @@ class DashboardController extends Controller
                 ];
             });
 
+        // Data stok terendah
         $lowStockProducts = \App\Models\Produk::select('produks.nama_produk', 'stoks.jumlah_stok')
             ->join('stoks', 'produks.id', '=', 'stoks.produk_id')
             ->orderBy('stoks.jumlah_stok', 'asc')
@@ -70,7 +71,42 @@ class DashboardController extends Controller
                 ];
             });
 
+        // 📊 Pendapatan dan Pengeluaran per Bulan untuk Laba Bersih
+        $monthlyRevenue = DB::table('pesanans')
+            ->whereNotNull('tgl_pesanan')
+            ->selectRaw("DATE_FORMAT(tgl_pesanan, '%Y-%m') as bulan, SUM(total) as total_pendapatan")
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get();
 
+        $monthlyPurchases = DB::table('laporan_pembelians')
+            ->whereNotNull('tgl_pembelian')
+            ->selectRaw("DATE_FORMAT(tgl_pembelian, '%Y-%m') as bulan, SUM(total) as total_pengeluaran")
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get();
+
+        $monthlyData = [];
+
+        foreach ($monthlyRevenue as $rev) {
+            $monthlyData[$rev->bulan]['bulan'] = $rev->bulan;
+            $monthlyData[$rev->bulan]['pendapatan'] = $rev->total_pendapatan;
+            $monthlyData[$rev->bulan]['pengeluaran'] = 0;
+        }
+
+        foreach ($monthlyPurchases as $pur) {
+            if (!isset($monthlyData[$pur->bulan])) {
+                $monthlyData[$pur->bulan]['bulan'] = $pur->bulan;
+                $monthlyData[$pur->bulan]['pendapatan'] = 0;
+            }
+            $monthlyData[$pur->bulan]['pengeluaran'] = $pur->total_pengeluaran;
+        }
+
+        foreach ($monthlyData as &$item) {
+            $item['laba'] = $item['pendapatan'] - $item['pengeluaran'];
+        }
+
+        ksort($monthlyData); // urut berdasarkan bulan
 
         return Inertia::render('Admin/Dashboard/Index', [
             'totalRevenue' => $totalRevenue,
@@ -80,6 +116,7 @@ class DashboardController extends Controller
             'recentSales' => $topCustomers,
             'monthlySales' => $monthlySales,
             'lowStockProducts' => $lowStockProducts,
+            'monthlyFinance' => array_values($monthlyData), // <- dikirim ke frontend
         ]);
     }
 }

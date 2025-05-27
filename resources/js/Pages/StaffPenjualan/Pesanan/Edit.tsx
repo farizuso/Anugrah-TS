@@ -23,7 +23,6 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import CreatableSelect from "react-select/creatable";
 import { CommandCombobox } from "@/Components/ui/CommandCombobox";
 
 interface EditPesanan {
@@ -53,6 +52,8 @@ const Edit = ({ pesananedit }: EditPesanan) => {
             produk_id: String(item.produk.id),
             harga: String(item.harga),
             quantity: String(item.quantity),
+            tipe_item: item.tipe_item || "jual",
+            durasi: item.durasi || 0,
         })),
         keterangan: pesananedit.keterangan || "",
         total: pesananedit.total || 0,
@@ -73,10 +74,6 @@ const Edit = ({ pesananedit }: EditPesanan) => {
         setData("total", total);
     }, [data.produk]);
 
-    const handlePelangganChange = (selected: any) => {
-        setData("pelanggan_id", selected ? selected.value : "");
-    };
-
     const handleProdukChange = (index: number, selected: any) => {
         const newProduk = [...data.produk];
         if (selected) {
@@ -85,18 +82,18 @@ const Edit = ({ pesananedit }: EditPesanan) => {
                 (p) => String(p.id) === selected.value
             );
             if (selectedProduk) {
-                newProduk[index].harga = String(selectedProduk.harga_jual); // ambil harga produk baru
+                const hargaGas = selectedProduk.harga_jual || 0;
+                if (newProduk[index].tipe_item === "sewa") {
+                    const durasi = newProduk[index].durasi || 1;
+                    newProduk[index].harga = String(hargaGas + 100000 * durasi);
+                } else {
+                    newProduk[index].harga = String(hargaGas);
+                }
             }
         } else {
             newProduk[index].produk_id = "";
             newProduk[index].harga = "";
         }
-        setData("produk", newProduk);
-    };
-
-    const handleHargaChange = (index: number, value: string) => {
-        const newProduk = [...data.produk];
-        newProduk[index].harga = value;
         setData("produk", newProduk);
     };
 
@@ -106,10 +103,46 @@ const Edit = ({ pesananedit }: EditPesanan) => {
         setData("produk", newProduk);
     };
 
+    const handleTipeChange = (index: number, value: string) => {
+        const newProduk = [...data.produk];
+        newProduk[index].tipe_item = value;
+        const produk = produks.find(
+            (p) => String(p.id) === newProduk[index].produk_id
+        );
+        const hargaGas = produk?.harga_jual || 0;
+        if (value === "sewa") {
+            const durasi = newProduk[index].durasi || 1;
+            newProduk[index].harga = String(hargaGas + 100000 * durasi);
+            newProduk[index].durasi = durasi;
+        } else {
+            newProduk[index].harga = String(hargaGas);
+            newProduk[index].durasi = 0;
+        }
+        setData("produk", newProduk);
+    };
+
+    const handleDurasiChange = (index: number, value: string) => {
+        const durasi = parseInt(value) || 1;
+        const newProduk = [...data.produk];
+        newProduk[index].durasi = durasi;
+        const produk = produks.find(
+            (p) => String(p.id) === newProduk[index].produk_id
+        );
+        const hargaGas = produk?.harga_jual || 0;
+        newProduk[index].harga = String(hargaGas + 100000 * durasi);
+        setData("produk", newProduk);
+    };
+
     const handleAddRow = () => {
         setData("produk", [
             ...data.produk,
-            { produk_id: "", harga: "", quantity: "" },
+            {
+                produk_id: "",
+                harga: "",
+                quantity: "",
+                tipe_item: "jual",
+                durasi: 0,
+            },
         ]);
     };
 
@@ -201,20 +234,48 @@ const Edit = ({ pesananedit }: EditPesanan) => {
                     <div className="space-y-2">
                         <Label>Produk</Label>
                         {data.produk.map((item, index) => (
-                            <div key={index} className="flex items-end gap-2">
-                                <div className="w-full">
+                            <div
+                                key={index}
+                                className="flex items-end gap-2 flex-wrap"
+                            >
+                                <div className="w-full sm:w-48">
                                     <CommandCombobox
                                         options={produkOptions}
                                         value={item.produk_id}
                                         onValueChange={(value) =>
-                                            handleProdukChange(index, {
-                                                value,
-                                            })
+                                            handleProdukChange(index, { value })
                                         }
                                         placeholder="Pilih Produk"
                                         searchPlaceholder="Cari produk..."
                                     />
                                 </div>
+
+                                <select
+                                    className="border rounded px-2 py-1"
+                                    value={item.tipe_item}
+                                    onChange={(e) =>
+                                        handleTipeChange(index, e.target.value)
+                                    }
+                                >
+                                    <option value="jual">Jual</option>
+                                    <option value="sewa">Sewa</option>
+                                </select>
+
+                                {item.tipe_item === "sewa" && (
+                                    <Input
+                                        type="number"
+                                        placeholder="Durasi (bln)"
+                                        className="w-28"
+                                        value={item.durasi}
+                                        onChange={(e) =>
+                                            handleDurasiChange(
+                                                index,
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                )}
+
                                 <Input
                                     type="text"
                                     placeholder="Harga"
@@ -232,6 +293,7 @@ const Edit = ({ pesananedit }: EditPesanan) => {
                                         handleQtyChange(index, e.target.value)
                                     }
                                 />
+
                                 <Button
                                     type="button"
                                     variant="destructive"
@@ -253,13 +315,7 @@ const Edit = ({ pesananedit }: EditPesanan) => {
 
                     <div>
                         <Label>Total</Label>
-                        <Input
-                            value={new Intl.NumberFormat("id-ID", {
-                                style: "currency",
-                                currency: "IDR",
-                            }).format(data.total)}
-                            disabled
-                        />
+                        <Input value={formatRupiah(data.total)} disabled />
                     </div>
 
                     <DialogFooter>

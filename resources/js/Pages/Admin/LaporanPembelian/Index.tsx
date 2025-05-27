@@ -167,7 +167,7 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
     return (
         <AdminLayout>
             {/* ubah lagi defaultvalue menjadi datatable */}
-            <Tabs defaultValue="form" className="w-full">
+            <Tabs defaultValue="datatable" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="datatable">Data Table</TabsTrigger>
                     <TabsTrigger value="form">Tambah Data</TabsTrigger>

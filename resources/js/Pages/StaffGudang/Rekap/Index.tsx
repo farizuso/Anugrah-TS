@@ -86,7 +86,7 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
     return (
         <AdminLayout>
             {/* ubah defultValue menjadi account */}
-            <Tabs defaultValue="form" className="w-full">
+            <Tabs defaultValue="account" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="account">Data Table</TabsTrigger>
                     <TabsTrigger value="form">Tambah Data</TabsTrigger>
@@ -111,7 +111,13 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
                                     <Label>Pesanan</Label>
                                     <CommandCombobox
                                         options={pesanans.map((p) => ({
-                                            label: `#${p.id} - ${p.pelanggan.nama_pelanggan}`,
+                                            label: `${
+                                                p.details[0]?.nomor_invoice ||
+                                                `#${p.id}`
+                                            } - ${
+                                                p.pelanggan?.nama_pelanggan ||
+                                                "-"
+                                            }`,
                                             value: p.id.toString(),
                                         }))}
                                         value={

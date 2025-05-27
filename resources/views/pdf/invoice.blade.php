@@ -26,8 +26,6 @@
             font-size: 14px;
         }
 
-      
-
         .info-table {
             width: 100%;
             margin-top: 5px;
@@ -101,13 +99,17 @@
     <p>Permata Green Menganti Regency Blok D2-02, Gresik | WA: 08978810015, 081333244901</p>
     <hr>
     <h2>INVOICE PESANAN</h2>
+
+    @php
+        $nomorInvoice = $pesanan->details[0]->nomor_invoice ?? ('#' . str_pad($pesanan->id, 6, '0', STR_PAD_LEFT));
+    @endphp
+    <p><strong>Nomor Invoice:</strong> {{ $nomorInvoice }}</p>
 </div>
 
 <table class="info-table">
     <tr>
         <td><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($pesanan->tgl_pesanan)->format('d M Y') }}</td>
         <td><strong>No. Telp:</strong> {{ $pesanan->pelanggan->no_hp }}</td>
-        
     </tr>
     <tr>
         <td><strong>Penerima:</strong> {{ $pesanan->pelanggan->nama_pelanggan }}</td>
@@ -115,10 +117,18 @@
     </tr>
 </table>
 
-@if($pesanan->jenis_pesanan === 'sewa')
+@php
+    $sewaItems = $pesanan->details->where('tipe_item', 'sewa');
+    $durasiTotal = $sewaItems->sum('durasi');
+    $masaSewaAwal = \Carbon\Carbon::parse($pesanan->tgl_pesanan);
+    $masaSewaAkhir = $masaSewaAwal->copy()->addMonths($durasiTotal);
+@endphp
+
+@if($sewaItems->count())
 <div class="highlight">
-    🛢️ Pesanan ini adalah <strong>Sewa Tabung</strong><br>
-    Masa sewa 6 bulan. Jika tidak dikembalikan, jaminan sebesar <strong>Rp {{ number_format(1200000, 0, ',', '.') }}/tabung</strong> akan hangus.
+    Pesanan ini mengandung <strong>Sewa Tabung</strong><br>
+    Masa sewa: <strong>{{ $masaSewaAwal->format('d M Y') }} - {{ $masaSewaAkhir->format('d M Y') }}</strong><br>
+    Biaya sewa: <strong>Rp100.000/bulan</strong> (belum termasuk isi gas)
 </div>
 @endif
 
@@ -133,17 +143,30 @@
     </thead>
     <tbody>
         @foreach($pesanan->details as $item)
+        @php
+            $hargaSewa = $item->tipe_item === 'sewa' ? 100000 * $item->durasi : 0;
+            $hargaGas = $item->harga - $hargaSewa;
+        @endphp
         <tr>
-            <td>{{ $item->produk->nama_produk }}</td>
+            <td>
+                {{ $item->produk->nama_produk }}<br>
+                <small><em>{{ ucfirst($item->tipe_item) }}{{ $item->tipe_item === 'sewa' ? ' - ' . $item->durasi . ' bln' : '' }}</em></small>
+            </td>
             <td>{{ $item->quantity }} tabung</td>
-            <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
+            <td>
+                @if($item->tipe_item === 'sewa')
+                    <small>
+                        Sewa: Rp {{ number_format(100000, 0, ',', '.') }} x {{ $item->durasi }}<br>
+                        Gas: Rp {{ number_format($hargaGas, 0, ',', '.') }}
+                    </small>
+                @else
+                    Rp {{ number_format($item->harga, 0, ',', '.') }}
+                @endif
+            </td>
             <td>Rp {{ number_format($item->harga * $item->quantity, 0, ',', '.') }}</td>
         </tr>
         @endforeach
-        {{-- <tr class="total-row">
-            <td colspan="3" class="text-right">Biaya Pengiriman</td>
-            <td>Rp {{ number_format($pesanan->biaya_pengiriman, 0, ',', '.') }}</td>
-        </tr> --}}
+
         <tr class="total-row">
             <td colspan="3" class="text-right">Total</td>
             <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>

@@ -5,7 +5,7 @@ import SectionTitle from "@/Components/section-title";
 import { DollarSign, CreditCard, Activity } from "lucide-react";
 import BarChart from "@/Layouts/partials/aside/BarChart";
 import PageTitle from "@/Layouts/partials/aside/PageTitle";
-import { LowStock, MonthlySales, PageProps } from "@/types";
+import { LowStock, MonthlyFinanceItem, MonthlySales, PageProps } from "@/types";
 
 const Dashboard = () => {
     const {
@@ -17,6 +17,7 @@ const Dashboard = () => {
         recentSales = [],
         monthlySales = [],
         lowStockProducts = [],
+        monthlyFinance = [],
     } = usePage<
         PageProps & {
             totalRevenue: number;
@@ -30,6 +31,7 @@ const Dashboard = () => {
             }[];
             monthlySales: MonthlySales[];
             lowStockProducts: LowStock[];
+            monthlyFinance: MonthlyFinanceItem[];
         }
     >().props;
 
@@ -44,7 +46,6 @@ const Dashboard = () => {
             description: "Total dari semua penjualan",
             icon: DollarSign,
         },
-
         {
             label: "Pembelian",
             amount: `${totalPurchases ?? 0}`,
@@ -64,7 +65,6 @@ const Dashboard = () => {
             icon: Activity,
         },
     ];
-    console.log("📊 monthlySales:", monthlySales);
 
     return (
         <AdminLayout>
@@ -102,6 +102,82 @@ const Dashboard = () => {
                         ))}
                     </section>
 
+                    {/* 🔻 Ringkasan Keuangan Bulanan */}
+                    <section>
+                        <Card>
+                            <CardContent className="flex flex-col gap-4">
+                                <section>
+                                    <p className="font-semibold">
+                                        Ringkasan Keuangan Bulanan
+                                    </p>
+                                    <p className="text-sm text-gray-400">
+                                        Menampilkan pendapatan, pengeluaran, dan
+                                        laba bersih per bulan.
+                                    </p>
+                                </section>
+                                <div className="overflow-auto">
+                                    <table className="min-w-full border text-sm text-left">
+                                        <thead className="bg-gray-100">
+                                            <tr>
+                                                <th className="p-2">Bulan</th>
+                                                <th className="p-2">
+                                                    Pendapatan
+                                                </th>
+                                                <th className="p-2">
+                                                    Pengeluaran
+                                                </th>
+                                                <th className="p-2">Laba</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {monthlyFinance.map((item, i) => (
+                                                <tr
+                                                    key={i}
+                                                    className="border-t"
+                                                >
+                                                    <td className="p-2">
+                                                        {item.bulan}
+                                                    </td>
+                                                    <td className="p-2 text-green-600">
+                                                        Rp{" "}
+                                                        {Number(
+                                                            item.pendapatan
+                                                        ).toLocaleString(
+                                                            "id-ID"
+                                                        )}
+                                                    </td>
+                                                    <td className="p-2 text-red-600">
+                                                        Rp{" "}
+                                                        {Number(
+                                                            item.pengeluaran
+                                                        ).toLocaleString(
+                                                            "id-ID"
+                                                        )}
+                                                    </td>
+                                                    <td
+                                                        className={`p-2 font-semibold ${
+                                                            item.laba >= 0
+                                                                ? "text-blue-600"
+                                                                : "text-red-600"
+                                                        }`}
+                                                    >
+                                                        Rp{" "}
+                                                        {Number(
+                                                            item.laba
+                                                        ).toLocaleString(
+                                                            "id-ID"
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </section>
+
+                    {/* Stok Terendah */}
                     <section>
                         <Card>
                             <CardContent className="flex flex-col gap-4">
@@ -126,7 +202,7 @@ const Dashboard = () => {
                         </Card>
                     </section>
 
-                    {/* Overview & Top Customers */}
+                    {/* Grafik Penjualan & Pelanggan Terbaik */}
                     <section className="grid grid-cols-1 gap-4 transition-all lg:grid-cols-2">
                         <Card>
                             <CardContent>

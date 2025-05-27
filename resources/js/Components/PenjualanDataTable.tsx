@@ -23,14 +23,14 @@ import {
     TableRow,
 } from "@/Components/ui/table";
 import { Calendar } from "@/Components/ui/calendar";
-import { LaporanPembelian } from "@/types"; // ✅ Import dari types utama
+import { Pesanan } from "@/types";
 
-interface LaporanDataTableProps {
-    data: LaporanPembelian[];
-    columns: ColumnDef<LaporanPembelian>[];
+interface PenjualanDataTableProps {
+    data: Pesanan[];
+    columns: ColumnDef<Pesanan>[];
 }
 
-export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
+export function PenjualanDataTable({ data, columns }: PenjualanDataTableProps) {
     const [globalFilter, setGlobalFilter] = React.useState("");
     const [startDate, setStartDate] = React.useState<Date | null>(null);
     const [endDate, setEndDate] = React.useState<Date | null>(null);
@@ -43,27 +43,13 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
         const end = new Date(endDate.setHours(23, 59, 59, 999));
 
         return data.filter((row) => {
-            const date = new Date(row.tgl_pembelian);
+            const date = new Date(row.tgl_pesanan);
             return date >= start && date <= end;
         });
     }, [data, startDate, endDate]);
 
-    const totalPrice = React.useMemo(() => {
-        return filteredData.reduce((total, item) => {
-            item.details?.forEach((detail) => {
-                total += detail.harga * detail.quantity;
-            });
-            return total;
-        }, 0);
-    }, [filteredData]);
-
-    const totalQuantity = React.useMemo(() => {
-        return filteredData.reduce((total, item) => {
-            item.details?.forEach((detail) => {
-                total += detail.quantity;
-            });
-            return total;
-        }, 0);
+    const totalTagihan = React.useMemo(() => {
+        return filteredData.reduce((total, item) => total + item.total, 0);
     }, [filteredData]);
 
     const applyQuickFilter = (type: string) => {
@@ -73,8 +59,7 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
         switch (type) {
             case "today":
                 from = new Date(now.setHours(0, 0, 0, 0));
-                to = new Date();
-                to.setHours(23, 59, 59, 999);
+                to = new Date(now.setHours(23, 59, 59, 999));
                 break;
             case "thisMonth":
                 from = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -99,40 +84,33 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
     };
 
     const exportToExcel = () => {
-        const rows: any[] = [];
-
-        filteredData.forEach((item) => {
-            (item.details || []).forEach((detail) => {
-                rows.push({
-                    "Tanggal Pembelian": new Date(
-                        item.tgl_pembelian
-                    ).toLocaleDateString("id-ID"),
-                    "Nama Supplier": item.supplier?.nama_supplier ?? "-",
-                    "Nama Produk": detail.produk?.nama_produk ?? "-",
-                    QTY: detail.quantity,
-                    "Harga Satuan": new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                    }).format(detail.harga),
-                    "Total Harga": new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                    }).format(item.total),
-                    Keterangan: item.keterangan ?? "-",
-                    Status: item.status ?? "-",
-                });
-            });
-        });
+        const rows = filteredData.map((item) => ({
+            "Tanggal Pesanan": new Date(item.tgl_pesanan).toLocaleDateString(
+                "id-ID"
+            ),
+            "Nomor Invoice": item.details?.[0]?.nomor_invoice ?? `#${item.id}`,
+            Pelanggan: item.pelanggan?.nama_pelanggan ?? "-",
+            "Total Tagihan": new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+            }).format(item.total),
+            "Jumlah Terbayar": new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+            }).format(item.jumlah_terbayar),
+            Status: item.status,
+            Keterangan: item.keterangan ?? "",
+        }));
 
         const ws = XLSX.utils.json_to_sheet(rows);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Laporan Pembelian");
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan Penjualan");
 
         const getDateStr = (date: Date) => date.toISOString().split("T")[0];
-        let fileName = "laporan_pembelian.xlsx";
+        let fileName = "laporan_penjualan.xlsx";
 
         if (startDate && endDate) {
-            fileName = `laporan_pembelian_${getDateStr(
+            fileName = `laporan_penjualan_${getDateStr(
                 startDate
             )}_sampai_${getDateStr(endDate)}.xlsx`;
         }
@@ -261,13 +239,11 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
             </div>
 
             <div className="flex justify-end items-center space-x-4 py-4">
-                <div className="text-sm">
-                    <strong>Total Jumlah Pembelian:</strong> {totalQuantity}{" "}
-                    Produk
-                </div>
-                <div className="text-sm">
-                    <strong>Total Harga:</strong> Rp{" "}
-                    {totalPrice.toLocaleString()}
+                <div className="text-sm font-semibold">
+                    Total Tagihan:{" "}
+                    <span className="text-green-600">
+                        Rp {totalTagihan.toLocaleString("id-ID")}
+                    </span>
                 </div>
             </div>
 

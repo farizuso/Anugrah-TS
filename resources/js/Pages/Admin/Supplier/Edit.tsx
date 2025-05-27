@@ -59,7 +59,7 @@ const Edit = ({ supplieredit }: EditSupplier) => {
                 <DialogHeader>
                     <DialogTitle>Edit Data Supplier</DialogTitle>
                     <DialogDescription>
-                        Masukkan data supplier
+                        Ubah data supplier dibawah ini.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={submit} className="grid gap-4 py-4">
