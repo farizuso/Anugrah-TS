@@ -236,7 +236,7 @@ function DebouncedInput({
         <div className="relative">
             <Input
                 {...props}
-                placeholder="Filter..."
+                placeholder="Cari.."
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 className="max-w-sm pl-8 bg-background"

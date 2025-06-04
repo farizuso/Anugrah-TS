@@ -8,6 +8,7 @@ import { id } from "date-fns/locale";
 import { router } from "@inertiajs/react";
 import Delete from "./Delete";
 import Edit from "./Edit";
+import { formatTanggalIndonesia } from "@/lib/utils";
 
 // Gunakan parameter opsional + default fallback
 export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
@@ -36,7 +37,9 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "tgl_pembelian",
+        id: "tgl_pembelian",
+        accessorFn: (row) =>
+            formatTanggalIndonesia(row.tgl_pembelian.toString()), // hasil string misalnya "18 Mei 2025"
         header: ({ column }) => (
             <Button
                 variant="default"
@@ -44,20 +47,15 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
                     column.toggleSorting(column.getIsSorted() === "asc")
                 }
             >
-                Tgl. Pembelian
+                Tgl. pembelian
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => {
-            const tanggal = row.getValue("tgl_pembelian");
-            const formattedDate =
-                tanggal && typeof tanggal === "string"
-                    ? format(new Date(tanggal), "dd MMMM yyyy", {
-                          locale: id,
-                      })
-                    : "-";
-            return <div>{formattedDate}</div>;
-        },
+        cell: ({ row }) => (
+            <div className="capitalize">{row.getValue("tgl_pembelian")}</div>
+        ),
+        enableGlobalFilter: true,
+        filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching
     },
     {
         accessorFn: (row) => row.supplier?.nama_supplier || "-",

@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { router } from "@inertiajs/react";
 import ConfirmReturn from "@/Components/ConfirmReturn";
+import { formatTanggalIndonesia } from "@/lib/utils";
 
 // Helper untuk format tanggal
 function formatDate(value?: string | null) {
@@ -71,7 +72,9 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
     },
 
     {
-        accessorKey: "tanggal_keluar",
+        id: "tanggal_keluar",
+        accessorFn: (row) =>
+            formatTanggalIndonesia(row.tanggal_keluar.toString()), // hasil string misalnya "18 Mei 2025"
         header: ({ column }) => (
             <Button
                 variant="default"
@@ -79,17 +82,15 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
                     column.toggleSorting(column.getIsSorted() === "asc")
                 }
             >
-                Tgl. Keluar <ArrowUpDown className="ml-2 h-4 w-4" />
+                Tgl. Keluar
+                <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => {
-            const tanggal = row.original.pesanan?.tgl_pesanan; // akses dari relasi pesanan
-            const formattedDate =
-                tanggal && typeof tanggal === "string"
-                    ? format(new Date(tanggal), "dd MMMM yyyy", { locale: id })
-                    : "-";
-            return <div>{formattedDate}</div>;
-        },
+        cell: ({ row }) => (
+            <div className="capitalize">{row.getValue("tanggal_keluar")}</div>
+        ),
+        enableGlobalFilter: true,
+        filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching
     },
 
     {

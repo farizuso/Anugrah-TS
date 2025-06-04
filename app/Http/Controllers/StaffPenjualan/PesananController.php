@@ -103,7 +103,7 @@ class PesananController extends Controller
             ]);
 
             $pelanggan = Pelanggan::find($request->pelanggan_id);
-            $lastId = \App\Models\PesananDetail::max('id') + 1;
+            $lastId = PesananDetail::max('id') + 1;
             $nomorInvoice = 'INV-' . now()->format('Ymd') . '-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
 
             foreach ($produkList as $item) {

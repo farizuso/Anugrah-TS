@@ -10,6 +10,7 @@ import Delete from "./Delete";
 import Edit from "./Edit";
 import Detail from "./Detail";
 import { Link } from "@inertiajs/react";
+import { formatTanggalIndonesia } from "@/lib/utils";
 
 // Gunakan parameter opsional + default fallback
 export const PesananColumns: ColumnDef<Pesanan>[] = [
@@ -38,7 +39,8 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "tgl_pesanan",
+        id: "tgl_pesanan",
+        accessorFn: (row) => formatTanggalIndonesia(row.tgl_pesanan.toString()), // hasil string misalnya "18 Mei 2025"
         header: ({ column }) => (
             <Button
                 variant="default"
@@ -46,20 +48,15 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
                     column.toggleSorting(column.getIsSorted() === "asc")
                 }
             >
-                Tgl.Pesanan
+                Tgl. Pesanan
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => {
-            const tanggal = row.getValue("tgl_pesanan");
-            const formattedDate =
-                tanggal && typeof tanggal === "string"
-                    ? format(new Date(tanggal), "dd MMMM yyyy", {
-                          locale: id,
-                      })
-                    : "-";
-            return <div>{formattedDate}</div>;
-        },
+        cell: ({ row }) => (
+            <div className="capitalize">{row.getValue("tgl_pesanan")}</div>
+        ),
+        enableGlobalFilter: true,
+        filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching
     },
     {
         accessorFn: (row) => row.pelanggan?.nama_pelanggan || "-",

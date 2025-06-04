@@ -113,7 +113,7 @@ export interface Rekap {
     pesanan: Pesanan;
     pelanggan: Pelanggan;
     nomor_tabung: string;
-    tanggal_keluar: string | null;
+    tanggal_keluar: Date;
     tanggal_kembali: string | null;
     status: "belum" | "kembali";
 }
