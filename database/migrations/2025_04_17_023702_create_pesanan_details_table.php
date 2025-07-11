@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('pesanan_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pesanan_id')->constrained()->cascadeOnDelete();
-            $table->string('nomor_invoice')->unique();
             $table->foreignId('produk_id')->constrained()->onDelete('cascade');
             $table->integer('harga');
             $table->integer('quantity');

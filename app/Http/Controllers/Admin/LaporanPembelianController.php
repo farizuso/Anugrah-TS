@@ -215,7 +215,7 @@ class LaporanPembelianController extends Controller
             }
 
             // Ubah status laporan menjadi Dikonfirmasi
-            $laporan->update(['status' => 'Dikonfirmasi']);
+            $laporan->update(['status' => 'Dikonfirmasi', 'keterangan' => 'Lunas',]);
 
             // Proses untuk menambah stok produk
             foreach ($laporan->details as $detail) {

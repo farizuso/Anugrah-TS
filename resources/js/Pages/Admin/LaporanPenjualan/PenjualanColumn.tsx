@@ -50,20 +50,16 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
             </Button>
         ),
         cell: ({ row }) => (
-            <div className="capitalize">
-                {row.getValue("tgl_pesanan")}
-            </div>
+            <div className="capitalize">{row.getValue("tgl_pesanan")}</div>
         ),
         enableGlobalFilter: true,
         filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching
     },
     {
-        id: "nomor_invoice",
-        header: "Nomor Invoice",
-        accessorFn: (row) =>
-            row.details && row.details.length > 0
-                ? row.details[0].nomor_invoice
-                : `#${row.id}`,
+        accessorKey: "nomor_invoice", // ─┐
+        id: "nomor_invoice", //  │ keduanya opsional—pakai salah satu
+        header: "Nomor Invoice", // ─┘
+        accessorFn: (row) => row.nomor_invoice ?? `#${row.id}`,
         enableGlobalFilter: true,
         filterFn: "fuzzy",
         cell: ({ row }) => row.getValue("nomor_invoice"),
@@ -103,7 +99,7 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
                     return (
                         sum +
                         (keterangan === "cicilan" ||
-                            keterangan === "belum lunas"
+                        keterangan === "belum lunas"
                             ? sisaTagihan
                             : total)
                     );
@@ -164,8 +160,8 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
                 status === "lunas"
                     ? "text-green-600 font-semibold"
                     : status === "belum lunas"
-                        ? "text-red-600 font-semibold"
-                        : "text-gray-700";
+                    ? "text-red-600 font-semibold"
+                    : "text-gray-700";
             return (
                 <div className={`capitalize ${className}`}>
                     {row.original.keterangan}

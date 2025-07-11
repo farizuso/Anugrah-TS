@@ -62,6 +62,7 @@ export interface Pembayaran {
 
 export interface Pesanan {
     id: number;
+    nomor_invoice: string;
     tgl_pesanan: Date;
     pelanggan: Pelanggan;
     total: number;
@@ -77,7 +78,6 @@ export interface Pesanan {
         quantity: number;
         tipe_item: string;
         durasi: number;
-        nomor_invoice: string;
         produk: {
             id: number;
             nama_produk: string;

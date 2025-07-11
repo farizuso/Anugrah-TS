@@ -44,20 +44,6 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
         enableSorting: false,
         enableHiding: false,
     },
-    // {
-    //     accessorKey: "pesanan_id",
-    //     header: ({ column }) => (
-    //         <Button
-    //             variant="ghost"
-    //             onClick={() =>
-    //                 column.toggleSorting(column.getIsSorted() === "asc")
-    //             }
-    //         >
-    //             ID Pesanan <ArrowUpDown className="ml-2 h-4 w-4" />
-    //         </Button>
-    //     ),
-    //     cell: ({ row }) => row.original.pesanan.id,
-    // },
     {
         accessorKey: "pelanggan",
         header: "Pelanggan",
@@ -69,6 +55,12 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
         accessorKey: "nomor_tabung",
         header: "Nomor Tabung",
         cell: ({ row }) => row.original.nomor_tabung ?? "-",
+    },
+    {
+        accessorKey: "nama_produk",
+        header: "nama produk",
+        cell: ({ row }) =>
+            row.original.pesanan?.details[0]?.produk?.nama_produk ?? "-",
     },
 
     {

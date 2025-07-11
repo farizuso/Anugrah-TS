@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('pesanans', function (Blueprint $table) {
             $table->id();
+            $table->string('nomor_invoice')->unique();
             $table->date('tgl_pesanan');
             $table->foreignId('pelanggan_id');
             $table->integer('total')->default(0); // bisa nullable jika awalnya tidak langsung dihitung

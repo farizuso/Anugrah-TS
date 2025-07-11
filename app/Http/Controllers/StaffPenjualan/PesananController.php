@@ -91,7 +91,12 @@ class PesananController extends Controller
                 $total += $subtotal;
             }
 
+
+            $lastId = Pesanan::max('id') + 1;
+            $nomorInvoice = 'INV-' . now()->format('Ymd') . '-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
+
             $pesanan = Pesanan::create([
+                'nomor_invoice' => $nomorInvoice,
                 'tgl_pesanan' => $request->tgl_pesanan,
                 'pelanggan_id' => $request->pelanggan_id,
                 'total' => $total,
@@ -103,13 +108,10 @@ class PesananController extends Controller
             ]);
 
             $pelanggan = Pelanggan::find($request->pelanggan_id);
-            $lastId = PesananDetail::max('id') + 1;
-            $nomorInvoice = 'INV-' . now()->format('Ymd') . '-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
 
             foreach ($produkList as $item) {
                 PesananDetail::create([
                     'pesanan_id' => $pesanan->id,
-                    'nomor_invoice' => $nomorInvoice,
                     'produk_id' => $item['produk_id'],
                     'harga' => $item['harga'],
                     'quantity' => $item['quantity'],

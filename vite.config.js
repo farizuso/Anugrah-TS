@@ -20,6 +20,6 @@ export default defineConfig({
     test: {
         // globals: true,
         // environment: "jsdom",
-        // setupFiles: "./setup.ts", // opsional jika kamu butuh mocking global, dsb.
+        // setupFiles: "./setup.ts", 
     },
 });

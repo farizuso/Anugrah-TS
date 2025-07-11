@@ -38,7 +38,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
     const auth = pageProps.props.auth;
 
     const { data, setData, post, processing, reset } = useForm({
-        tgl_pesanan: new Date(),
+        tgl_pesanan: format(new Date(), "yyyy-MM-dd"),
         pelanggan_id: "",
         produk: [
             {
@@ -180,6 +180,51 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                             </CardHeader>
 
                             <CardContent className="space-y-4">
+                                <div className="space-y-1">
+                                    <Label>Tanggal Pemesanan</Label>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !data.tgl_pesanan &&
+                                                        "text-muted-foreground"
+                                                )}
+                                            >
+                                                {data.tgl_pesanan ??
+                                                    "Pilih Tanggal"}
+                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={
+                                                    data.tgl_pesanan
+                                                        ? new Date(
+                                                              data.tgl_pesanan
+                                                          )
+                                                        : undefined
+                                                }
+                                                onSelect={(date) => {
+                                                    if (date) {
+                                                        const formatted =
+                                                            format(
+                                                                date,
+                                                                "yyyy-MM-dd"
+                                                            );
+                                                        setData(
+                                                            "tgl_pesanan",
+                                                            formatted
+                                                        );
+                                                    }
+                                                }}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+
                                 <div className="flex flex-col gap-2">
                                     <Label>Nama Pelanggan</Label>
                                     <CommandCombobox

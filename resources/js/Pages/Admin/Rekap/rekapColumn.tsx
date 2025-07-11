@@ -68,6 +68,12 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
         header: "Nomor Tabung",
         cell: ({ row }) => row.original.nomor_tabung ?? "-",
     },
+    {
+        accessorKey: "nama_produk",
+        header: "nama produk",
+        cell: ({ row }) =>
+            row.original.pesanan?.details[0]?.produk?.nama_produk ?? "-",
+    },
 
     {
         id: "tanggal_keluar",

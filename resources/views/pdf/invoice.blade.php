@@ -103,7 +103,7 @@
     @php
         $nomorInvoice = $pesanan->details[0]->nomor_invoice ?? ('#' . str_pad($pesanan->id, 6, '0', STR_PAD_LEFT));
     @endphp
-    <p><strong>Nomor Invoice:</strong> {{ $nomorInvoice }}</p>
+   <p><strong>Nomor Invoice:</strong> {{ $pesanan->nomor_invoice ?? ('#' . str_pad($pesanan->id, 6, '0', STR_PAD_LEFT)) }}</p>
 </div>
 
 <table class="info-table">

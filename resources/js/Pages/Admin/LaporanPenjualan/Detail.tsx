@@ -48,9 +48,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                 <h2 className="text-2xl font-semibold">Detail Transaksi</h2>
                 <p className="text-sm mt-1">
                     Nomor Invoice:{" "}
-                    <strong>
-                        {pesanan.details[0]?.nomor_invoice || `#${pesanan.id}`}
-                    </strong>
+                    <strong>{pesanan.nomor_invoice || `#${pesanan.id}`}</strong>
                 </p>
             </div>
 

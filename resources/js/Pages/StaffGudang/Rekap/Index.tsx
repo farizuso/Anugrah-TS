@@ -112,10 +112,9 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
                                     <CommandCombobox
                                         options={pesanans.map((p) => ({
                                             label: `${
-                                                p.details[0]?.nomor_invoice ||
-                                                `#${p.id}`
+                                                p.nomor_invoice ?? `#${p.id}`
                                             } - ${
-                                                p.pelanggan?.nama_pelanggan ||
+                                                p.pelanggan?.nama_pelanggan ??
                                                 "-"
                                             }`,
                                             value: p.id.toString(),
@@ -179,9 +178,6 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
                                             >
                                                 <option value="keluar">
                                                     Keluar
-                                                </option>
-                                                <option value="kembali">
-                                                    Kembali
                                                 </option>
                                             </select>
                                         </div>

@@ -59,6 +59,15 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
         filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching
     },
     {
+        accessorKey: "nomor_invoice", // ─┐
+        id: "nomor_invoice", //  │ keduanya opsional—pakai salah satu
+        header: "Nomor Invoice", // ─┘
+        accessorFn: (row) => row.nomor_invoice ?? `#${row.id}`,
+        enableGlobalFilter: true,
+        filterFn: "fuzzy",
+        cell: ({ row }) => row.getValue("nomor_invoice"),
+    },
+    {
         accessorFn: (row) => row.pelanggan?.nama_pelanggan || "-",
         header: "Nama Pelanggan",
         cell: ({ row }) => (
