@@ -101,12 +101,12 @@ export default function Login() {
                     >
                         Sign in
                     </Button>
-                    {/* <Link
+                    <Link
                         className="text-blue-500 text-center underline"
                         href="/register"
                     >
                         Register
-                    </Link> */}
+                    </Link>
                 </form>
             </div>
         </GuestLayout>
