@@ -99,7 +99,7 @@ export default function Login() {
                         type="submit"
                         variant={"blue"}
                     >
-                        Sign in
+                        login
                     </Button>
                     {/* <Link
                         className="text-blue-500 text-center underline"
