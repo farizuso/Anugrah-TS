@@ -5,6 +5,7 @@ import { Pembayaran, Pesanan, Produk } from "@/types";
 import { addMonths, format } from "date-fns";
 
 import AdminLayout from "@/Layouts/AdminLayout";
+import { formatRupiah } from "@/lib/utils";
 
 interface DetailProps {
     pesanan: Pesanan;
@@ -15,7 +16,7 @@ const Detail = ({ pesanan }: DetailProps) => {
 
     const isSewaTabung = pesanan.jenis_pesanan === "sewa";
 
-    const formatRupiah = (angka: number) =>
+    const formatrupiah = (angka: number) =>
         `Rp ${angka.toLocaleString("id-ID")}`;
 
     const getHargaRinci = (item: any) => {

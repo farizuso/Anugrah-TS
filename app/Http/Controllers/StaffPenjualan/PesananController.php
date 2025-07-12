@@ -147,8 +147,7 @@ class PesananController extends Controller
             DB::rollBack();
             Log::error("Gagal simpan pesanan: " . $e->getMessage());
             return redirect()->back()
-                ->with('error', 'Terjadi kesalahan saat membuat pesanan.')
-                ->withInput();
+                ->with('error', 'Gagal simpan pesanan: ' . $e->getMessage());
         }
     }
 

@@ -13,12 +13,13 @@ import {
 import ConfirmPembayaran from "@/Components/ConfirmPembayaran";
 import { router } from "@inertiajs/react";
 import { Pembayaran, Pesanan } from "@/types";
+import { formatRupiah } from "@/lib/utils";
 
 interface DetailProps {
     pesanan: Pesanan;
 }
 
-const formatRupiah = (angka: number) => `Rp ${angka.toLocaleString("id-ID")}`;
+// const formatRupiah = (angka: number) => `Rp ${angka.toLocaleString("id-ID")}`;
 
 const getHargaRinci = (item: any) => {
     const hargaSewa = item.tipe_item === "sewa" ? 100000 * item.durasi : 0;

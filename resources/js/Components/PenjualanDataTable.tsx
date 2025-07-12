@@ -24,6 +24,7 @@ import {
 } from "@/Components/ui/table";
 import { Calendar } from "@/Components/ui/calendar";
 import { Pesanan } from "@/types";
+import { formatRupiah } from "@/lib/utils";
 
 interface PenjualanDataTableProps {
     data: Pesanan[];
@@ -242,7 +243,7 @@ export function PenjualanDataTable({ data, columns }: PenjualanDataTableProps) {
                 <div className="text-sm font-semibold">
                     Total Tagihan:{" "}
                     <span className="text-green-600">
-                        Rp {totalTagihan.toLocaleString("id-ID")}
+                        {formatRupiah(totalTagihan)}
                     </span>
                 </div>
             </div>
