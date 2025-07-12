@@ -156,8 +156,8 @@
             <td>
                 @if($item->tipe_item === 'sewa')
                     <small>
-                        Sewa: Rp {{ number_format(100000, 0, ',', '.') }} x {{ $item->Arr::query($array) }}<br>
-                        Gas: Rp {{ number_format($hargaGas, 0, ',', '.') }} x {{ $item->Arr::query($array) }}
+                        Sewa: Rp {{ number_format(100000, 0, ',', '.') }} x {{ $item->quantity }}<br>
+                        Gas: Rp {{ number_format($hargaGas, 0, ',', '.') }} x {{ $item->quantity }}
                     </small>
                 @else
                     Rp {{ number_format($item->harga, 0, ',', '.') }}
