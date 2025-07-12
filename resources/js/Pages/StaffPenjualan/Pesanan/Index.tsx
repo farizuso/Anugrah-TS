@@ -96,9 +96,8 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
     };
 
     const handleQuantityChange = (index: number, value: string) => {
-        const qty = value === "" ? "0" : value;
         const newProduk = [...data.produk];
-        newProduk[index].quantity = qty;
+        newProduk[index].quantity = value === "" ? "0" : value;
         setData("produk", newProduk);
     };
 
@@ -149,7 +148,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
 
     useEffect(() => {
         const totalHarga = data.produk.reduce((acc, curr) => {
-            const qty = parseInt(curr.quantity || "0", 10);
+            const qty = Number(curr.quantity);
             const harga = Number(curr.harga);
             const validQty = Number.isFinite(qty) ? qty : 0;
             const validHarga = Number.isFinite(harga) ? harga : 0;
