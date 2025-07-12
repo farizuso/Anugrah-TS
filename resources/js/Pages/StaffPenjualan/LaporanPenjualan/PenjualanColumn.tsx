@@ -87,7 +87,7 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
             }).format(
                 keterangan === "cicilan" || keterangan === "belum lunas"
                     ? sisaTagihan
-                    : total
+                    : 0
             );
 
             return <div className="font-bold text-red-600">{formatted}</div>;

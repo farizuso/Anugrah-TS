@@ -32,7 +32,8 @@ const Detail = ({ pesanan }: DetailProps) => {
     const getDurasiSewa = (pesanan: Pesanan) => {
         const durasi = pesanan.details
             .filter((item) => item.tipe_item === "sewa")
-            .reduce((acc, item) => acc + item.durasi, 0);
+            .reduce((acc, item) => acc + (parseInt(String(item.durasi)) || 0), 0);
+
 
         const startDate = new Date(pesanan.tgl_pesanan);
         const endDate = addMonths(startDate, durasi);

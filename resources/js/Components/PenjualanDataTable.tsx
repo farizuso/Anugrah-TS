@@ -50,7 +50,7 @@ export function PenjualanDataTable({ data, columns }: PenjualanDataTableProps) {
     }, [data, startDate, endDate]);
 
     const totalTagihan = React.useMemo(() => {
-        return filteredData.reduce((total, item) => total + Number(item.total), 0);
+        return filteredData.reduce((total, item) => total + Number(item.total - item.jumlah_terbayar), 0);
     }, [filteredData]);
 
     const applyQuickFilter = (type: string) => {
