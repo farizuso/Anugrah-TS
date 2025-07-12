@@ -1,5 +1,3 @@
-
-text / x - generic Index.tsx(Java source, ASCII text)
 import { Button } from "@/Components/ui/button";
 import {
     Card,
