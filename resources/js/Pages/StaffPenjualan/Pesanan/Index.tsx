@@ -96,8 +96,9 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
     };
 
     const handleQuantityChange = (index: number, value: string) => {
+        const qty = value === "" ? "0" : value;
         const newProduk = [...data.produk];
-        newProduk[index].quantity = value;
+        newProduk[index].quantity = qty;
         setData("produk", newProduk);
     };
 
@@ -148,9 +149,11 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
 
     useEffect(() => {
         const totalHarga = data.produk.reduce((acc, curr) => {
-            const qty = parseFloat(curr.quantity) || 0;
-            const harga = parseFloat(curr.harga?.toString() || "0");
-            return Number(acc) + Number(harga) * qty;
+            const qty = parseInt(curr.quantity || "0", 10);
+            const harga = Number(curr.harga);
+            const validQty = Number.isFinite(qty) ? qty : 0;
+            const validHarga = Number.isFinite(harga) ? harga : 0;
+            return acc + validHarga * validQty;
         }, 0);
         setData("total", totalHarga);
     }, [data.produk]);
@@ -189,7 +192,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                 className={cn(
                                                     "w-full justify-start text-left font-normal",
                                                     !data.tgl_pesanan &&
-                                                        "text-muted-foreground"
+                                                    "text-muted-foreground"
                                                 )}
                                             >
                                                 {data.tgl_pesanan ??
@@ -203,8 +206,8 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                 selected={
                                                     data.tgl_pesanan
                                                         ? new Date(
-                                                              data.tgl_pesanan
-                                                          )
+                                                            data.tgl_pesanan
+                                                        )
                                                         : undefined
                                                 }
                                                 onSelect={(date) => {
@@ -280,7 +283,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                         if (
                                                             tipe === "sewa" &&
                                                             produk?.kategori ===
-                                                                "gas"
+                                                            "gas"
                                                         ) {
                                                             const hargaGas =
                                                                 produk?.harga_jual ||
