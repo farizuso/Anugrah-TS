@@ -163,7 +163,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
             <Tabs defaultValue="datatable" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="datatable">Data Table</TabsTrigger>
-                    <TabsTrigger value="form">Tempek</TabsTrigger>
+                    <TabsTrigger value="form">Tambah Data</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="datatable">
