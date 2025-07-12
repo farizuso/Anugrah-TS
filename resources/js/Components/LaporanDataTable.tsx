@@ -24,6 +24,7 @@ import {
 } from "@/Components/ui/table";
 import { Calendar } from "@/Components/ui/calendar";
 import { LaporanPembelian } from "@/types"; // ✅ Import dari types utama
+import { formatRupiah } from "@/lib/utils";
 
 interface LaporanDataTableProps {
     data: LaporanPembelian[];
@@ -61,7 +62,6 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
         return filteredData.reduce((total, item) => {
             item.details?.forEach((detail) => {
                 total += Number(detail.quantity);
-                console.log(typeof detail.quantity, detail.quantity);
             });
             return total;
         }, 0);
@@ -269,7 +269,7 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
                 </div>
                 <div className="text-sm">
                     <strong>Total Harga:</strong> Rp{" "}
-                    {totalPrice.toLocaleString()}
+                    {formatRupiah(totalPrice)}
                 </div>
             </div>
 

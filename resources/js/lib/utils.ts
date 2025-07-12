@@ -19,3 +19,11 @@ export function formatTanggalIndonesia(dateString: string) {
     const date = new Date(dateString);
     return format(date, "dd MMMM yyyy", { locale: id });
 }
+
+export function formatRupiah(value: number): string {
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+    }).format(value);
+}
