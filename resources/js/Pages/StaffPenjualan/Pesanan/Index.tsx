@@ -273,49 +273,37 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                     className="border rounded px-2 py-1"
                                                     value={item.tipe_item}
                                                     onChange={(e) => {
-                                                        const tipe =
-                                                            e.target.value;
-                                                        const newProduk = [
-                                                            ...data.produk,
-                                                        ];
-                                                        newProduk[
-                                                            index
-                                                        ].tipe_item = tipe;
-                                                        if (
-                                                            tipe === "sewa" &&
-                                                            produk?.kategori ===
-                                                            "gas"
-                                                        ) {
-                                                            const hargaGas =
-                                                                produk?.harga_jual ||
-                                                                0;
-                                                            const hargaSewa =
-                                                                100000 *
-                                                                (newProduk[
-                                                                    index
-                                                                ].durasi || 1);
-                                                            newProduk[
-                                                                index
-                                                            ].harga =
-                                                                hargaGas +
-                                                                hargaSewa;
-                                                            newProduk[
-                                                                index
-                                                            ].durasi = 1;
+                                                        const tipe = e.target.value;
+                                                        const newProduk = [...data.produk];
+
+                                                        // Update tipe_item
+                                                        newProduk[index].tipe_item = tipe;
+
+                                                        // Jika sewa gas
+                                                        if (tipe === "sewa" && produk?.kategori === "gas") {
+                                                            // Pastikan hargaGas numeric
+                                                            const hargaGas = produk?.harga_jual ? Number(produk.harga_jual) : 0;
+
+                                                            // Jika durasi belum ada, default 1
+                                                            const durasi = newProduk[index].durasi && newProduk[index].durasi > 0
+                                                                ? newProduk[index].durasi
+                                                                : 1;
+
+                                                            const hargaSewa = 100000 * durasi;
+
+                                                            // Set harga dan durasi
+                                                            newProduk[index].harga = hargaGas + hargaSewa;
+                                                            newProduk[index].durasi = durasi;
                                                         } else {
-                                                            newProduk[
-                                                                index
-                                                            ].harga =
-                                                                produk?.harga_jual ||
-                                                                0;
-                                                            newProduk[
-                                                                index
-                                                            ].durasi = 0;
+                                                            // Pastikan harga numeric
+                                                            const hargaGas = produk?.harga_jual ? Number(produk.harga_jual) : 0;
+
+                                                            newProduk[index].harga = hargaGas;
+                                                            newProduk[index].durasi = 0;
                                                         }
-                                                        setData(
-                                                            "produk",
-                                                            newProduk
-                                                        );
+
+                                                        // Update state
+                                                        setData("produk", newProduk);
                                                     }}
                                                 >
                                                     <option value="jual">
