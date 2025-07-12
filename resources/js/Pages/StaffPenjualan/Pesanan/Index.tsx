@@ -26,6 +26,7 @@ import { CalendarIcon } from "lucide-react";
 import { DataTable } from "@/Components/DataTable";
 import { Produk, PageProps, Pesanan, Pelanggan } from "@/types";
 import { CommandCombobox } from "@/Components/ui/CommandCombobox";
+import { formatRupiah } from "@/lib/utils";
 
 interface PesananProps {
     posts: Pesanan[];
@@ -64,11 +65,11 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         label: produk.nama_produk,
     }));
 
-    const formatRupiah = (number: number): string =>
-        new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-        }).format(number);
+    // const formatRupiah = (number: number): string =>
+    //     new Intl.NumberFormat("id-ID", {
+    //         style: "currency",
+    //         currency: "IDR",
+    //     }).format(number);
 
     const handleProdukChange = (index: number, option: any) => {
         const produk = produks.find((p) => String(p.id) === option?.value);
@@ -365,9 +366,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                     type="text"
                                                     placeholder="Harga"
                                                     className="w-32"
-                                                    value={formatRupiah(
-                                                        Number(item.harga)
-                                                    )}
+                                                    value={formatRupiah(item.harga)}
                                                     readOnly
                                                 />
 
