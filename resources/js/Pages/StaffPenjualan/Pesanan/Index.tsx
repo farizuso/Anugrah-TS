@@ -349,7 +349,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                                 index
                                                             ].harga =
                                                                 hargaGas +
-                                                                hargaSewa;
+                                                                Number(hargaSewa);
                                                             setData(
                                                                 "produk",
                                                                 newProduk
