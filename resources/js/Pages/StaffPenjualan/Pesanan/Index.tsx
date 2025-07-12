@@ -80,12 +80,23 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
             newProduk[index].tipe_item === "sewa" &&
             produk?.kategori === "gas"
         ) {
-            const hargaGas = produk?.harga_jual || 0;
-            const hargaSewa = 100000 * (newProduk[index].durasi || 1);
+            // Pastikan hargaGas numeric
+            const hargaGas = produk?.harga_jual ? Number(produk.harga_jual) : 0;
+
+            // Pastikan durasi minimal 1
+            const durasi = newProduk[index].durasi && newProduk[index].durasi > 0
+                ? newProduk[index].durasi
+                : 1;
+
+            const hargaSewa = 100000 * durasi;
+
             newProduk[index].harga = hargaGas + hargaSewa;
-            newProduk[index].durasi = 1;
+            newProduk[index].durasi = durasi;
         } else {
-            newProduk[index].harga = produk?.harga_jual || 0;
+            // Pastikan harga numeric
+            const hargaGas = produk?.harga_jual ? Number(produk.harga_jual) : 0;
+
+            newProduk[index].harga = hargaGas;
             newProduk[index].durasi = 0;
         }
 
@@ -95,6 +106,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         updatedSelected[index] = option;
         setSelectedProduk(updatedSelected);
     };
+
 
     const handleQuantityChange = (index: number, value: string) => {
         const qty = parseInt(value, 10);
