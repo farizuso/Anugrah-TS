@@ -147,13 +147,19 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
     };
 
     useEffect(() => {
+        console.log("=== Kalkulasi Total ===");
+        data.produk.forEach((item, idx) => {
+            console.log(`Item ${idx}: harga=${item.harga}, quantity=${item.quantity}`);
+        });
         const totalHarga = data.produk.reduce((acc, curr) => {
             const qty = Number(curr.quantity);
             const harga = Number(curr.harga);
             const validQty = Number.isFinite(qty) ? qty : 0;
             const validHarga = Number.isFinite(harga) ? harga : 0;
+            console.log(`Qty: ${validQty}, Harga: ${validHarga}, Subtotal: ${validHarga * validQty}`);
             return acc + validHarga * validQty;
         }, 0);
+        console.log("TOTAL:", totalHarga);
         setData("total", totalHarga);
     }, [data.produk]);
 
