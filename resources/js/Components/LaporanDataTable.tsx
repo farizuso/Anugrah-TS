@@ -61,9 +61,11 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
         return filteredData.reduce((total, item) => {
             item.details?.forEach((detail) => {
                 total += detail.quantity;
+                console.log(typeof detail.quantity, detail.quantity);
             });
             return total;
         }, 0);
+        
     }, [filteredData]);
 
     const applyQuickFilter = (type: string) => {
