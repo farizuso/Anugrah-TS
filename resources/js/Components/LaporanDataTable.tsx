@@ -268,7 +268,7 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
                     Produk
                 </div>
                 <div className="text-sm">
-                    <strong>Total Harga:</strong> Rp{" "}
+                    <strong>Total Harga:</strong>
                     {formatRupiah(totalPrice)}
                 </div>
             </div>
