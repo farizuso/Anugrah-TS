@@ -43,7 +43,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         produk: [
             {
                 produk_id: "",
-                quantity: "",
+                quantity: 0,
                 harga: 0,
                 tipe_item: "jual",
                 durasi: 0,
@@ -96,8 +96,9 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
     };
 
     const handleQuantityChange = (index: number, value: string) => {
+        const qty = parseInt(value, 10);
         const newProduk = [...data.produk];
-        newProduk[index].quantity = value === "" ? "0" : value;
+        newProduk[index].quantity = Number.isFinite(qty) ? qty : 0;
         setData("produk", newProduk);
     };
 
@@ -106,7 +107,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
             ...data.produk,
             {
                 produk_id: "",
-                quantity: "",
+                quantity: 0,
                 harga: 0,
                 tipe_item: "jual",
                 durasi: 0,
@@ -136,7 +137,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                 setData("produk", [
                     {
                         produk_id: "",
-                        quantity: "",
+                        quantity: 0,
                         harga: 0,
                         tipe_item: "jual",
                         durasi: 0,
