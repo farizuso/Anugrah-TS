@@ -327,35 +327,38 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
                                                 </select>
 
                                                 {item.tipe_item === "sewa" && (
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="Durasi (bln)"
-                                                        className="w-28"
-                                                        value={item.durasi}
-                                                        onChange={(e) => {
-                                                            const durasi = parseInt(e.target.value) || 1;
+                                                    <div className="flex gap-1 items-center">
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="Durasi (bln)"
+                                                            className="w-28"
+                                                            value={item.durasi}
+                                                            onChange={(e) => {
+                                                                const durasi = parseInt(e.target.value) || 1;
 
-                                                            // Copy array state
-                                                            const newProduk = [...data.produk];
+                                                                // Copy array state
+                                                                const newProduk = [...data.produk];
 
-                                                            // Update durasi
-                                                            newProduk[index].durasi = durasi;
+                                                                // Update durasi
+                                                                newProduk[index].durasi = durasi;
 
-                                                            // Pastikan hargaGas number polos
-                                                            const hargaGas = produk?.harga_jual
-                                                                ? Number(produk.harga_jual)
-                                                                : 0;
+                                                                // Pastikan hargaGas number polos
+                                                                const hargaGas = produk?.harga_jual
+                                                                    ? Number(produk.harga_jual)
+                                                                    : 0;
 
-                                                            // Hitung hargaSewa number polos
-                                                            const hargaSewa = 100000 * durasi;
+                                                                // Hitung hargaSewa number polos
+                                                                const hargaSewa = 100000 * durasi;
 
-                                                            // Assign harga = hargaGas + hargaSewa
-                                                            newProduk[index].harga = hargaGas + hargaSewa;
+                                                                // Assign harga = hargaGas + hargaSewa
+                                                                newProduk[index].harga = hargaGas + hargaSewa;
 
-                                                            // Simpan state
-                                                            setData("produk", newProduk);
-                                                        }}
-                                                    />
+                                                                // Simpan state
+                                                                setData("produk", newProduk);
+                                                            }}
+                                                        />
+                                                        <Label>Bulan</Label>
+                                                    </div>
                                                 )}
 
                                                 <Input
