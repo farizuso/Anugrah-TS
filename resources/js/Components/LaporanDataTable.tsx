@@ -60,7 +60,7 @@ export function LaporanDataTable({ data, columns }: LaporanDataTableProps) {
     const totalQuantity = React.useMemo(() => {
         return filteredData.reduce((total, item) => {
             item.details?.forEach((detail) => {
-                total += detail.quantity;
+                total += Number(detail.quantity);
                 console.log(typeof detail.quantity, detail.quantity);
             });
             return total;
