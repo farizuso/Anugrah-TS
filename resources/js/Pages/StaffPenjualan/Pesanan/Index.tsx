@@ -150,7 +150,7 @@ const TabsDemo = ({ posts, produks, pelanggans }: PesananProps) => {
         const totalHarga = data.produk.reduce((acc, curr) => {
             const qty = parseFloat(curr.quantity) || 0;
             const harga = parseFloat(curr.harga?.toString() || "0");
-            return acc + Number(harga) * qty;
+            return Number(acc) + Number(harga) * qty;
         }, 0);
         setData("total", totalHarga);
     }, [data.produk]);
