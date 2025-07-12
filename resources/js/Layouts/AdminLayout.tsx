@@ -67,8 +67,7 @@ const AdminLayout = ({
                 <div className="hidden border-r bg-muted/40 dark:bg-muted md:block">
                     <div className="flex h-full max-h-screen flex-col gap-2">
                         <div className="flex h-14 items-center justify-center border-b px-4 lg:h-[60px] lg:px-6">
-                            <Link
-                                href="/"
+                            <div
                                 className="flex items-center gap-2 font-semibold"
                             >
                                 <img
@@ -77,7 +76,7 @@ const AdminLayout = ({
                                     className="h-6 w-auto"
                                 />
                                 {/* <span>Acme Inc</span> */}
-                            </Link>
+                            </div>
                         </div>
                         <div className="flex-1 py-1">
                             <Aside />

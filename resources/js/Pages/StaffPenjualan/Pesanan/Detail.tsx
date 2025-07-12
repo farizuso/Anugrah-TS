@@ -196,11 +196,12 @@ const Detail = ({ pesanan }: DetailProps) => {
                                                     <div>
                                                         Sewa:{" "}
                                                         {formatRupiah(100000)} x{" "}
-                                                        {item.durasi}
+                                                        {item.quantity}
                                                     </div>
                                                     <div>
                                                         Gas:{" "}
-                                                        {formatRupiah(hargaGas)}
+                                                        {formatRupiah(hargaGas)} x{" "}
+                                                        {item.quantity}
                                                     </div>
                                                 </div>
                                             ) : (
