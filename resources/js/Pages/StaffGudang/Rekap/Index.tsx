@@ -53,7 +53,7 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
         const produkList = selected.details.map((d) => ({
             produk_id: d.produk.id, // yang benar
             produk_nama: d.produk.nama_produk,
-            tabung: Array(d.quantity).fill(""),
+            tabung: Array(Number(d.quantity)).fill(""),
         }));
             console.log(produkList);
             console.log(selected.details),
