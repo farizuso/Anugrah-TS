@@ -24,7 +24,7 @@ interface RekapProps {
 }
 
 const Index = ({ rekaps, pesanans }: RekapProps) => {
-    console.log(rekaps);
+    // console.log(rekaps);
     const { data, setData, post, processing, reset, errors } = useForm<{
         pesanan_id: number | null; // Correct way to define pesanan_id as a number or null
         status: string;
@@ -48,13 +48,16 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
 
         setData("pesanan_id", selected.id as any);
 
-        console.log(selected);
+        // console.log(selected);
 
         const produkList = selected.details.map((d) => ({
             produk_id: d.produk.id, // yang benar
             produk_nama: d.produk.nama_produk,
             tabung: Array(d.quantity).fill(""),
         }));
+            console.log(produkList);
+            console.log(selected.details),
+
 
         setData("tabung_per_produk", produkList);
     };
@@ -197,6 +200,7 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
                                                                 key={`pesanan-${data.pesanan_id}-produk-${produk.produk_id}-tabung-${j}`}
                                                                 className="mb-2"
                                                             >
+                                                                
                                                                 <Label>
                                                                     Tabung #
                                                                     {j + 1}
