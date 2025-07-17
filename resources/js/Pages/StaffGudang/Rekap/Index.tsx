@@ -55,8 +55,6 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
             produk_nama: d.produk.nama_produk,
             tabung: Array(Number(d.quantity)).fill(""),
         }));
-            console.log(produkList);
-            console.log(selected.details),
 
 
         setData("tabung_per_produk", produkList);
@@ -114,12 +112,10 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
                                     <Label>Pesanan</Label>
                                     <CommandCombobox
                                         options={pesanans.map((p) => ({
-                                            label: `${
-                                                p.nomor_invoice ?? `#${p.id}`
-                                            } - ${
-                                                p.pelanggan?.nama_pelanggan ??
+                                            label: `${p.nomor_invoice ?? `#${p.id}`
+                                                } - ${p.pelanggan?.nama_pelanggan ??
                                                 "-"
-                                            }`,
+                                                }`,
                                             value: p.id.toString(),
                                         }))}
                                         value={
@@ -153,13 +149,13 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
                                                             selectedPesanan?.details
                                                         )
                                                             ? selectedPesanan.details
-                                                                  .map(
-                                                                      (d) =>
-                                                                          d
-                                                                              .produk
-                                                                              .nama_produk
-                                                                  )
-                                                                  .join(", ")
+                                                                .map(
+                                                                    (d) =>
+                                                                        d
+                                                                            .produk
+                                                                            .nama_produk
+                                                                )
+                                                                .join(", ")
                                                             : ""
                                                     }
                                                     readOnly
@@ -200,7 +196,7 @@ const Index = ({ rekaps, pesanans }: RekapProps) => {
                                                                 key={`pesanan-${data.pesanan_id}-produk-${produk.produk_id}-tabung-${j}`}
                                                                 className="mb-2"
                                                             >
-                                                                
+
                                                                 <Label>
                                                                     Tabung #
                                                                     {j + 1}
