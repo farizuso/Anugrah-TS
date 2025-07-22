@@ -58,11 +58,24 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
     },
     {
         accessorKey: "nama_produk",
-        header: "nama produk",
-        cell: ({ row }) =>
-            row.original.pesanan?.details[0]?.produk?.nama_produk ?? "-",
-    },
+        header: "Nama Produk",
+        cell: ({ row }) => {
+            console.log("Row data:", row.original);
+            const details = row.original.pesanan?.details ?? [];
 
+            if (!details.length) return "-";
+
+            return (
+                <ul className="list-disc list-inside">
+                    {details.map((d, index) => (
+                        <li key={index}>
+                            {d.produk?.nama_produk ?? "-"}
+                        </li>
+                    ))}
+                </ul>
+            );
+        },
+    },
     {
         id: "tanggal_keluar",
         accessorFn: (row) =>
