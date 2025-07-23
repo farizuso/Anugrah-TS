@@ -56,26 +56,26 @@ export const rekapColumns: ColumnDef<Rekap>[] = [
         header: "Nomor Tabung",
         cell: ({ row }) => row.original.nomor_tabung ?? "-",
     },
-    {
-        accessorKey: "nama_produk",
-        header: "Nama Produk",
-        cell: ({ row }) => {
-            console.log("Row data:", row.original);
-            const details = row.original.pesanan?.details ?? [];
+    // {
+    //     accessorKey: "nama_produk",
+    //     header: "Nama Produk",
+    //     cell: ({ row }) => {
+    //         console.log("Row data:", row.original);
+    //         const details = row.original.pesanan?.details ?? [];
 
-            if (!details.length) return "-";
+    //         if (!details.length) return "-";
 
-            return (
-                <ul className="list-disc list-inside">
-                    {details.map((d, index) => (
-                        <li key={index}>
-                            {d.produk?.nama_produk ?? "-"}
-                        </li>
-                    ))}
-                </ul>
-            );
-        },
-    },
+    //         return (
+    //             <ul className="list-disc list-inside">
+    //                 {details.map((d, index) => (
+    //                     <li key={index}>
+    //                         {d.produk?.nama_produk ?? "-"}
+    //                     </li>
+    //                 ))}
+    //             </ul>
+    //         );
+    //     },
+    // },
     {
         id: "tanggal_keluar",
         accessorFn: (row) =>
