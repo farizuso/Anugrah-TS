@@ -13,6 +13,9 @@ class LaporanPembelian extends Model
         'tgl_pembelian',
         'supplier_id',
         'total',
+        'ppn',
+        'grand_total',
+        'metode_pembayaran',
         'keterangan',
         'details', // Pastikan details sesuai dengan struktur yang diinginkan
         'status',

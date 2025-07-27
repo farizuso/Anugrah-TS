@@ -1,5 +1,3 @@
-// File: resources/js/Components/LaporanDataTable.tsx
-
 import * as React from "react";
 import {
     useReactTable,
@@ -25,23 +23,15 @@ import {
     TableRow,
 } from "@/Components/ui/table";
 import { Calendar } from "@/Components/ui/calendar";
+import { Pesanan } from "@/types";
 import { formatRupiah } from "@/lib/utils";
 
-interface LaporanDataTableProps<T> {
-    data: T[];
-    columns: ColumnDef<T>[];
-    excelName?: string;
-    excelMap?: (item: T) => Record<string, string | number>;
-    getTotal?: (data: T[]) => number;
+interface PenjualanDataTableProps {
+    data: Pesanan[];
+    columns: ColumnDef<Pesanan>[];
 }
 
-export function LaporanDataTable<T>({
-    data,
-    columns,
-    excelName = "laporan.xlsx",
-    excelMap,
-    getTotal,
-}: LaporanDataTableProps<T>) {
+export function PenjualanDataTable({ data, columns }: PenjualanDataTableProps) {
     const [globalFilter, setGlobalFilter] = React.useState("");
     const [startDate, setStartDate] = React.useState<Date | null>(null);
     const [endDate, setEndDate] = React.useState<Date | null>(null);
@@ -49,17 +39,19 @@ export function LaporanDataTable<T>({
 
     const filteredData = React.useMemo(() => {
         if (!startDate || !endDate) return data;
+
         const start = new Date(startDate.setHours(0, 0, 0, 0));
         const end = new Date(endDate.setHours(23, 59, 59, 999));
-        return data.filter((row: any) => {
-            const date = new Date(row.tgl_pesanan || row.tanggal);
+
+        return data.filter((row) => {
+            const date = new Date(row.tgl_pesanan);
             return date >= start && date <= end;
         });
     }, [data, startDate, endDate]);
 
-    const totalNilai = React.useMemo(() => {
-        return getTotal ? getTotal(filteredData) : 0;
-    }, [filteredData, getTotal]);
+    const totalTagihan = React.useMemo(() => {
+        return filteredData.reduce((total, item) => total + Number(item.total - item.jumlah_terbayar), 0);
+    }, [filteredData]);
 
     const applyQuickFilter = (type: string) => {
         const now = new Date();
@@ -93,16 +85,33 @@ export function LaporanDataTable<T>({
     };
 
     const exportToExcel = () => {
-        const rows = excelMap ? filteredData.map(excelMap) : filteredData;
+        const rows = filteredData.map((item) => ({
+            "Tanggal Pesanan": new Date(item.tgl_pesanan).toLocaleDateString(
+                "id-ID"
+            ),
+            "Nomor Invoice": item.details?.[0]?.nomor_invoice ?? `#${item.id}`,
+            Pelanggan: item.pelanggan?.nama_pelanggan ?? "-",
+            "Total Tagihan": new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+            }).format(item.total),
+            "Jumlah Terbayar": new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+            }).format(item.jumlah_terbayar),
+            Status: item.status,
+            Keterangan: item.keterangan ?? "",
+        }));
+
         const ws = XLSX.utils.json_to_sheet(rows);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan Penjualan");
 
         const getDateStr = (date: Date) => date.toISOString().split("T")[0];
-        let fileName = excelName;
+        let fileName = "laporan_penjualan.xlsx";
 
         if (startDate && endDate) {
-            fileName = `${excelName.replace(".xlsx", "")}_${getDateStr(
+            fileName = `laporan_penjualan_${getDateStr(
                 startDate
             )}_sampai_${getDateStr(endDate)}.xlsx`;
         }
@@ -230,16 +239,14 @@ export function LaporanDataTable<T>({
                 </Table>
             </div>
 
-            {getTotal && (
-                <div className="flex justify-end items-center space-x-4 py-4">
-                    <div className="text-sm font-semibold">
-                        Total:{" "}
-                        <span className="text-green-600">
-                            {formatRupiah(totalNilai)}
-                        </span>
-                    </div>
+            <div className="flex justify-end items-center space-x-4 py-4">
+                <div className="text-sm font-semibold">
+                    Total Tagihan:{" "}
+                    <span className="text-green-600">
+                        {formatRupiah(totalTagihan)}
+                    </span>
                 </div>
-            )}
+            </div>
 
             <div className="flex items-center justify-end space-x-2 py-4">
                 <Button

@@ -385,4 +385,56 @@ class PesananController extends Controller
 
         return redirect()->back()->with('success', 'Data berhasil dihapus.');
     }
+
+    public function barangTerjual(Request $request)
+    {
+        $awal = $request->input('tanggal_awal');
+        $akhir = $request->input('tanggal_akhir');
+
+        $data = PesananDetail::with('produk')
+            ->whereHas('pesanan', function ($q) use ($awal, $akhir) {
+                if ($awal && $akhir) {
+                    $q->whereBetween('tgl_pesanan', [$awal, $akhir]);
+                }
+            })
+            ->select(
+                'produk_id',
+                DB::raw('SUM(quantity) as total_qty'),
+                DB::raw('SUM(harga * quantity) as total_pendapatan')
+            )
+            ->groupBy('produk_id')
+            ->get();
+
+        return inertia('Admin/LaporanBarang/Index', [
+            'laporan' => $data,
+            'tanggal_awal' => $awal,
+            'tanggal_akhir' => $akhir,
+        ]);
+    }
+
+    public function barangPerPelanggan(Request $request)
+    {
+        $awal = $request->input('tanggal_awal');
+        $akhir = $request->input('tanggal_akhir');
+
+        $data = PesananDetail::with(['produk', 'pesanan.pelanggan'])
+            ->whereHas('pesanan', function ($q) use ($awal, $akhir) {
+                if ($awal && $akhir) {
+                    $q->whereBetween('tgl_pesanan', [$awal, $akhir]);
+                }
+            })
+            ->select(
+                'produk_id',
+                'pesanan_id',
+                DB::raw('SUM(quantity) as jumlah_beli')
+            )
+            ->groupBy('produk_id', 'pesanan_id')
+            ->get();
+
+        return inertia('Admin/LaporanPelanggan/Index', [
+            'laporan' => $data,
+            'tanggal_awal' => $awal,
+            'tanggal_akhir' => $akhir,
+        ]);
+    }
 }

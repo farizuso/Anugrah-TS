@@ -7,27 +7,31 @@ use Illuminate\Http\Request;
 use App\Models\Pesanan;
 use App\Models\LaporanPembelian;
 use App\Models\Stok;
+use App\Models\Produk;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Total revenue dari seluruh pesanan
-        $totalRevenue = Pesanan::sum('total');
+        $year = $request->input('year', now()->year);
 
-        // Jumlah pembelian & penjualan dihitung dari jumlah pesanan
-        $totalPurchases = LaporanPembelian::count();
-        $totalSales = Pesanan::count();
+        // Total revenue dari seluruh pesanan tahun tertentu
+        $totalRevenue = Pesanan::whereYear('tgl_pesanan', $year)->sum('total');
 
-        // Total stok
+        // Jumlah pembelian & penjualan dari tahun tersebut
+        $totalPurchases = LaporanPembelian::whereYear('tgl_pembelian', $year)->count();
+        $totalSales = Pesanan::whereYear('tgl_pesanan', $year)->count();
+
+        // Total stok (tidak perlu filter tahun)
         $totalStock = Stok::sum('jumlah_stok');
 
-        // Top 5 pelanggan dengan pembelian terbanyak
+        // Top 5 pelanggan dari pesanan di tahun itu
         $topCustomers = DB::table('pesanans')
             ->join('pelanggans', 'pesanans.pelanggan_id', '=', 'pelanggans.id')
+            ->whereYear('pesanans.tgl_pesanan', $year)
             ->select(
                 'pelanggans.nama_pelanggan as name',
                 'pelanggans.no_hp as phone',
@@ -45,8 +49,9 @@ class DashboardController extends Controller
                 ];
             });
 
-        // Grafik penjualan bulanan
-        $monthlySales = Pesanan::whereNotNull('tgl_pesanan')
+        // Grafik penjualan bulanan dari tahun itu
+        $monthlySales = Pesanan::whereYear('tgl_pesanan', $year)
+            ->whereNotNull('tgl_pesanan')
             ->selectRaw('MONTH(tgl_pesanan) as month, SUM(total) as total')
             ->groupByRaw('MONTH(tgl_pesanan)')
             ->orderByRaw('MONTH(tgl_pesanan)')
@@ -58,8 +63,8 @@ class DashboardController extends Controller
                 ];
             });
 
-        // Data stok terendah
-        $lowStockProducts = \App\Models\Produk::select('produks.nama_produk', 'stoks.jumlah_stok')
+        // Stok terendah tetap (tidak terkait tahun)
+        $lowStockProducts = Produk::select('produks.nama_produk', 'stoks.jumlah_stok')
             ->join('stoks', 'produks.id', '=', 'stoks.produk_id')
             ->orderBy('stoks.jumlah_stok', 'asc')
             ->limit(5)
@@ -71,16 +76,16 @@ class DashboardController extends Controller
                 ];
             });
 
-        // 📊 Pendapatan dan Pengeluaran per Bulan untuk Laba Bersih
+        // 📊 Pendapatan dan Pengeluaran per Bulan dari tahun tersebut
         $monthlyRevenue = DB::table('pesanans')
-            ->whereNotNull('tgl_pesanan')
+            ->whereYear('tgl_pesanan', $year)
             ->selectRaw("DATE_FORMAT(tgl_pesanan, '%Y-%m') as bulan, SUM(total) as total_pendapatan")
             ->groupBy('bulan')
             ->orderBy('bulan')
             ->get();
 
         $monthlyPurchases = DB::table('laporan_pembelians')
-            ->whereNotNull('tgl_pembelian')
+            ->whereYear('tgl_pembelian', $year)
             ->selectRaw("DATE_FORMAT(tgl_pembelian, '%Y-%m') as bulan, SUM(total) as total_pengeluaran")
             ->groupBy('bulan')
             ->orderBy('bulan')
@@ -106,7 +111,7 @@ class DashboardController extends Controller
             $item['laba'] = $item['pendapatan'] - $item['pengeluaran'];
         }
 
-        ksort($monthlyData); // urut berdasarkan bulan
+        ksort($monthlyData);
 
         return Inertia::render('Admin/Dashboard/Index', [
             'totalRevenue' => $totalRevenue,
@@ -116,7 +121,8 @@ class DashboardController extends Controller
             'recentSales' => $topCustomers,
             'monthlySales' => $monthlySales,
             'lowStockProducts' => $lowStockProducts,
-            'monthlyFinance' => array_values($monthlyData), // <- dikirim ke frontend
+            'monthlyFinance' => array_values($monthlyData),
+            'selectedYear' => (int) $year, // Kirim ke frontend
         ]);
     }
 }

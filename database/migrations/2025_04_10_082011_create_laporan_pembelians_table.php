@@ -14,9 +14,12 @@ return new class extends Migration
     {
         Schema::create('laporan_pembelians', function (Blueprint $table) {
             $table->id();
-            $table->date('tgl_pembelian');
+            $table->dateTime('tgl_pembelian');
             $table->foreignId('supplier_id');
+            $table->double('ppn')->default(0); // Hapus `after`
+            $table->double('grand_total')->default(0); // Hapus `after`
             $table->integer('total')->default(0); // bisa nullable jika awalnya tidak langsung dihitung
+            $table->string('metode_pembayaran')->nullable();
             $table->text('keterangan')->nullable();
             $table->string('status')->default('Belum Dikonfirmasi'); // bisa nullable jika awalnya belum dikonfirmasi();
             $table->timestamps();

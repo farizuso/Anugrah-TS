@@ -30,7 +30,10 @@ export interface LaporanPembelian {
     id: number;
     tgl_pembelian: Date;
     supplier: Supplier;
+    ppn: number;
+    grand_total: number;
     total: number;
+    metode_pembayaran: string;
     keterangan: string;
     status: string;
     details: {
@@ -42,6 +45,20 @@ export interface LaporanPembelian {
             nama_produk: string;
         };
     }[];
+}
+
+export interface LaporanBarang {
+    laporan: {
+        produk: { nama_produk: string };
+        jumlah_beli: number;
+        pesanan: {
+            pelanggan: {
+                nama_pelanggan: string;
+            };
+        };
+    }[];
+    tanggal_awal: string;
+    tanggal_akhir: string;
 }
 
 export interface Supplier {

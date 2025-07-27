@@ -67,6 +67,16 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         ),
     },
     {
+        accessorFn: (row) => row.supplier?.no_telp || "-",
+        header: "No_Telp",
+        cell: ({ row }) => (
+            <div className="capitalize">
+                {row.original.supplier?.no_telp || "-"}
+            </div>
+        ),
+    },
+
+    {
         header: "Nama Produk",
         cell: ({ row }) => (
             <div className="space-y-1">
@@ -109,7 +119,7 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         ),
     },
     {
-        header: "Total Harga",
+        header: "Sub Total",
         cell: ({ row }) => {
             const total = row.original.total;
             const formatted = new Intl.NumberFormat("id-ID", {
@@ -130,6 +140,30 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
         },
     },
     {
+        header: "PPN (11%)",
+        cell: ({ row }) => {
+            const ppn = row.original.ppn;
+            return new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+            }).format(ppn);
+        },
+    },
+    {
+        header: "Grand Total",
+        cell: ({ row }) => {
+            const grand = row.original.grand_total;
+            return (
+                <span className="font-bold text-blue-600">
+                    {new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                    }).format(grand)}
+                </span>
+            );
+        },
+    },
+    {
         accessorKey: "keterangan",
         header: "Keterangan",
         cell: ({ row }) => {
@@ -147,6 +181,14 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
             );
         },
     },
+    {
+        header: "Metode Pembayaran",
+        accessorFn: (row) => row.metode_pembayaran || "-",
+        cell: ({ row }) => (
+            <span className="capitalize">{row.original.metode_pembayaran}</span>
+        ),
+    },
+
     {
         accessorKey: "status",
         header: "Status",

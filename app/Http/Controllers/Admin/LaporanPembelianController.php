@@ -81,6 +81,8 @@ class LaporanPembelianController extends Controller
             'produk.*.harga' => 'required|numeric|min:0',
             'produk.*.quantity' => 'required|numeric|min:1',
             'keterangan' => 'nullable|string',
+            'metode_pembayaran' => 'required|in:Tunai,Transfer',
+
         ]);
 
         if ($validator->fails()) {
@@ -92,19 +94,36 @@ class LaporanPembelianController extends Controller
 
         try {
             $validated = $validator->validated();
-            $tglFix = Carbon::parse($validated['tgl_pembelian'])->format('Y-m-d');
+            $tglFix = Carbon::parse($validated['tgl_pembelian'])->setTimezone('Asia/Jakarta')->format('Y-m-d H:i:s');
+
+
 
             DB::transaction(function () use ($validated, $tglFix) {
                 $supplierId = $validated['supplier_id'];
                 $supplier = Supplier::find($supplierId);
 
+                // Hitung total harga
+                $total = collect($validated['produk'])->sum(function ($item) {
+                    return $item['harga'] * $item['quantity'];
+                });
+
+                // Hitung PPN dan Grand Total
+                $ppn = $total * 0.11;
+                $grandTotal = $total + $ppn;
+
+                // Simpan laporan pembelian
                 $pembelian = LaporanPembelian::create([
                     'tgl_pembelian' => $tglFix,
                     'supplier_id' => $supplierId,
                     'keterangan' => $validated['keterangan'] ?? null,
-                    'total' => collect($validated['produk'])->sum(fn($item) => $item['harga'] * $item['quantity']),
+                    'metode_pembayaran' => $validated['metode_pembayaran'],
+                    'total' => $total,
+                    'ppn' => $ppn,
+                    'grand_total' => $grandTotal,
+
                 ]);
 
+                // Simpan detail produk
                 foreach ($validated['produk'] as $item) {
                     LaporanPembelianDetail::create([
                         'laporan_pembelian_id' => $pembelian->id,
@@ -125,6 +144,7 @@ class LaporanPembelianController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menambahkan data: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Update the specified resource in storage.

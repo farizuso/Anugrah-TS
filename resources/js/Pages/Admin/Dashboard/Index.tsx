@@ -6,8 +6,12 @@ import { DollarSign, CreditCard, Activity } from "lucide-react";
 import BarChart from "@/Layouts/partials/aside/BarChart";
 import PageTitle from "@/Layouts/partials/aside/PageTitle";
 import { LowStock, MonthlyFinanceItem, MonthlySales, PageProps } from "@/types";
+import { useState } from "react";
 
 const Dashboard = () => {
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
     const {
         auth,
         totalRevenue = 0,
@@ -18,6 +22,7 @@ const Dashboard = () => {
         monthlySales = [],
         lowStockProducts = [],
         monthlyFinance = [],
+        selectedYear = currentYear,
     } = usePage<
         PageProps & {
             totalRevenue: number;
@@ -32,8 +37,11 @@ const Dashboard = () => {
             monthlySales: MonthlySales[];
             lowStockProducts: LowStock[];
             monthlyFinance: MonthlyFinanceItem[];
+            selectedYear: number;
         }
     >().props;
+
+    const [year, setYear] = useState(selectedYear);
 
     const cardData = [
         {
@@ -78,6 +86,35 @@ const Dashboard = () => {
                 <div className="flex flex-col gap-5 w-full">
                     <PageTitle title="" />
 
+                    {/* Dropdown Filter Tahun */}
+                    <div className="mb-4">
+                        <label
+                            htmlFor="year"
+                            className="text-sm font-medium text-gray-700"
+                        >
+                            Pilih Tahun
+                        </label>
+                        <select
+                            id="year"
+                            value={year}
+                            onChange={(e) => {
+                                const y = parseInt(e.target.value);
+                                setYear(y);
+                                window.location.href = route(
+                                    "admin.dashboard.index",
+                                    { year: y }
+                                );
+                            }}
+                            className="mt-1 block w-32 rounded-md border-gray-300 shadow-sm"
+                        >
+                            {years.map((y) => (
+                                <option key={y} value={y}>
+                                    {y}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
                     {/* Cards Section */}
                     <section className="grid w-full grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2 xl:grid-cols-4">
                         {cardData.map((d, i) => (
@@ -102,13 +139,13 @@ const Dashboard = () => {
                         ))}
                     </section>
 
-                    {/* 🔻 Ringkasan Keuangan Bulanan */}
+                    {/* Ringkasan Keuangan Bulanan */}
                     <section>
                         <Card>
                             <CardContent className="flex flex-col gap-4">
                                 <section>
                                     <p className="font-semibold">
-                                        Ringkasan Keuangan Bulanan
+                                        Ringkasan Keuangan Bulanan ({year})
                                     </p>
                                     <p className="text-sm text-gray-400">
                                         Menampilkan pendapatan, pengeluaran, dan
@@ -207,7 +244,7 @@ const Dashboard = () => {
                         <Card>
                             <CardContent>
                                 <p className="text-sm text-gray-400">
-                                    Grafik Penjualan Bulanan
+                                    Grafik Penjualan Bulanan ({year})
                                 </p>
                                 <BarChart data={monthlySales} />
                             </CardContent>

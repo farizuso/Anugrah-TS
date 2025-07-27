@@ -55,13 +55,19 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
         produk: [{ produk_id: "", harga: "", quantity: "" }],
         total: 0,
         keterangan: "",
+        ppn: 0,
+        grand_total: 0,
+        metode_pembayaran: "",
         status: "",
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        const formattedDate = format(data.tgl_pembelian, "yyyy-MM-dd");
+        const localTime = new Date();
+        const formattedDate = `${localTime.getFullYear()}-${
+            localTime.getMonth() + 1
+        }-${localTime.getDate()} ${localTime.getHours()}:${localTime.getMinutes()}:00`;
 
         post(route("admin.laporanpembelian.store"), {
             data: {
@@ -75,7 +81,10 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                     supplier_id: "",
                     produk: [{ produk_id: "", harga: "", quantity: "" }],
                     total: 0,
+                    ppn: 0,
+                    grand_total: 0,
                     keterangan: "",
+                    metode_pembayaran: "",
                     status: "",
                 });
                 setSelectedSupplier(null);
@@ -163,6 +172,9 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
         }, 0);
         setData("total", totalHarga);
     }, [data.produk]);
+
+    const ppn = data.total * 0.11;
+    const grandTotal = data.total + ppn;
 
     return (
         <AdminLayout>
@@ -312,13 +324,31 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                                 </Button>
 
                                 <div className="space-y-1">
-                                    <Label>Total</Label>
+                                    <Label>Sub Total</Label>
                                     <Input
                                         type="text"
                                         value={formatRupiah(data.total)}
                                         readOnly
                                     />
                                 </div>
+
+                                <div className="space-y-1">
+                                    <Label>PPN 11%</Label>
+                                    <Input
+                                        type="text"
+                                        value={formatRupiah(ppn)}
+                                        readOnly
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label>Grand Total</Label>
+                                    <Input
+                                        type="text"
+                                        value={formatRupiah(grandTotal)}
+                                        readOnly
+                                    />
+                                </div>
+
                                 <div>
                                     <Label className="mb-1 block">
                                         Keterangan Pembayaran
@@ -344,6 +374,35 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                                     {errors.keterangan && (
                                         <p className="text-sm text-red-500">
                                             {errors.keterangan}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <Label className="mb-1 block">
+                                        Metode Pembayaran
+                                    </Label>
+                                    <Select
+                                        value={data.metode_pembayaran}
+                                        onValueChange={(value) =>
+                                            setData("metode_pembayaran", value)
+                                        }
+                                    >
+                                        <SelectTrigger className="w-[200px]">
+                                            <SelectValue placeholder="Pilih metode pembayaran" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Tunai">
+                                                Tunai
+                                            </SelectItem>
+                                            <SelectItem value="Transfer">
+                                                Transfer
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.metode_pembayaran && (
+                                        <p className="text-sm text-red-500">
+                                            {errors.metode_pembayaran}
                                         </p>
                                     )}
                                 </div>
