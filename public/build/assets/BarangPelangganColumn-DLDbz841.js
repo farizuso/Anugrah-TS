@@ -1,0 +1,1 @@
+import{f as e}from"./utils-DszqnmLP.js";import"./format-E3oY-FzV.js";const o=[{accessorKey:"tgl_pesanan",header:"Tanggal Pesanan",cell:({row:a})=>e(a.original.tgl_pesanan)},{accessorKey:"nama_pelanggan",header:"Nama Pelanggan"},{accessorKey:"nama_produk",header:"Nama Produk"},{accessorKey:"jumlah_beli",header:"Jumlah Beli"}];export{o as BarangPelangganColumns};

@@ -391,18 +391,20 @@ class PesananController extends Controller
         $awal = $request->input('tanggal_awal');
         $akhir = $request->input('tanggal_akhir');
 
-        $data = PesananDetail::with('produk')
-            ->whereHas('pesanan', function ($q) use ($awal, $akhir) {
-                if ($awal && $akhir) {
-                    $q->whereBetween('tgl_pesanan', [$awal, $akhir]);
-                }
+        $data = PesananDetail::join('pesanans', 'pesanan_details.pesanan_id', '=', 'pesanans.id')
+            ->join('produks', 'pesanan_details.produk_id', '=', 'produks.id')
+            ->when($awal && $akhir, function ($query) use ($awal, $akhir) {
+                $query->whereBetween('pesanans.tgl_pesanan', [$awal, $akhir]);
             })
             ->select(
-                'produk_id',
-                DB::raw('SUM(quantity) as total_qty'),
-                DB::raw('SUM(harga * quantity) as total_pendapatan')
+                'pesanan_details.produk_id',
+                'produks.nama_produk',
+                'pesanans.tgl_pesanan',
+                DB::raw('SUM(pesanan_details.quantity) as total_qty'),
+                DB::raw('SUM(pesanan_details.harga * pesanan_details.quantity) as total_pendapatan')
             )
-            ->groupBy('produk_id')
+            ->groupBy('pesanan_details.produk_id', 'produks.nama_produk', 'pesanans.tgl_pesanan')
+            ->orderBy('pesanans.tgl_pesanan', 'asc')
             ->get();
 
         return inertia('Admin/LaporanBarang/Index', [
@@ -417,22 +419,27 @@ class PesananController extends Controller
         $awal = $request->input('tanggal_awal');
         $akhir = $request->input('tanggal_akhir');
 
-        $data = PesananDetail::with(['produk', 'pesanan.pelanggan'])
-            ->whereHas('pesanan', function ($q) use ($awal, $akhir) {
-                if ($awal && $akhir) {
-                    $q->whereBetween('tgl_pesanan', [$awal, $akhir]);
-                }
+        $query = PesananDetail::query()
+            ->join('pesanans', 'pesanan_details.pesanan_id', '=', 'pesanans.id')
+            ->join('produks', 'pesanan_details.produk_id', '=', 'produks.id')
+            ->join('pelanggans', 'pesanans.pelanggan_id', '=', 'pelanggans.id')
+            ->when($awal && $akhir, function ($q) use ($awal, $akhir) {
+                $q->whereDate('pesanans.tgl_pesanan', '>=', $awal)
+                    ->whereDate('pesanans.tgl_pesanan', '<=', $akhir);
             })
             ->select(
                 'produk_id',
                 'pesanan_id',
-                DB::raw('SUM(quantity) as jumlah_beli')
+                'produks.nama_produk',
+                'pelanggans.nama_pelanggan',
+                'pesanans.tgl_pesanan',
+                DB::raw('SUM(pesanan_details.quantity) as jumlah_beli')
             )
-            ->groupBy('produk_id', 'pesanan_id')
+            ->groupBy('produk_id', 'pesanan_id', 'produks.nama_produk', 'pelanggans.nama_pelanggan', 'pesanans.tgl_pesanan')
             ->get();
 
         return inertia('Admin/LaporanPelanggan/Index', [
-            'laporan' => $data,
+            'laporan' => $query,
             'tanggal_awal' => $awal,
             'tanggal_akhir' => $akhir,
         ]);

@@ -56,6 +56,7 @@ export function LaporanDataTable<T>({
             return date >= start && date <= end;
         });
     }, [data, startDate, endDate]);
+    console.log(data);
 
     const totalNilai = React.useMemo(() => {
         return getTotal ? getTotal(filteredData) : 0;

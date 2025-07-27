@@ -28,13 +28,6 @@ class LaporanPembelianController extends Controller
     {
         $posts = LaporanPembelian::with(['details.produk', 'supplier'])->get();
 
-        // Pastikan tgl_pembelian adalah objek Date
-        $posts->transform(function ($post) {
-            $post->tgl_pembelian = Carbon::parse($post->tgl_pembelian)->format('Y-m-d');
-
-            return $post;
-        });
-
         return Inertia::render('Admin/LaporanPembelian/Index', [
             'posts' => $posts
         ]);

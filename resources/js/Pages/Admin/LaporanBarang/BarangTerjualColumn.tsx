@@ -1,18 +1,27 @@
 // File: resources/js/Pages/Admin/BarangTerjualColumn.tsx
 
+import { formatRupiah, formatTanggalIndonesia, formatTanggalIndonesiaTok } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 
 export type BarangTerjual = {
-    produk: { nama_produk: string };
+    nama_produk: string;
     total_qty: number;
     total_pendapatan: number;
+    tgl_pesanan?: string;
+
 };
 
 export const BarangTerjualColumns: ColumnDef<BarangTerjual>[] = [
     {
-        accessorKey: "produk.nama_produk",
+        accessorKey: "tgl_pesanan",
+        header: "Tanggal Pesanan",
+        cell: ({ row }) => row.original.tgl_pesanan ? formatTanggalIndonesiaTok(row.original.tgl_pesanan) : "-",
+
+    },
+    {
+        accessorKey: "nama_produk",
         header: "Nama Produk",
-        cell: ({ row }) => row.original.produk.nama_produk,
+        cell: ({ row }) => row.original.nama_produk,
     },
     {
         accessorKey: "total_qty",
@@ -23,11 +32,7 @@ export const BarangTerjualColumns: ColumnDef<BarangTerjual>[] = [
         accessorKey: "total_pendapatan",
         header: "Pendapatan",
         cell: ({ row }) => {
-            const nilai = row.original.total_pendapatan;
-            return new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
-            }).format(nilai);
+            return formatRupiah(row.original.total_pendapatan);
         },
     },
 ];

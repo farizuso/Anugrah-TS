@@ -1,6 +1,3 @@
-// File: resources/js/Pages/Admin/LaporanBarangTerjual.tsx
-
-import React from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { LaporanDataTable } from "@/Components/LaporanDataTable";
@@ -30,13 +27,13 @@ const LaporanBarangTerjual = ({
                         columns={BarangTerjualColumns}
                         excelName="laporan_barang_terjual.xlsx"
                         excelMap={(item) => ({
-                            "Nama Produk": item.produk.nama_produk,
+                            "Nama Produk": item.nama_produk,
                             "Total Terjual": item.total_qty,
                             Pendapatan: item.total_pendapatan,
                         })}
                         getTotal={(data) =>
                             data.reduce(
-                                (total, item) => total + item.total_pendapatan,
+                                (total, item) => total + Number(item.total_pendapatan),
                                 0
                             )
                         }

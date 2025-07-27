@@ -39,7 +39,7 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
     {
         id: "tgl_pembelian",
         accessorFn: (row) =>
-            formatTanggalIndonesia(row.tgl_pembelian.toString()), // hasil string misalnya "18 Mei 2025"
+            formatTanggalIndonesia(row.tgl_pembelian.toString()), // contoh hasil: "18 Mei 2025 14:30"
         header: ({ column }) => (
             <Button
                 variant="default"
@@ -47,15 +47,17 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
                     column.toggleSorting(column.getIsSorted() === "asc")
                 }
             >
-                Tgl. pembelian
+                Tgl. Pembelian
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("tgl_pembelian")}</div>
-        ),
+        cell: ({ row }) => {
+            console.log("Tanggal mentah:", row.original.tgl_pembelian);
+            return <div className="capitalize">{row.getValue("tgl_pembelian")}</div>;
+        },
         enableGlobalFilter: true,
-        filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching
+        filterFn: "includesString",
+
     },
     {
         accessorFn: (row) => row.supplier?.nama_supplier || "-",
@@ -172,8 +174,8 @@ export const PembelianColumns: ColumnDef<LaporanPembelian>[] = [
                 status === "lunas"
                     ? "text-green-600 font-semibold"
                     : status === "belum lunas"
-                    ? "text-red-600 font-semibold"
-                    : "text-gray-700";
+                        ? "text-red-600 font-semibold"
+                        : "text-gray-700";
             return (
                 <div className={`capitalize ${className}`}>
                     {row.original.keterangan}

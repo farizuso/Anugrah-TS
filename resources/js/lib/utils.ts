@@ -16,16 +16,14 @@ export function getFirstWord(value: string) {
     return value.split(" ")[0];
 }
 
-export function formatTanggalIndonesia(
-    dateStr: string,
-    withTime = false
-): string {
-    return formatInTimeZone(
-        dateStr,
-        "Asia/Jakarta",
-        withTime ? "dd MMMM yyyy HH:mm" : "dd MMMM yyyy",
-        { locale: id }
-    );
+export function formatTanggalIndonesia(tanggal: string | Date) {
+    // console.log("formatTanggalIndonesia menerima:", tanggal);
+    return formatInTimeZone(tanggal, 'Asia/Jakarta', "dd MMMM yyyy HH:mm", { locale: id });
+}
+
+export function formatTanggalIndonesiaTok(tanggal: string | Date) {
+    // console.log("formatTanggalIndonesia menerima:", tanggal);
+    return formatInTimeZone(tanggal, 'Asia/Jakarta', "dd MMMM yyyy", { locale: id });
 }
 
 export function formatRupiah(value: number): string {

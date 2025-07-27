@@ -1,30 +1,32 @@
 // File: resources/js/Pages/Admin/BarangPelangganColumn.tsx
 
+import { formatTanggalIndonesiaTok } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 
 export type BarangPelanggan = {
-    produk: { nama_produk: string };
+    nama_pelanggan: string;
+    nama_produk: string;
     jumlah_beli: number;
-    pesanan: {
-        pelanggan: { nama_pelanggan: string };
-    };
+    tgl_pesanan: string;
 };
 
 export const BarangPelangganColumns: ColumnDef<BarangPelanggan>[] = [
     {
-        accessorKey: "pesanan.pelanggan.nama_pelanggan",
-        header: "Nama Pelanggan",
-        cell: ({ row }) =>
-            row.original.pesanan.pelanggan?.nama_pelanggan || "-",
+        accessorKey: "tgl_pesanan",
+        header: "Tanggal Pesanan",
+        cell: ({ row }) => formatTanggalIndonesiaTok(row.original.tgl_pesanan),
     },
     {
-        accessorKey: "produk.nama_produk",
+        accessorKey: "nama_pelanggan",
+        header: "Nama Pelanggan",
+    },
+    {
+        accessorKey: "nama_produk",
         header: "Nama Produk",
-        cell: ({ row }) => row.original.produk.nama_produk,
     },
     {
         accessorKey: "jumlah_beli",
         header: "Jumlah Beli",
-        cell: ({ row }) => row.original.jumlah_beli,
     },
 ];
+

@@ -7,18 +7,11 @@ import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { DataTable } from "@/Components/DataTable";
-import { BarangPelangganColumns } from "./BarangPelangganColumn";
+import { BarangPelanggan, BarangPelangganColumns } from "./BarangPelangganColumn";
+import { LaporanDataTable } from "@/Components/LaporanDataTable";
 
 interface Props {
-    laporan: {
-        produk: { nama_produk: string };
-        jumlah_beli: number;
-        pesanan: {
-            pelanggan: {
-                nama_pelanggan: string;
-            };
-        };
-    }[];
+    laporan: BarangPelanggan[];
     tanggal_awal: string;
     tanggal_akhir: string;
 }
@@ -40,7 +33,7 @@ const LaporanBarangPelanggan = ({
 
     return (
         <AdminLayout>
-            <DataTable columns={BarangPelangganColumns} data={laporan} />
+            <LaporanDataTable columns={BarangPelangganColumns} data={laporan} />
         </AdminLayout>
     );
 };

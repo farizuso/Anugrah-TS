@@ -38,6 +38,9 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { CommandCombobox } from "@/Components/ui/CommandCombobox";
+import { formatInTimeZone } from "date-fns-tz";
+
+
 
 interface LaporanPembelianProps {
     posts: LaporanPembelian[];
@@ -65,9 +68,8 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
         e.preventDefault();
 
         const localTime = new Date();
-        const formattedDate = `${localTime.getFullYear()}-${
-            localTime.getMonth() + 1
-        }-${localTime.getDate()} ${localTime.getHours()}:${localTime.getMinutes()}:00`;
+        const formattedDate = formatInTimeZone(data.tgl_pembelian, 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
+
 
         post(route("admin.laporanpembelian.store"), {
             data: {
@@ -207,40 +209,17 @@ const TabsDemo = ({ posts, produks, suppliers }: LaporanPembelianProps) => {
                             <CardContent className="space-y-4">
                                 <div className="space-y-1">
                                     <Label>Tanggal Pembelian</Label>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !data.tgl_pembelian &&
-                                                        "text-muted-foreground"
-                                                )}
-                                            >
-                                                {data.tgl_pembelian
-                                                    ? format(
-                                                          data.tgl_pembelian,
-                                                          "yyyy-MM-dd"
-                                                      )
-                                                    : "Pilih Tanggal"}
-                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={data.tgl_pembelian}
-                                                onSelect={(date) => {
-                                                    if (date) {
-                                                        setData(
-                                                            "tgl_pembelian",
-                                                            date
-                                                        );
-                                                    }
-                                                }}
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
+                                    <div className="space-y-1">
+                                        <Label>Tanggal & Waktu Pembelian</Label>
+                                        <Input
+                                            type="datetime-local"
+                                            value={format(data.tgl_pembelian, "yyyy-MM-dd'T'HH:mm")}
+                                            onChange={(e) => {
+                                                const value = new Date(e.target.value);
+                                                setData("tgl_pembelian", value);
+                                            }}
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="flex flex-col gap-2">

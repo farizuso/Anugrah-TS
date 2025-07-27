@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
 
 class LaporanPembelian extends Model
 {
@@ -23,12 +26,17 @@ class LaporanPembelian extends Model
     ];
 
     protected $casts = [
-        'tgl_pembelian' => 'date',  // Menggunakan tipe date di sini
+        'tgl_pembelian' => 'datetime',
     ];
 
-    /**
-     * Relasi dengan Supplier
-     */
+    // protected function tglPembelian(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn($value) => Carbon::parse($value)->timezone('Asia/Jakarta'),
+    //     );
+    // }
+
+
     public function details()
     {
         return $this->hasMany(LaporanPembelianDetail::class, 'laporan_pembelian_id');
