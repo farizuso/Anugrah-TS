@@ -31,6 +31,7 @@ class ProductController extends Controller
                 'nama_produk' => 'required',
                 'simbol' => 'required',
                 'kategori' => 'required',
+                'berat' => 'required',
                 'harga_jual' => 'required',
             ]);
 
@@ -84,6 +85,7 @@ class ProductController extends Controller
             'nama_produk' => $request->nama_produk,
             'simbol' => $request->simbol,
             'kategori' => $request->kategori,
+            'berat' => $request->berat,
             'harga_jual' => $request->harga_jual
         ]);
         return redirect()->route('admin.produk.index')->with('success', 'data Produk berhasil diubah');

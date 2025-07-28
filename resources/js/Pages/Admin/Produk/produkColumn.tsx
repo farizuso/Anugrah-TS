@@ -86,6 +86,23 @@ export const produkColumns: ColumnDef<Produk>[] = [
         ),
     },
     {
+        accessorKey: "berat",
+        header: ({ column }) => (
+            <Button
+                variant="grey"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
+            >
+                Satuan / Berat
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => (
+            <div className="capitalize">{row.getValue("berat")}</div>
+        ),
+    },
+    {
         id: "jumlah_stok",
         header: ({ column }) => (
             <Button

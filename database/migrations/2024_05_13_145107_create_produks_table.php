@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama_produk');
             $table->string('simbol');
             $table->string('kategori');
+            $table->string('berat');
             $table->integer('harga_jual');
             $table->timestamps();
         });

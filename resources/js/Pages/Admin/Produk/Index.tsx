@@ -39,6 +39,7 @@ const TabsDemo = ({ posts }: ProdukProps) => {
         nama_produk: "",
         simbol: "",
         kategori: "",
+        berat: "",
         harga_jual: "",
     });
 
@@ -130,6 +131,19 @@ const TabsDemo = ({ posts }: ProdukProps) => {
                                         }
                                         value={data.kategori}
                                         placeholder="Masukkan kategori produk"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="new">Berat</Label>
+                                    <Input
+                                        id="new"
+                                        type="text"
+                                        name="berat"
+                                        onChange={(e) =>
+                                            setData("berat", e.target.value)
+                                        }
+                                        value={data.berat}
+                                        placeholder="Masukkan berat produk"
                                     />
                                 </div>
                                 <div className="space-y-1">

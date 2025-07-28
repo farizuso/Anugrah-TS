@@ -114,6 +114,7 @@ export interface Produk {
     nama_produk: string;
     simbol: string;
     kategori: string;
+    berat: string;
     harga_jual: number;
     stok?: Stok | null;
 }

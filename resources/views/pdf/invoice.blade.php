@@ -152,7 +152,7 @@
                 {{ $item->produk->nama_produk }}<br>
                 <small><em>{{ ucfirst($item->tipe_item) }}{{ $item->tipe_item === 'sewa' ? ' - ' . $item->durasi . ' bln' : '' }}</em></small>
             </td>
-            <td>{{ $item->quantity }} tabung</td>
+           <td>{{ $item->quantity }} tabung / {{ $item->produk->berat }}</td>
             <td>
                 @if($item->tipe_item === 'sewa')
                     <small>

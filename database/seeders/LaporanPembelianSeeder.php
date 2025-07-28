@@ -18,11 +18,11 @@ class LaporanPembelianSeeder extends Seeder
             $this->call(SupplierSeeder::class);
         }
 
-        // Ambil produk yang sudah ada dari ProdukSeeder
+        // Ambil produk dan supplier
         $produks = Produk::all();
         $suppliers = Supplier::all();
 
-        // Daftar harga tetap berdasarkan nama_produk dari ProdukSeeder
+        // Daftar harga tetap berdasarkan nama_produk
         $hargaTetap = [
             'oxygen' => 35000,
             'karbon dioksida' => 150000,
@@ -36,15 +36,23 @@ class LaporanPembelianSeeder extends Seeder
 
         // Buat 5 laporan pembelian acak
         foreach (range(1, 5) as $i) {
-            $tgl = Carbon::now()->subDays(rand(1, 30))->format('Y-m-d');
+            $tgl = Carbon::now()
+                ->subDays(rand(1, 30))
+                ->setTime(rand(8, 17), rand(0, 59)) // random jam
+                ->format('Y-m-d H:i:s');
+
             $supplier = $suppliers->random();
             $keterangan = rand(0, 1) ? 'Lunas' : 'Belum Lunas';
+            $metodePembayaran = rand(0, 1) ? 'Tunai' : 'Transfer';
 
             $pembelian = LaporanPembelian::create([
                 'tgl_pembelian' => $tgl,
                 'supplier_id' => $supplier->id,
                 'keterangan' => $keterangan,
-                'total' => 0,
+                'metode_pembayaran' => $metodePembayaran,
+                'total' => 0, // sementara
+                'ppn' => 0,
+                'grand_total' => 0,
             ]);
 
             $total = 0;
@@ -64,7 +72,14 @@ class LaporanPembelianSeeder extends Seeder
                 $total += $harga * $qty;
             }
 
-            $pembelian->update(['total' => $total]);
+            $ppn = $total * 0.11;
+            $grandTotal = $total + $ppn;
+
+            $pembelian->update([
+                'total' => $total,
+                'ppn' => $ppn,
+                'grand_total' => $grandTotal,
+            ]);
         }
     }
 }

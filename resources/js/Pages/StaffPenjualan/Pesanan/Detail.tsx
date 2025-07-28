@@ -200,8 +200,8 @@ const Detail = ({ pesanan }: DetailProps) => {
                                                     </div>
                                                     <div>
                                                         Gas:{" "}
-                                                        {formatRupiah(hargaGas)} x{" "}
-                                                        {item.quantity}
+                                                        {formatRupiah(hargaGas)}{" "}
+                                                        x {item.quantity}
                                                     </div>
                                                 </div>
                                             ) : (
@@ -243,7 +243,6 @@ const Detail = ({ pesanan }: DetailProps) => {
                         <SelectContent>
                             <SelectItem value="tunai">Tunai</SelectItem>
                             <SelectItem value="transfer">Transfer</SelectItem>
-                            <SelectItem value="cicilan">Cicilan</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

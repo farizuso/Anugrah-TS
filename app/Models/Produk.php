@@ -13,8 +13,8 @@ class Produk extends Model
         'nama_produk',
         'simbol',
         'kategori',
+        'berat',
         'harga_jual',
-        // 'jenis',
     ];
 
     public function rekaps()

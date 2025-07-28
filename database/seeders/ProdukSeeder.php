@@ -19,6 +19,7 @@ class ProdukSeeder extends Seeder
                 'nama_produk' => "nitrogen",
                 'simbol' => "N",
                 'kategori' => "gas",
+                'berat' => "80 KG",
                 'harga_jual' => 170000,
             ],
             [
@@ -26,6 +27,7 @@ class ProdukSeeder extends Seeder
                 'nama_produk' => "oxygen",
                 'simbol' => "O",
                 'kategori' => "gas",
+                'berat' => "80 KG",
                 'harga_jual' => 100000,
             ],
             [
@@ -33,6 +35,7 @@ class ProdukSeeder extends Seeder
                 'nama_produk' => "argon",
                 'simbol' => "Ar",
                 'kategori' => "gas",
+                'berat' => "80 KG",
                 'harga_jual' => 350000,
             ],
             [
@@ -40,6 +43,7 @@ class ProdukSeeder extends Seeder
                 'nama_produk' => "asitilen",
                 'simbol' => "C2H2",
                 'kategori' => "gas",
+                'berat' => "90 KG",
                 'harga_jual' => 500000,
             ],
             [
@@ -47,6 +51,7 @@ class ProdukSeeder extends Seeder
                 'nama_produk' => "karbon dioksida",
                 'simbol' => "CO2",
                 'kategori' => "gas",
+                'berat' => "100 KG",
                 'harga_jual' => 200000,
             ],
             [
@@ -54,6 +59,7 @@ class ProdukSeeder extends Seeder
                 'nama_produk' => "LPG",
                 'simbol' => "LPG",
                 'kategori' => "gas",
+                'berat' => "50 KG",
                 'harga_jual' => 850000,
             ],
             [
@@ -61,6 +67,7 @@ class ProdukSeeder extends Seeder
                 'nama_produk' => "regulator",
                 'simbol' => "-",
                 'kategori' => "aksesoris",
+                'berat' => "pcs",
                 'harga_jual' => 150000,
             ],
             [
@@ -68,6 +75,7 @@ class ProdukSeeder extends Seeder
                 'nama_produk' => "non-breathing mask",
                 'simbol' => "-",
                 'kategori' => "aksesoris",
+                'berat' => "pcs",
                 'harga_jual' => 25000,
             ],
         ];
