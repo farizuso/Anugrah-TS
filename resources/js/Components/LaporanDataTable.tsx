@@ -52,7 +52,7 @@ export function LaporanDataTable<T>({
         const start = new Date(startDate.setHours(0, 0, 0, 0));
         const end = new Date(endDate.setHours(23, 59, 59, 999));
         return data.filter((row: any) => {
-            const date = new Date(row.tgl_pesanan || row.tanggal);
+            const date = new Date(row.tgl_pesanan || row.tgl_pembelian || row.tanggal);
             return date >= start && date <= end;
         });
     }, [data, startDate, endDate]);

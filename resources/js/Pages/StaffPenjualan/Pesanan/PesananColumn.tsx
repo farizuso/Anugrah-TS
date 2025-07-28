@@ -10,7 +10,7 @@ import Delete from "./Delete";
 import Edit from "./Edit";
 import Detail from "./Detail";
 import { Link } from "@inertiajs/react";
-import { formatTanggalIndonesia } from "@/lib/utils";
+import { formatTanggalIndonesia, formatTanggalIndonesiaTok } from "@/lib/utils";
 
 // Gunakan parameter opsional + default fallback
 export const PesananColumns: ColumnDef<Pesanan>[] = [
@@ -53,7 +53,7 @@ export const PesananColumns: ColumnDef<Pesanan>[] = [
             </Button>
         ),
         cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("tgl_pesanan")}</div>
+            <div className="capitalize">{formatTanggalIndonesiaTok(row.original.tgl_pesanan.toString())}</div>
         ),
         enableGlobalFilter: true,
         filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching

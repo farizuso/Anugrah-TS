@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { router } from "@inertiajs/react";
 import { Link } from "@inertiajs/react";
-import { formatTanggalIndonesia } from "@/lib/utils";
+import { formatTanggalIndonesia, formatTanggalIndonesiaTok } from "@/lib/utils";
 
 // Gunakan parameter opsional + default fallback
 export const PenjualanColumns: ColumnDef<Pesanan>[] = [
@@ -50,7 +50,7 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
             </Button>
         ),
         cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("tgl_pesanan")}</div>
+            <div className="capitalize">{formatTanggalIndonesiaTok(row.original.tgl_pesanan.toString())}</div>
         ),
         enableGlobalFilter: true,
         filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching

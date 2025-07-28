@@ -24,14 +24,29 @@ class LaporanPembelianController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = LaporanPembelian::with(['details.produk', 'supplier'])->get();
+        $awal = $request->input('tanggal_awal');
+        $akhir = $request->input('tanggal_akhir');
+
+        $query = LaporanPembelian::with(['details.produk', 'supplier']);
+
+        if ($awal && $akhir) {
+            $start = Carbon::parse($awal)->startOfDay();
+            $end = Carbon::parse($akhir)->endOfDay();
+
+            $query->whereBetween('tgl_pembelian', [$start, $end]);
+        }
+
+        $posts = $query->get();
 
         return Inertia::render('Admin/LaporanPembelian/Index', [
-            'posts' => $posts
+            'posts' => $posts,
+            'tanggal_awal' => $awal,
+            'tanggal_akhir' => $akhir
         ]);
     }
+
 
     public function getLaporanPembelianGudang()
     {
