@@ -28,7 +28,7 @@ class PesananController extends Controller
 
         // Pastikan tgl_pembelian adalah objek Date
         $posts->transform(function ($post) {
-            $post->tgl_pesanan = Carbon::parse($post->tgl_pesanan)->format('Y-m-d');
+            $post->tgl_pesanan = Carbon::parse($post->tgl_pesanan)->format('Y-m-d H:i:s');
 
             return $post;
         });

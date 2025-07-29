@@ -53,7 +53,7 @@ export const PenjualanColumns: ColumnDef<Pesanan>[] = [
             </Button>
         ),
         cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("tgl_pesanan")}</div>
+            <div className="capitalize">{formatTanggalIndonesia(row.original.tgl_pesanan.toString())}</div>
         ),
         enableGlobalFilter: true,
         filterFn: "includesString", // atau "fuzzy" jika kamu pakai fuzzy matching

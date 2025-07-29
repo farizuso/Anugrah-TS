@@ -27,7 +27,7 @@ class Pesanan extends Model
 
 
     protected $casts = [
-        'tgl_pesanan' => 'date',
+        'tgl_pesanan' => 'datetime',
     ];
 
     public function pelanggan()

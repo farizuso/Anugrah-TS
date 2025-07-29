@@ -15,7 +15,7 @@ export const BarangTerjualColumns: ColumnDef<BarangTerjual>[] = [
     {
         accessorKey: "tgl_pesanan",
         header: "Tanggal Pesanan",
-        cell: ({ row }) => row.original.tgl_pesanan ? formatTanggalIndonesiaTok(row.original.tgl_pesanan) : "-",
+        cell: ({ row }) => row.original.tgl_pesanan ? formatTanggalIndonesia(row.original.tgl_pesanan) : "-",
 
     },
     {

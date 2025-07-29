@@ -5,7 +5,7 @@ import { Pembayaran, Pesanan, Produk } from "@/types";
 import { addMonths, format } from "date-fns";
 
 import AdminLayout from "@/Layouts/AdminLayout";
-import { formatRupiah } from "@/lib/utils";
+import { formatRupiah, formatTanggalIndonesia } from "@/lib/utils";
 
 interface DetailProps {
     pesanan: Pesanan;
@@ -63,10 +63,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                         <p>
                             Tanggal pesanan:{" "}
                             <strong>
-                                {format(
-                                    new Date(pesanan.tgl_pesanan),
-                                    "dd MMM yyyy"
-                                )}
+                                {formatTanggalIndonesia(pesanan.tgl_pesanan)}
                             </strong>
                         </p>
                         <p>

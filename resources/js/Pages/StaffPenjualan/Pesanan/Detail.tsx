@@ -13,7 +13,7 @@ import {
 import ConfirmPembayaran from "@/Components/ConfirmPembayaran";
 import { router } from "@inertiajs/react";
 import { Pembayaran, Pesanan } from "@/types";
-import { formatRupiah } from "@/lib/utils";
+import { formatRupiah, formatTanggalIndonesia } from "@/lib/utils";
 
 interface DetailProps {
     pesanan: Pesanan;
@@ -76,10 +76,7 @@ const Detail = ({ pesanan }: DetailProps) => {
                         <p>
                             Tanggal pesanan:{" "}
                             <strong>
-                                {format(
-                                    new Date(pesanan.tgl_pesanan),
-                                    "dd MMM yyyy"
-                                )}
+                                {formatTanggalIndonesia(pesanan.tgl_pesanan)}
                             </strong>
                         </p>
                         <p>
