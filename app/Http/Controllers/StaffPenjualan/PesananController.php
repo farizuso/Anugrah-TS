@@ -94,10 +94,13 @@ class PesananController extends Controller
 
             $lastId = Pesanan::max('id') + 1;
             $nomorInvoice = 'INV-' . now()->format('Ymd') . '-' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
+            $tgl_pesanan = Carbon::parse($request->tgl_pesanan)
+                ->setTimezone('Asia/Jakarta')
+                ->format('Y-m-d H:i:s');
 
             $pesanan = Pesanan::create([
                 'nomor_invoice' => $nomorInvoice,
-                'tgl_pesanan' => $request->tgl_pesanan,
+                'tgl_pesanan' => $tgl_pesanan,
                 'pelanggan_id' => $request->pelanggan_id,
                 'total' => $total,
                 'jenis_pesanan' => 'campuran',
